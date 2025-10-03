@@ -9,6 +9,7 @@ import { Deals } from "./landing_pages/deals";
 import { Register } from "./pages/sign_up";
 import { Login } from "./pages/sign_in";
 import { Provider } from "./services/provider";
+import { ForgetPassword } from "./pages/forget_password";
 import { NewProduct } from "./landing_pages/new_product";
 import { Package } from "./landing_pages/package";
 import { SlideButton } from "./components/slides-components/slide_button";
@@ -30,6 +31,7 @@ function App() {
           <Route path="/page" element={<SectionPage />} />
           <Route path="/register" element={<Register />} />
           <Route path="/login" element={<Login />} />
+          <Route path="/forget-password" element={<ForgetPassword />} />
 
           <Route path="/slide-button" element={<SlideButton />} />
           <Route path="/slide-pagination" element={<SlidePagination />} />
