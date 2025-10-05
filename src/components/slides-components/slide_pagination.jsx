@@ -1,5 +1,277 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
+import Countdown from "react-countdown";
+import {
+  Navigation,
+  Pagination,
+  Scrollbar,
+  A11y,
+  Autoplay,
+} from "swiper/modules";
 
-export const SlidePagination = () => {
-  return <div>S</div>;
+import { Swiper, SwiperSlide } from "swiper/react";
+
+// Import Swiper styles
+import "swiper/css";
+import "swiper/css/navigation";
+import "swiper/css/pagination";
+import "swiper/css/scrollbar";
+import { CircleChevronLeft, CircleChevronRight } from "lucide-react";
+
+export const slideImages = [
+  "/dressblack.png",
+  "/jupewhitcap.png",
+  "/jolisa.jpg",
+  "/clintonsar.jpg",
+  "/styletop.png",
+];
+export const images = [
+  "/mainpicture.png",
+  "/imageslide.png",
+  "/sara.jpg",
+  "/shirtwhite.png",
+  "/shopingphoto.png",
+  "/sweater.png",
+];
+
+export const SlidePagination = ({
+  images = [],
+  slidesPerView = 3,
+  spaceBetween = 0,
+  autoplayDelay = 3000,
+  loop = true,
+  centeredSlides = false,
+  showNavigation = true,
+  showPagination = true,
+  initialSlide = 0,
+  activeImageSize = "w-52 h-52 md:w-80 md:h-80",
+  inactiveImageSize = "w-36 h-36 md:w-56 md:h-56",
+  containerMaxWidth = "max-w-6xl",
+  containerHeight = "h-96",
+  navigationPosition = "bottom-10 md:left-24 top-56 md:top-72",
+  navigationButtonClass = "bg-gray-100 rounded-full w-8 h-8 hover:bg-gray-700 text-black hover:text-white",
+  slideId = "slider",
+}) => {
+  console.log("received values==>", centeredSlides);
+  console.log("received values==>", showNavigation);
+  console.log("received values==>", navigationButtonClass);
+  console.log("received values images affichees==>", slidesPerView);
+  return (
+    <div className="relative ">
+      <Swiper
+        className="max-w-6xl mx-auto  h-96"
+        modules={[Navigation, Pagination, Scrollbar, A11y, Autoplay]}
+        spaceBetween={0}
+        initialSlide={initialSlide}
+        slidesPerView={3}
+        navigation={{
+          nextEl: ".swiper-button-next-custom",
+          prevEl: ".swiper-button-prev-custom",
+        }}
+        centeredSlides={true}
+        autoplay={{ delay: 3000, disableOnInteraction: false }}
+        pagination={{ clickable: true }}
+        loop={true}
+      >
+        {images.map((src, index) => (
+          <SwiperSlide
+            key={index}
+            className="flex items-center justify-center gap-0  "
+          >
+            {({ isActive }) => (
+              <img
+                src={src}
+                alt={`slide-${index}`}
+                className={`rounded-xl transition-all duration-500 object-cover ${
+                  isActive
+                    ? "w-52 h-52 md:w-80 md:h-80 scale-110"
+                    : "w-36 h-36 md:w-56 md:h-56 opacity-70"
+                }`}
+              />
+            )}
+          </SwiperSlide>
+        ))}
+      </Swiper>
+      <div className="absolute bottom-10 md:left-24  top-56 md:top-72 transform translate-x-1/2   flex justify-center items-center gap-2 z-50">
+        <button className="swiper-button-prev-custom bg-gray-100 rounded-full w-8 h-8 hover:bg-gray-700 text-black hover:text-white flex items-center justify-center transition-colors">
+          <CircleChevronLeft size={20} />
+        </button>
+        <button className="swiper-button-next-custom bg-gray-100 rounded-full w-8 h-8 hover:bg-gray-700 text-black hover:text-white flex items-center justify-center transition-colors">
+          <CircleChevronRight size={20} />
+        </button>
+      </div>
+    </div>
+  );
+};
+
+{
+  /* +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ */
+}
+
+export const CountdownTimer = () => {
+  const endDate = new Date("2025-10-31T23:59:59").getTime();
+
+  const SegmentDigit = ({ digit }) => {
+    // Configuration des segments pour chaque chiffre (0-9)
+    const segments = {
+      0: [true, true, true, false, true, true, true],
+      1: [false, false, true, false, false, true, false],
+      2: [true, false, true, true, true, false, true],
+      3: [true, false, true, true, false, true, true],
+      4: [false, true, true, true, false, true, false],
+      5: [true, true, false, true, false, true, true],
+      6: [true, true, false, true, true, true, true],
+      7: [true, false, true, false, false, true, false],
+      8: [true, true, true, true, true, true, true],
+      9: [true, true, true, true, false, true, true],
+    };
+
+    const activeSegments = segments[digit] || segments["0"];
+    const segmentClass = (isActive) =>
+      `rounded-sm transition-colors duration-300 ${
+        isActive ? "bg-gray-800" : "bg-gray-200"
+      }`;
+
+    return (
+      <div className="relative mx-1" style={{ width: "24px", height: "40px" }}>
+        {/* Segment horizontal haut */}
+        <div
+          className={segmentClass(activeSegments[0])}
+          style={{
+            position: "absolute",
+            top: 0,
+            left: "4px",
+            right: "4px",
+            height: "4px",
+          }}
+        />
+
+        {/* Segment vertical haut gauche */}
+        <div
+          className={segmentClass(activeSegments[1])}
+          style={{
+            position: "absolute",
+            top: "4px",
+            left: 0,
+            width: "4px",
+            height: "14px",
+          }}
+        />
+
+        {/* Segment vertical haut droit */}
+        <div
+          className={segmentClass(activeSegments[2])}
+          style={{
+            position: "absolute",
+            top: "4px",
+            right: 0,
+            width: "4px",
+            height: "14px",
+          }}
+        />
+
+        {/* Segment horizontal milieu */}
+        <div
+          className={segmentClass(activeSegments[3])}
+          style={{
+            position: "absolute",
+            top: "18px",
+            left: "4px",
+            right: "4px",
+            height: "4px",
+          }}
+        />
+
+        {/* Segment vertical bas gauche */}
+        <div
+          className={segmentClass(activeSegments[4])}
+          style={{
+            position: "absolute",
+            bottom: "4px",
+            left: 0,
+            width: "4px",
+            height: "14px",
+          }}
+        />
+
+        {/* Segment vertical bas droit */}
+        <div
+          className={segmentClass(activeSegments[5])}
+          style={{
+            position: "absolute",
+            bottom: "4px",
+            right: 0,
+            width: "4px",
+            height: "14px",
+          }}
+        />
+
+        {/* Segment horizontal bas */}
+        <div
+          className={segmentClass(activeSegments[6])}
+          style={{
+            position: "absolute",
+            bottom: 0,
+            left: "4px",
+            right: "4px",
+            height: "4px",
+          }}
+        />
+      </div>
+    );
+  };
+
+  const renderer = ({ days, hours, minutes, seconds, completed }) => {
+    if (completed) {
+      return <div className="text-3xl font-bold text-green-600">Done </div>;
+    }
+
+    const timeUnits = [
+      { label: "Days", value: days },
+      { label: "Hours", value: hours },
+      { label: "Minutes", value: minutes },
+      { label: "Secondes", value: seconds },
+    ];
+
+    return (
+      <div className="text-center bg-white p-6 rounded-2xl shadow-sm mx-auto max-w-xl">
+        <div>
+          <h2 className="font-bold text-2xl font-Volkhov">
+            Deals Of The Month
+          </h2>
+          <p className="text-sm leading-5 my-2">
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Scelerisque
+            duis ultrices sollicitudin aliquam sem. Scelerisque duis ultrices
+            sollicitudin{" "}
+          </p>
+
+          <button className="bg-black/70 hover:bg-[#000000] duration-300 transition-all py-2 px-5 my-5 rounded-md text-white shadow-lg">
+            Buy Now
+          </button>
+
+          <h3 className="text-center font-semibold text-2xl mb-6">
+            Hurry, Before It’s Too Late!
+          </h3>
+        </div>
+
+        <div className="flex justify-center gap-6 ">
+          {timeUnits.map((unit, i) => {
+            const digits = String(unit.value).padStart(2, "0").split("");
+
+            return (
+              <div key={i} className="bg-gray-50 rounded-xl shadow-md p-2">
+                <div className="flex justify-center ">
+                  {digits.map((digit, idx) => (
+                    <SegmentDigit key={idx} digit={digit} />
+                  ))}
+                </div>
+                <div className="text-xs text-gray-500 mt-2">{unit.label}</div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    );
+  };
+
+  return <Countdown date={endDate} renderer={renderer} />;
 };

@@ -1,0 +1,95 @@
+export const DaysCountingDown = () => {
+  const [counting, setCounting] = useState({
+    days: 0,
+    hours: 0,
+    minutes: 0,
+    sec: 0,
+  });
+
+  useEffect(() => {
+    const targetDate = new Date("2025-12-31T23:59:59").getTime();
+    const calculateDays = () => {
+      const now = new Date().getTime();
+      const distance = targetDate - now;
+      if (distance > 0) {
+        return {
+          days: Math.floor(distance / (1000 * 60 * 60 * 24)),
+          hours: Math.floor((distance / (1000 * 60 * 60)) % 24),
+          minutes: Math.floor((distance / (1000 * 60)) % 60),
+          sec: Math.floor((distance / 1000) % 60),
+        };
+      }
+      return {
+        days: 0,
+        hours: 0,
+        minutes: 0,
+        sec: 0,
+      };
+    };
+
+    setCounting(calculateDays());
+
+    const timer = setInterval(() => {
+      setCounting(calculateDays());
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, []);
+
+  return (
+    <div className="   text-center font-bold text-lg justify-center max-5xl mx-auto">
+      <h2 className="font-bold text-2xl ">Deals Of The Month</h2>
+      <p className="text-sm leading-5">
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Scelerisque
+        duis ultrices sollicitudin aliquam sem. Scelerisque duis ultrices
+        sollicitudin{" "}
+      </p>
+
+      <button className="bg-black/70 hover:bg-[#000000] duration-300 transition-all py-2 px-5 rounded-md text-white">
+        Buy Now
+      </button>
+
+      <h3 className="text-center font-semibold text-2xl mb-6">
+        Hurry, Before It’s Too Late!
+      </h3>
+
+      <div className="flex justify-center md:grid grid-cols-1 max-6xl  md:grid-cols-4 gap-2 mx-auto md:max-w-72 text-center">
+        <div className="flex flex-col items-center">
+          <span className="text-lg font-bold text-gray-800 bg-white border border-gray-300 rounded-md px-4 py-2 shadow">
+            {String(counting.days).padStart(2, "0")}
+          </span>
+          <span className="mt-2 text-sm text-gray-500 uppercase tracking-wide">
+            Days
+          </span>
+        </div>
+
+        <div className="flex flex-col items-center">
+          <span className="text-lg font-bold text-gray-800 bg-white border border-gray-300 rounded-md px-4 py-2 shadow">
+            {String(counting.hours).padStart(2, "0")}
+          </span>
+          <span className="mt-2 text-sm text-gray-500 uppercase tracking-wide">
+            Hours
+          </span>
+        </div>
+
+        <div className="flex flex-col items-center">
+          <span className="text-lg font-bold text-gray-800 bg-white border border-gray-300 rounded-md px-4 py-2 shadow">
+            {String(counting.minutes).padStart(2, "0")}
+          </span>
+          <span className="mt-2 text-sm text-gray-500 uppercase tracking-wide">
+            Minutes
+          </span>
+        </div>
+
+        <div className="flex flex-col items-center">
+          <span className="text-lg font-bold text-gray-800 bg-white border border-gray-300 rounded-md px-4 py-2 shadow">
+            {String(counting.sec).padStart(2, "0")}
+          </span>
+          <span className="mt-2 text-sm text-gray-500 uppercase tracking-wide">
+            Seconds
+          </span>
+        </div>
+      </div>
+    </div>
+  );
+};
