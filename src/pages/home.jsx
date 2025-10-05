@@ -73,7 +73,7 @@ export const Home = () => {
           <SlidePagination slideId="slider1" images={images} />
         </div>
 
-        <div className="relative flex items-center justify-center gap-4 mx-auto max-6xl">
+        <div className="relative flex flex-col  items-center justify-center gap-4 mx-auto max-6xl">
           <div className="">
             <CountdownTimer />
           </div>
