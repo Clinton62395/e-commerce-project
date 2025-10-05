@@ -11,7 +11,7 @@ import {
 export const Home = () => {
   return (
     <>
-      <main className="bg-white mt-10  ">
+      <main className="bg-white mt-10 overflow-x-hidden ">
         <div className=" grid grid-cols-1 md:grid-cols-3 gap-10 md:gap-4 p-4 mx-auto max-w-6xl">
           <div className="bg-gray-100 rounded-t-lg flex items-end hover:scale-105 duration-300 shadow-sm hover:shadow-lg">
             <img

@@ -67,10 +67,10 @@ export const NewProduct = () => {
   ];
   return (
     <div>
-      <main className="mx-auto max-w-6xl ">
+      <main className="mx-auto w-full md:max-w-6xl p-2 overflow-x-hidden">
         <div className="text-center ">
           <h1 className="text-3xl  fontsemibold my-2 ">New Arrivals</h1>
-          <p className="text-sm  w-1/2  mx-auto">
+          <p className="text-sm w-full p-4  md:w-1/2  mx-auto">
             Lorem ipsum dolor sit amet, consectetur adipiscing elit. Scelerisque
             duis ultrices sollicitudin aliquam sem. Scelerisque duis ultrices
             sollicitudin{" "}
@@ -82,11 +82,11 @@ export const NewProduct = () => {
               key={index}
               className="group relative duration-200 transition-all rounded-md shadow-sm hover:shadow-md p-2"
             >
-              <div className="relative ">
+              <div className="relative overflow-hidden ">
                 <img
                   src={item.image}
                   alt={item.description}
-                  className=" object-cover rounded-md transition-all duration-500 transform group-hover:-translate-x-2"
+                  className=" object-cover w-full rounded-md transition-all duration-500 transform group-hover:-translate-x-2"
                 />
                 <div className="absolute inset-0 bg-black opacity-0 group-hover:opacity-50 transition-opacity duration-200 rounded-md pointer-events-none"></div>
               </div>
