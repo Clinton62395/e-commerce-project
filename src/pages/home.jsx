@@ -70,23 +70,30 @@ export const Home = () => {
           <ArrowUp size={24} />
         </button>
         <div className="my-5 flex flex-col space-y-4">
-          <SlidePagination slideId="slider1" images={images} />
+          <SlidePagination
+            slideId="slider1"
+            images={images}
+            centeredSlides={true}
+          />
         </div>
 
-        <div className="relative flex flex-col  items-center justify-center gap-4 mx-auto max-6xl">
-          <div className="">
+        <div className="min-h-screen flex flex-col md:flex-row  w-full  items-center justify-center gap-y-5 md:gap-2 mx-auto max-6xl">
+          <div className=" max-w-md min-w-0">
             <CountdownTimer />
           </div>
-          <SlidePagination
-            slideId="slider2"
-            images={slideImages}
-            slidesPerView={2}
-            containerMaxWidth="max-w-md"
-            initialSlide={2}
-            centeredSlides={false}
-            activeImageSize="w-40 h-40 md:w-56 md:h-56"
-            inactiveImageSize="w-32 h-32 md:w-48 md:h-48"
-          />
+          <div className="flex-1 w-full  min-w-0 p-2">
+            <SlidePagination
+              slideId="slider2"
+              images={slideImages}
+              spaceBetween={0}
+              slidesPerView={3}
+              initialSlide={2}
+              centeredSlides={false}
+              activeImageSize="w-52 h-52 md:w-80 md:h-full"
+              inactiveImageSize="w-36 h-36 md:w-56 md:h-56"
+              autoplayDelay={5000}
+            />
+          </div>
         </div>
       </main>
     </>

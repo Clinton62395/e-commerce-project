@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
+import gsap from "gsap";
 import Countdown from "react-countdown";
 import {
   Navigation,
@@ -39,63 +40,68 @@ export const SlidePagination = ({
   spaceBetween = 0,
   autoplayDelay = 3000,
   loop = true,
+
   centeredSlides = false,
   showNavigation = true,
   showPagination = true,
   initialSlide = 0,
-  activeImageSize = "w-52 h-52 md:w-80 md:h-80",
+  activeImageSize = "w-52 h-52 md:w-80 md:h-full ",
   inactiveImageSize = "w-36 h-36 md:w-56 md:h-56",
-  containerMaxWidth = "max-w-6xl",
-  containerHeight = "h-96",
-  navigationPosition = "bottom-10 md:left-24 top-56 md:top-72",
-  navigationButtonClass = "bg-gray-100 rounded-full w-8 h-8 hover:bg-gray-700 text-black hover:text-white",
+  containerMaxWidth = "max-w-6xl mx-auto",
+  containerHeight = " h-52 md:h-96",
+  navigationPosition = "absolute bottom-10 md:left-24  top-56 md:top-72 transform translate-x-1/2   flex justify-center items-center gap-2 z-50",
+  navigationButtonClass = "bg-gray-100 flex justify-center items-center duration-500 transition-all rounded-full w-8 h-8 hover:bg-gray-700 text-black hover:text-white",
   slideId = "slider",
 }) => {
-  console.log("received values==>", centeredSlides);
-  console.log("received values==>", showNavigation);
-  console.log("received values==>", navigationButtonClass);
-  console.log("received values images affichees==>", slidesPerView);
+  const swiperRef = useRef(null);
+  useEffect(() => {
+    const instance = swiperRef.current?.swiper;
+    if (instance) {
+      instance.params.navigation.prevEl = `.swiper-button-prev-${slideId}`;
+      instance.params.navigation.nextEl = `.swiper-button-next-${slideId}`;
+      instance.navigation.init();
+      instance.navigation.update();
+    }
+  }, [slideId]);
+
   return (
-    <div className="relative ">
+    <div className="relative">
       <Swiper
-        className="max-w-6xl mx-auto  h-96"
+        ref={swiperRef}
+        className={`${containerMaxWidth} ${containerHeight}`}
         modules={[Navigation, Pagination, Scrollbar, A11y, Autoplay]}
-        spaceBetween={0}
+        spaceBetween={spaceBetween}
         initialSlide={initialSlide}
-        slidesPerView={3}
-        navigation={{
-          nextEl: ".swiper-button-next-custom",
-          prevEl: ".swiper-button-prev-custom",
-        }}
-        centeredSlides={true}
-        autoplay={{ delay: 3000, disableOnInteraction: false }}
-        pagination={{ clickable: true }}
-        loop={true}
+        slidesPerView={slidesPerView}
+        navigation={false}
+        centeredSlides={centeredSlides}
+        autoplay={{ delay: autoplayDelay, disableOnInteraction: false }}
+        pagination={showPagination ? { clickable: true } : false}
+        loop={loop}
       >
         {images.map((src, index) => (
-          <SwiperSlide
-            key={index}
-            className="flex items-center justify-center gap-0  "
-          >
+          <SwiperSlide key={index} className={``}>
             {({ isActive }) => (
               <img
                 src={src}
                 alt={`slide-${index}`}
                 className={`rounded-xl transition-all duration-500 object-cover ${
-                  isActive
-                    ? "w-52 h-52 md:w-80 md:h-80 scale-110"
-                    : "w-36 h-36 md:w-56 md:h-56 opacity-70"
+                  isActive ? activeImageSize : inactiveImageSize
                 }`}
               />
             )}
           </SwiperSlide>
         ))}
       </Swiper>
-      <div className="absolute bottom-10 md:left-24  top-56 md:top-72 transform translate-x-1/2   flex justify-center items-center gap-2 z-50">
-        <button className="swiper-button-prev-custom bg-gray-100 rounded-full w-8 h-8 hover:bg-gray-700 text-black hover:text-white flex items-center justify-center transition-colors">
+      <div className={`${navigationPosition}`}>
+        <button
+          className={`swiper-button-prev-${slideId} ${navigationButtonClass}`}
+        >
           <CircleChevronLeft size={20} />
         </button>
-        <button className="swiper-button-next-custom bg-gray-100 rounded-full w-8 h-8 hover:bg-gray-700 text-black hover:text-white flex items-center justify-center transition-colors">
+        <button
+          className={`swiper-button-next-${slideId}  ${navigationButtonClass}`}
+        >
           <CircleChevronRight size={20} />
         </button>
       </div>
@@ -222,7 +228,11 @@ export const CountdownTimer = () => {
 
   const renderer = ({ days, hours, minutes, seconds, completed }) => {
     if (completed) {
-      return <div className="text-3xl font-bold text-green-600">Done </div>;
+      return (
+        <div className="text-3xl font-bold text-green-600 h-screen flex items-center justify-center">
+          Done{" "}
+        </div>
+      );
     }
 
     const timeUnits = [
@@ -233,7 +243,7 @@ export const CountdownTimer = () => {
     ];
 
     return (
-      <div className="text-center bg-white p-6 rounded-2xl shadow-sm mx-auto max-w-xl">
+      <div className="text-center bg-white p-6 rounded-2xl shadow-sm  ">
         <div>
           <h2 className="font-bold text-2xl font-Volkhov">
             Deals Of The Month
@@ -253,7 +263,7 @@ export const CountdownTimer = () => {
           </h3>
         </div>
 
-        <div className="flex justify-center gap-6 ">
+        <div className="flex justify-center gap-2 md:gap-4 ">
           {timeUnits.map((unit, i) => {
             const digits = String(unit.value).padStart(2, "0").split("");
 
