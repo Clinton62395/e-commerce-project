@@ -33,6 +33,15 @@ export const images = [
   "/shopingphoto.png",
   "/sweater.png",
 ];
+export const dynamicImages = [
+  "/image11.png",
+  "/image22.png",
+  "/image33.png",
+  "/image44.png",
+  "/image55.png",
+  "/image77.png",
+  "/image66.png",
+];
 
 export const SlidePagination = ({
   images = [],

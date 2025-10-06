@@ -1,8 +1,16 @@
 import React from "react";
 
-import { ArrowUp, ShoppingCart } from "lucide-react";
+import {
+  ArrowUp,
+  BadgeCheck,
+  Box,
+  HandCoins,
+  PhoneOutgoing,
+  ShoppingCart,
+} from "lucide-react";
 import {
   CountdownTimer,
+  dynamicImages,
   images,
   slideImages,
   SlidePagination,
@@ -81,7 +89,7 @@ export const Home = () => {
           <div className=" max-w-md min-w-0">
             <CountdownTimer />
           </div>
-          <div className="flex-1 w-full  min-w-0 p-2">
+          <div className="relative flex-1 w-full  min-w-0 p-2">
             <SlidePagination
               slideId="slider2"
               images={slideImages}
@@ -92,7 +100,144 @@ export const Home = () => {
               activeImageSize="w-52 h-52 md:w-80 md:h-full"
               inactiveImageSize="w-36 h-36 md:w-56 md:h-56"
               autoplayDelay={5000}
+              navigationPosition="absolute transform translate-x-1/2 z-10 flex"
             />
+            {/* promo card */}
+
+            <div className=" absolute bottom-4 z-10 text-center rounded-md shadow-md p-2  bg-slate-300 text-black w-32 h-16 md:w-36 md:h-20">
+              <h4>01 Spring Sale</h4>
+              <span className="text-lg md:text-3xl font-semibold">30% OFF</span>
+            </div>
+          </div>
+        </div>
+
+        {/*  */}
+        <div className=" bg-slate-100 ">
+          <div className=" relative my-5 flex items-center justify-center gap-3 w-full mx-auto max-w-6xl flex-wrap md:flex-nowrap">
+            <di>
+              <img
+                src="/homepicture.png"
+                alt="homepicture"
+                className="w-full h-full "
+              />
+            </di>
+            {/* <div
+              style={{
+                transformOrigin: "bottom left",
+                transform: "skewY(-5deg)",
+              }}
+            >
+              <div className="  text-start text-black py-5 px-2  transform ">
+                <p className="font-semibold ">Women Collection</p>
+                <h2>Peaky Blinders</h2>
+                <p className="text-lg font-semibold underline my-2">
+                  DESCRIPTION
+                </p>
+                <p className="text-xs ">
+                  Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+                  Scelerisque duis ultrices sollicitudin aliquam sem.
+                  Scelerisque duis ultrices sollicitudin. Lorem ipsum dolor sit
+                  amet, consectetur adipiscing elit. Scelerisque duis.
+                </p>
+                <p className="flex items-center gap-2 text-xs my-2">
+                  Size:
+                  <span className="bg-black/80 hover:bg-black duration-300 transition-all text-white rounded-md p-2 px-3">
+                    M
+                  </span>
+                </p>
+                <p className=" font-semibold">$100.00</p>
+
+                <button className="bg-black/80 my-2 hover:bg-black duration-300 transition-all text-white px-5  py-2 rounded-md">
+                  Buy Now
+                </button>
+              </div>
+            </div> */}
+
+            <div
+              className="relative bg-gray-100 border-2 border-blue-500 p-8 md:p-12"
+              style={{
+                clipPath: "polygon(0 0, 100% 0, 100% 100%, 8% 100%, 0 0)",
+              }}
+            >
+              <div className="ml-12 md:ml-24">
+                <p className="text-sm text-gray-500 mb-2">Women Collection</p>
+                <h1 className="text-4xl md:text-5xl font-bold text-gray-800 mb-6">
+                  Peaky Blinders
+                </h1>
+
+                <h3 className="text-sm font-semibold uppercase mb-3 underline">
+                  Description
+                </h3>
+                <p className="text-gray-600 text-sm leading-relaxed mb-6 max-w-2xl">
+                  Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+                  Scelerisque duis ultrices sollicitudin aliquam sem.
+                </p>
+
+                <div className="flex items-center gap-3 mb-6">
+                  <span className="text-sm">Size:</span>
+                  <button className="bg-black text-white px-6 py-2 rounded-full text-sm">
+                    M
+                  </button>
+                </div>
+
+                <p className="text-3xl font-bold mb-6">$100.00</p>
+
+                <button className="bg-black text-white px-8 py-3 rounded-lg hover:bg-gray-800 transition-colors">
+                  Buy Now
+                </button>
+              </div>
+            </div>
+          </div>
+          <div className="flex  items-center bg-white shadow-md py-5 md:py-10 my-4 justify-evenly">
+            <div className="flex gap-3 items-center">
+              <HandCoins size={20} />
+              <div className="flex flex-col">
+                <h3>High Quality</h3>
+                <h3>crafted from top materials</h3>
+              </div>
+            </div>
+
+            <div className="flex gap-3 items-center">
+              <BadgeCheck size={20} />
+              <div className="flex flex-col ">
+                <h3>Warrany Protection</h3>
+                <h3>Over 2 years</h3>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-3">
+              <Box size={20} />
+              <div className="flex flex-col">
+                <h3>Free Shipping</h3>
+                <h3>Order over 150 $</h3>
+              </div>
+            </div>
+
+            <div className="flex items-center ">
+              <PhoneOutgoing size={20} />
+              <div className="flex flex-col gap-3">
+                <h3>24 / 7 Support</h3>
+                <h3>Dedicated support</h3>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/*  */}
+
+        <div className="h-screen justify-center items-center flex flex-col">
+          <h2 className="text-center text-2xl font-bold">Follow Us On Instagram</h2>
+          <p className="text-sm leading-relaxed w-full  p-4 max-w-2xl mx-auto">
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Scelerisque
+            duis ultrices sollicitudin aliquam sem. Scelerisque duis ultrices
+            sollicitudin{" "}
+          </p>
+          <div className="flex items-center justify-center mx-2">
+            {dynamicImages.map((src, index) => (
+              <div key={index} className="">
+                <img src={src} className="" />
+              </div>
+            ))}
           </div>
         </div>
       </main>
