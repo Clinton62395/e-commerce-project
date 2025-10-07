@@ -1,10 +1,12 @@
 import React, { useState } from "react";
 import { LandingPageNavbar } from "../components/navbar";
-import { ChevronRight, Tally2, Tally3, Tally4, Tally5 } from "lucide-react";
+import { ChevronRight, Columns2, Rows3 } from "lucide-react";
 import Pagination from "@mui/material/Pagination";
 import Stack from "@mui/material/Stack";
 
 export const Shop = () => {
+  const [layout, setLayout] = useState("grid");
+  const grid = "grid grid-cols-1 md:grid-cols-3 gap-3 mx-2";
   const products = [
     {
       id: 1,
@@ -105,20 +107,20 @@ export const Shop = () => {
     "Beachwear",
   ];
   const color = [
-    "bg-[#FF6C6C] w-8 h-8 rounded-full p-2",
-    "bg-[#FF7629] w-8 h-8 rounded-full p-2",
-    "bg-[#FFF06C] w-8 h-8 rounded-full p-2",
-    "bg-[#9BFF6C] w-8 h-8 rounded-full p-2",
-    "bg-[#6CFF9E] w-8 h-8 rounded-full p-2",
-    "bg-[#6CFFDC] w-8 h-8 rounded-full p-2",
-    "bg-[#6CB9FF] w-8 h-8 rounded-full p-2",
-    "bg-[#6CF6FF] w-8 h-8 rounded-full p-2",
-    "bg-[#6CA7FF] w-8 h-8 rounded-full p-2",
-    "bg-[#6C7BFF] w-8 h-8 rounded-full p-2",
-    "bg-[#8A6CFF] w-8 h-8 rounded-full p-2",
-    "bg-[#B66CFF] w-8 h-8 rounded-full p-2",
-    "bg-[#FC6CFF] w-8 h-8 rounded-full p-2",
-    "bg-[#FF6C6C] w-8 h-8 rounded-full p-2",
+    "bg-[#FF6C6C] w-6 h-6 rounded-full p-2",
+    "bg-[#FF7629] w-6 h-6 rounded-full p-2",
+    "bg-[#FFF06C] w-6 h-6 rounded-full p-2",
+    "bg-[#9BFF6C] w-6 h-6 rounded-full p-2",
+    "bg-[#6CFF9E] w-6 h-6 rounded-full p-2",
+    "bg-[#6CFFDC] w-6 h-6 rounded-full p-2",
+    "bg-[#6CB9FF] w-6 h-6 rounded-full p-2",
+    "bg-[#6CA7FF] w-6 h-6 rounded-full p-2",
+    "bg-[#6C7BFF] w-6 h-6 rounded-full p-2",
+    "bg-[#8A6CFF] w-6 h-6 rounded-full p-2",
+    "bg-[#B66CFF] w-6 h-6 rounded-full p-2",
+    "bg-[#FC6CFF] w-6 h-6 rounded-full p-2",
+    "bg-[#FF6C6C] w-6 h-6 rounded-full p-2",
+    "bg-[#6CF6FF] w-6 h-6 rounded-full p-2",
   ];
   const sizes = ["S", "L", "M", "XL", "XXL"];
 
@@ -135,7 +137,7 @@ export const Shop = () => {
   return (
     <div className="h-screen ">
       <div className="flex flex-col space-y-4 justify-center items-center my-5">
-        <div className="flex gap-3 items-center">
+        <div className="flex gap-2 items-center">
           <h1 className="font-bold text-2xl">Home</h1>
           <span>
             <ChevronRight />
@@ -144,69 +146,144 @@ export const Shop = () => {
         </div>
       </div>
 
-      <div className="flex justify-center items-center ">
-        <div className="w-full max-w-md mx-auto text-center ">
-          <h2>Filters</h2>
-          <span>Size</span>
-          <div className="grid grid-cols-2 md:grid-cols-3  gap-2 text-start max-w-32 mx-auto ">
+      <div
+        className={`flex justify-center items-center `}
+      >
+        <div className="w-full max-w-md ms-auto text-center ">
+          <h2 className="font-semibold text-2xl">Filters</h2>
+          <span className="font-bold text-xl">Size</span>
+          <div className="grid grid-cols-3 md:grid-cols-4  gap-2 text-start max-w-48 mx-auto ">
             {sizes.map((size) => (
-              <button key={size} className="border flex items-center justify-center rounded-md p-2 ">{size}</button>
+              <button
+                key={size}
+                className="border flex items-center justify-center rounded-md p-2 duration-150 transition-all hover:bg-slate-50 hover:shadow-md "
+              >
+                {size}
+              </button>
             ))}
           </div>
-          <p className="font-bold text-2xl ">Price</p>
-          <div className="flex flex-col gap-4 text-start">
+
+          {/* colors */}
+          <span className="font-bold text-xl">Color</span>
+
+          <div className="grid grid-cols-5 md:grid-cols-7 w-full  text-start max-w-72  mx-auto ">
+            {color.map((color) => (
+              <button
+                key={color}
+                className=" flex items-center justify-center rounded-md p-2 "
+              >
+                {color && <div className={color}></div>}
+              </button>
+            ))}
+          </div>
+
+          <span className="font-bold text-xl">Brands</span>
+
+          <div className="md:grid flex flex-wrap  md:grid-cols-3  gap-2 max-w-72  mx-auto mb-2">
+            {brands.map((brand, index) => (
+              <button key={index} className="  mx-2 ">
+                {brand}
+              </button>
+            ))}
+          </div>
+
+          <span className="font-bold text-xl my-3">Collection</span>
+
+          <div className="md:grid flex flex-wrap  md:grid-cols-4  gap-2 max-w-96  mx-auto mb-2">
+            {Collection.map((col) => (
+              <button className="  mx-2 ">{col}</button>
+            ))}
+          </div>
+
+          <p className="font-bold text-xl  ">Price</p>
+          <div className="grid grid-cols-2 gap-2 md:grid-cols-3 md:gap-6 text-start mx-auto max-w-80 ">
             {prices.map((price) => (
-              <button key={price}>{price}</button>
+              <button
+                key={price}
+                className="border p-2 duration-150 transition-all hover:bg-slate-50 hover:shadow-md"
+              >
+                {price}
+              </button>
+            ))}
+          </div>
+          <p className="font-bold text-xl my-4">Tags</p>
+          <div className="grid grid-cols-3 md:grid-cols-5 gap-2 text-start ml-2">
+            {tags.map((tag) => (
+              <button key={tag}>{tag}</button>
             ))}
           </div>
         </div>
         <div className="flex-1">
           <div className="flex justify-between my-4 md:my-5 mx-5">
-            <h3>Best selling</h3>
+            <h3 className="hidden md:flex font-bold text-2xl">Best selling</h3>
             <div className="flex gap-4">
               <button
+                onClick={() => setLayout("list")}
                 aria-label="size"
-                className=" w-10 h-10 bg-slate-200 rounded-full flex justify-center items-center p-2 duration-300 transition-all hover:bg-slate-300"
+                className={`} w-10 h-10 bg-slate-200 ${
+                  layout === "list" ? "text-green-500" : "text-black"
+                } rounded-full flex justify-center items-center p-2 duration-300 transition-all hover:bg-slate-300`}
               >
-                <Tally3 size={20} />
+                <Columns2 size={20} />
               </button>
               <button
+                onClick={() => setLayout("grid")}
                 aria-label="size"
-                className=" w-10 h-10 bg-slate-200 rounded-full flex justify-center items-center p-2 duration-300 transition-all hover:bg-slate-300"
+                className={` w-10 h-10 bg-slate-200 rounded-full flex ${
+                  layout === "grid" ? "text-green-500" : "text-black"
+                } justify-center items-center p-2 duration-300 transition-all hover:bg-slate-300`}
               >
-                <Tally2 size={20} />
-              </button>
-              <button
-                aria-label="size"
-                className=" w-10 h-10 bg-slate-200 rounded-full flex justify-center items-center p-2 duration-300 transition-all hover:bg-slate-300"
-              >
-                <Tally4 size={20} />
-              </button>
-              <button
-                aria-label="size"
-                className=" w-10 h-10 bg-slate-200 rounded-full flex justify-center items-center p-2 duration-300 transition-all hover:bg-slate-300"
-              >
-                <Tally5 size={20} />
+                <Rows3 size={20} />
               </button>
             </div>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mx-2">
-            {currentIndex.map((product, index) => (
-              <div key={index} className="flex flex-col gap-2">
-                <img src={product.src} alt={product.title} />
-                <h3>{product.title}</h3>
-                <p>{product.price}</p>
-                <p>{product?.reducePrice}</p>
-                <div className="flex gap-2">
-                  {product.color1 && <div className={product.color1}></div>}
-                  {product.color2 && <div className={product.color2}></div>}
-                  {product?.color3 && <div className={product.color3}></div>}
+          <div
+            className={` ${
+              layout === "grid"
+                ? "grid grid-cols-1 md:grid-cols-3 gap-3 mx-2"
+                : "flex gap-4 flex-col items-center "
+            }`}
+          >
+            {currentIndex.map((product) => (
+              <div
+                key={product.id}
+                className={`${
+                  layout === "list" ? " flex-grow " : { grid }
+                }flex flex-col gap-2`}
+              >
+                <div
+                  className={`${
+                    layout === "list"
+                      ? " flex flex-col md:flex-row flex-grow md:flex items-center gap-5 md:gap-10 mx-2 "
+                      : { grid }
+                  }`}
+                >
+                  <img
+                    src={product.src}
+                    alt={product.title}
+                    className={`object-cover rounded-md ${
+                      layout === "list" ? "w-72 h-72" : "w-full "
+                    }`}
+                  />
+                  <div>
+                    <h3>{product.title}</h3>
+                    <p>{product.price}</p>
+                    <p>{product?.reducePrice}</p>
+
+                    <div className="flex gap-2">
+                      {product.color1 && <div className={product.color1}></div>}
+                      {product.color2 && <div className={product.color2}></div>}
+                      {product?.color3 && (
+                        <div className={product.color3}></div>
+                      )}
+                    </div>
+                  </div>
                 </div>
               </div>
             ))}
           </div>
           {/* 📄 Pagination */}
-          <div className="pb-10">
+          <div className="pb-10 flex justify-center">
             <Stack spacing={2}>
               <Pagination
                 count={Math.ceil(products.length / itemsPerPage)}
