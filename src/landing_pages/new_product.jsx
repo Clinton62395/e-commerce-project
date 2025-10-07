@@ -205,9 +205,12 @@ export const NewProduct = () => {
           ))}
         </div>
         <div className="flex justify-center my-4">
-          <button className="bg-black/80 duration-200 transition-all hover:shadow-sm text-white rounded-md py-2 fontsemibold px-6 hover:bg-black">
+          <Link
+            to="/shop"
+            className="bg-black/80 duration-200 transition-all hover:shadow-sm text-white rounded-md py-2 fontsemibold px-6 hover:bg-black"
+          >
             View more
-          </button>
+          </Link>
         </div>
       </main>
     </div>
