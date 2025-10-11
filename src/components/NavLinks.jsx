@@ -40,64 +40,32 @@ export const NavLinks = ({ logo = "FASCO", pages = defaultLinks }) => {
   const isAuthPage = location.pathname === "/";
 
   return (
-    <div>
-      {" "}
-      <div
-        className={`mb-10flex items-center justify-center gap-4 p-4 relative  ${
-          isAuthPage
-            ? "border-green-500 text-white font-bold"
-            : "font-semibold text-gray-700"
-        }`}
+    <div
+      className={`mb-10  relative  ${
+        isAuthPage
+          ? "border-green-500 text-white font-bold"
+          : "font-semibold text-gray-700"
+      }`}
+    >
+      <button
+        className=" md:hidden absolute left-4 -top-6 z-20 bg-white p-2 rounded-md shadow-sm text-gray-700 hover:bg-gray-100"
+        onClick={() => setIsMenuOpen(!isMenuOpen)}
       >
-        <button
-          className="md:hidden absolute left-4 z-20 bg-white p-2 rounded-md shadow-sm text-gray-700 hover:bg-gray-100"
-          onClick={() => setIsMenuOpen(!isMenuOpen)}
-        >
-          {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
-        </button>
-        {isMenuOpen && (
-          <div className=" ms-10 md:mx-auto text-center w-full bg-white shadow-md flex flex-wrap space-y-2 items-center gap-2 md:gap-4 p-2 md:p-4 md:hidden z-10">
-            {pages.map((page, index) => {
-              const isActive = location.pathname === page.link;
-              return (
-                <div
-                  key={index}
-                  className=" flex items-center  md:px-4 border rounded-xl p-2 transition-all duration-200 hover:bg-gray-300 shadow-md hover:shadow-lg "
-                >
-                  <Link
-                    to={page.link}
-                    className={`flex items-center gap-2 md:gap-4 duration-200 transition-all text-xs md:text-[20px] hover:font-semibold ${
-                      isActive
-                        ? "text-green-500 font-bold border-b-2 border-green-500"
-                        : "text-gray-700"
-                    }`}
-                  >
-                    {page.icon}
-                    {page.name}
-                  </Link>
-                </div>
-              );
-            })}
-          </div>
-        )}
-
-        <div className="hidden  md:flex items-center justify-between mx-10">
-          <Link to="/" className="text-3xl font-bold leading-loose text-black ">
-            FASCO
-          </Link>
-
-          <div className="flex gap-10 me-5">
-            {pages.map((page, index) => {
-              const isActive = location.pathname === page.link;
-              const isSignUp = page.link === "/register";
-              return (
+        {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
+      </button>
+      {isMenuOpen && (
+        <div className="mt-5 text-center w-full  max-w-full mx-auto bg-white shadow-md  flex flex-wrap justify-center min-w-0  items-center gap-2 md:gap-4 p-2  md:hidden z-10">
+          {pages.map((page, index) => {
+            const isActive = location.pathname === page.link;
+            return (
+              <div
+                key={index}
+                className=" flex items-center min-w-0 md:px-4 border rounded-xl p-2 transition-all duration-200 hover:bg-gray-300 shadow-md hover:shadow-lg "
+              >
                 <Link
-                  key={index}
                   to={page.link}
-                  className={`flex items-center gap-2 text-[14px] transition-all duration-500 ${
-                    isSignUp
-                      ? "bg-black/80 text-white px-4 py-2 rounded-full shadow-md hover:bg-black"
-                      : isActive
+                  className={`flex items-center gap-2 md:gap-4 duration-200 transition-all text-xs md:text-[20px] hover:font-semibold ${
+                    isActive
                       ? "text-green-500 font-bold border-b-2 border-green-500"
                       : "text-gray-700"
                   }`}
@@ -105,9 +73,38 @@ export const NavLinks = ({ logo = "FASCO", pages = defaultLinks }) => {
                   {page.icon}
                   {page.name}
                 </Link>
-              );
-            })}
-          </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+
+      <div className="hidden  md:flex items-center justify-between mx-10">
+        <Link to="/" className="text-3xl font-bold leading-loose text-black ">
+          FASCO
+        </Link>
+
+        <div className="flex gap-10 me-5">
+          {pages.map((page, index) => {
+            const isActive = location.pathname === page.link;
+            const isSignUp = page.link === "/register";
+            return (
+              <Link
+                key={index}
+                to={page.link}
+                className={`flex items-center gap-2 text-[14px] transition-all duration-500 ${
+                  isSignUp
+                    ? "bg-black/80 text-white px-4 py-2 rounded-full shadow-md hover:bg-black"
+                    : isActive
+                    ? "text-green-500 font-bold border-b-2 border-green-500"
+                    : "text-gray-700"
+                }`}
+              >
+                {page.icon}
+                {page.name}
+              </Link>
+            );
+          })}
         </div>
       </div>
     </div>

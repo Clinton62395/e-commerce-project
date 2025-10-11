@@ -3,6 +3,11 @@ import { LandingPageNavbar } from "../components/navbar";
 import { ChevronRight, Columns2, Rows3 } from "lucide-react";
 import Pagination from "@mui/material/Pagination";
 import Stack from "@mui/material/Stack";
+import {
+  ServiceTime,
+  SocioMediaProfile,
+  SubscriptNewLetter,
+} from "../components/slides-components/component_section";
 
 export const Shop = () => {
   const [layout, setLayout] = useState("grid");
@@ -147,7 +152,9 @@ export const Shop = () => {
       </div>
 
       <div
-        className={`flex justify-center items-center `}
+        className={` flex justify-center items-center ${
+          layout === "list" ? "md:grid md:grid-cols-2" : "flex"
+        } `}
       >
         <div className="w-full max-w-md ms-auto text-center ">
           <h2 className="font-semibold text-2xl">Filters</h2>
@@ -254,7 +261,7 @@ export const Shop = () => {
                 <div
                   className={`${
                     layout === "list"
-                      ? " flex flex-col md:flex-row flex-grow md:flex items-center gap-5 md:gap-10 mx-2 "
+                      ? " flex flex-col justify-center md:flex-row flex-grow md:flex items-center gap-5 md:gap-10 mx-2 "
                       : { grid }
                   }`}
                 >
@@ -262,7 +269,7 @@ export const Shop = () => {
                     src={product.src}
                     alt={product.title}
                     className={`object-cover rounded-md ${
-                      layout === "list" ? "w-72 h-72" : "w-full "
+                      layout === "list" ? "w-72 h-72" : { grid }
                     }`}
                   />
                   <div>
@@ -297,6 +304,13 @@ export const Shop = () => {
             </Stack>
           </div>
         </div>
+      </div>
+
+      {/* component section  */}
+      <div className="flex flex-col ">
+        <ServiceTime />
+        <SocioMediaProfile />
+        <SubscriptNewLetter />
       </div>
     </div>
   );

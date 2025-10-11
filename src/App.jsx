@@ -22,25 +22,27 @@ function App() {
     <>
       <ToastContainer />
       <BrowserRouter>
-        <Routes>
-          <Route element={<HomeLayout />}>
-            <Route index element={<Home />} />
-            <Route path="/deals" element={<Deals />} />
-            <Route path="/new-products" element={<NewProduct />} />
-            <Route path="/packages" element={<Package />} />
-            <Route path="/page" element={<SectionPage />} />
-            <Route path="/register" element={<Register />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/forget-password" element={<ForgetPassword />} />
-          </Route>
+        <Provider>
+          <Routes>
+            <Route element={<HomeLayout />}>
+              <Route index element={<Home />} />
+              <Route path="/deals" element={<Deals />} />
+              <Route path="/new-products" element={<NewProduct />} />
+              <Route path="/packages" element={<Package />} />
+              <Route path="/page" element={<SectionPage />} />
+              <Route path="/register" element={<Register />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/forget-password" element={<ForgetPassword />} />
+            </Route>
 
-          <Route element={<ShopLayout />}>
-            <Route index element={<Home />} />
-            <Route path="/shop" element={<Shop />} />
-            <Route path="/products" element={<Products />} />
-            <Route path="/shop-page" element={<SectionPage />} />
-          </Route>
-        </Routes>
+            <Route element={<ShopLayout />}>
+              <Route index element={<Home />} />
+              <Route path="/shop" element={<Shop />} />
+              <Route path="/products" element={<Products />} />
+              <Route path="/shop-page" element={<SectionPage />} />
+            </Route>
+          </Routes>
+        </Provider>
       </BrowserRouter>
     </>
   );

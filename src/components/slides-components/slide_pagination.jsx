@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import gsap from "gsap";
+
 import Countdown from "react-countdown";
 import {
   Navigation,
@@ -17,6 +18,7 @@ import "swiper/css/navigation";
 import "swiper/css/pagination";
 import "swiper/css/scrollbar";
 import { CircleChevronLeft, CircleChevronRight } from "lucide-react";
+import { Link } from "react-router-dom";
 
 export const slideImages = [
   "/dressblack.png",
@@ -122,7 +124,7 @@ export const SlidePagination = ({
   /* +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ */
 }
 
-export const CountdownTimer = () => {
+export const CountdownTimer = ({ children }) => {
   const endDate = new Date("2025-10-31T23:59:59").getTime();
 
   const SegmentDigit = ({ digit }) => {
@@ -236,6 +238,12 @@ export const CountdownTimer = () => {
   };
 
   const renderer = ({ days, hours, minutes, seconds, completed }) => {
+    const timeValues = { days, hours, minutes, seconds, completed };
+
+    if (typeof children === "function") {
+      return children(timeValues) || null;
+    }
+
     if (completed) {
       return (
         <div className="text-3xl font-bold text-green-600 h-screen flex items-center justify-center">
@@ -263,9 +271,12 @@ export const CountdownTimer = () => {
             sollicitudin{" "}
           </p>
 
-          <button className="bg-black/70 hover:bg-[#000000] duration-300 transition-all py-2 px-5 my-5 rounded-md text-white shadow-lg">
+          <Link
+            to="/shop"
+            className="bg-black/70 hover:bg-[#000000] duration-300 transition-all py-2 px-5 my-5 rounded-md text-white shadow-lg"
+          >
             Buy Now
-          </button>
+          </Link>
 
           <h3 className="text-center font-semibold text-2xl mb-6">
             Hurry, Before It’s Too Late!
@@ -292,5 +303,5 @@ export const CountdownTimer = () => {
     );
   };
 
-  return <Countdown date={endDate} renderer={renderer} />;
+  return <Countdown date={endDate} autoStart renderer={renderer} />;
 };

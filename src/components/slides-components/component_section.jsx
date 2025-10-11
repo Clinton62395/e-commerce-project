@@ -1,9 +1,12 @@
-import React from "react";
-import { BadgeCheck, Box, HandCoins, PhoneOutgoing } from "lucide-react";
+import React, { useState } from "react";
+import { BadgeCheck, Box, HandCoins, PhoneOutgoing, Star } from "lucide-react";
+import { CountdownTimer, dynamicImages } from "./slide_pagination";
+import { progress } from "framer-motion";
+
 export const ServiceTime = () => {
   return (
     <div className=" bg-slate-100">
-      <div className=" relative my-5 flex items-center justify-center gap-3 w-full mx-auto max-w-6xl flex-wrap md:flex-nowrap">
+      <div className="md:grid md:grid-cols-2 relative my-5 flex items-center justify-center gap-3 w-full mx-auto max-w-6xl flex-wrap md:flex-nowrap">
         <div>
           <img
             src="/homepicture.png"
@@ -13,11 +16,17 @@ export const ServiceTime = () => {
         </div>
 
         <div
-          className="relative bg-gray-100 border-2 border-blue-500 p-8 md:p-12"
           style={{
-            clipPath: "polygon(0 0, 100% 0, 100% 100%, 8% 100%, 0 0)",
+            clipPath: "polygon(20% 0, 100% 0, 100% 100%, 7% 100%)",
           }}
+          className=" relative bg-[#DADADA]  p-8 md:p-12"
         >
+          <div
+            style={{
+              clipPath: "polygon(20% 0, 100% 0, 100% 100%, 7% 100%)",
+            }}
+            className="absolute left-0 top-0 h-wull w-[4px] "
+          ></div>
           <div className="ml-12 md:ml-24">
             <p className="text-sm text-gray-500 mb-2">Women Collection</p>
             <h1 className="text-4xl md:text-5xl font-bold text-gray-800 mb-6">
@@ -118,3 +127,25 @@ export const SubscriptNewLetter = () => {
     </div>
   );
 };
+
+export const SocioMediaProfile = () => {
+  return (
+    <div className="h-screen justify-center items-center flex flex-col">
+      <h2 className="text-center text-2xl font-bold">Follow Us On Instagram</h2>
+      <p className="text-sm leading-relaxed w-full  p-4 max-w-2xl mx-auto">
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Scelerisque
+        duis ultrices sollicitudin aliquam sem. Scelerisque duis ultrices
+        sollicitudin{" "}
+      </p>
+      <div className="flex items-center justify-center mx-2">
+        {dynamicImages.map((src, index) => (
+          <div key={index} className="">
+            <img src={src} className="" />
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+// ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++

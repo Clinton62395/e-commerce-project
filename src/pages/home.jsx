@@ -11,6 +11,7 @@ import {
 import { Link } from "react-router-dom";
 import {
   ServiceTime,
+  SocioMediaProfile,
   SubscriptNewLetter,
 } from "../components/slides-components/component_section";
 import { NewProduct } from "../landing_pages/new_product";
@@ -114,24 +115,10 @@ export const Home = () => {
           <ServiceTime />
         </div>
 
-        {/*  */}
-        <div className="h-screen justify-center items-center flex flex-col">
-          <h2 className="text-center text-2xl font-bold">
-            Follow Us On Instagram
-          </h2>
-          <p className="text-sm leading-relaxed w-full  p-4 max-w-2xl mx-auto">
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Scelerisque
-            duis ultrices sollicitudin aliquam sem. Scelerisque duis ultrices
-            sollicitudin{" "}
-          </p>
-          <div className="flex items-center justify-center mx-2">
-            {dynamicImages.map((src, index) => (
-              <div key={index} className="">
-                <img src={src} className="" />
-              </div>
-            ))}
-          </div>
-        </div>
+        {/* sociol media profile picture component  */}
+
+        <SocioMediaProfile />
+
         {/* scribscript new letter component  */}
         <SubscriptNewLetter />
         {/* footer */}
