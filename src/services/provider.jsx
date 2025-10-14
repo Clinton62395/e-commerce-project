@@ -17,7 +17,6 @@ export const UseCart = () => {
 
 export const Provider = ({ children }) => {
   const [cart, setCart] = useState([]);
-  const [isAddedToCart, setIsAddedToCart] = useState(false);
 
   // get cart from local storage
   useEffect(() => {
@@ -40,33 +39,32 @@ export const Provider = ({ children }) => {
     }
   }, [cart]);
 
-  const addProduct = (currentImage, imageUrl) => {
-    if (!currentImage || !currentImage.sideImages?.length) return;
+  const addProduct = (product, selectedImageUrl) => {
+    if (!product || !selectedImageUrl) return;
 
-    setIsAddedToCart(true);
-    setTimeout(() => setIsAddedToCart(false), 1000);
-
-    const product = {
-      id: imageUrl,
-      image: imageUrl,
-      title: currentImage.title,
-      color: currentImage.color1,
-      price: currentImage.price,
-      rate: currentImage.rate,
-      reducePrice: currentImage.reducePrice,
-      size: currentImage.size,
+    const newProduct = {
+      id: selectedImageUrl,
+      image: selectedImageUrl,
+      title: product.title,
+      color: product.color1,
+      price: product.price,
+      rate: product.rate,
+      reducePrice: product.reducePrice,
+      size: product.size,
+      deadline: product.deadline,
       quantity: 1,
+      totalQuantity: 1,
     };
 
     setCart((prev) => {
-      const exists = prev.some((item) => item.id === imageUrl);
+      const exists = prev.some((item) => item.id === selectedImageUrl);
       const updatedCart = exists
         ? prev.map((item) =>
-            item.id === imageUrl
+            item.id === selectedImageUrl
               ? { ...item, quantity: item.quantity + 1 }
               : item
           )
-        : [...prev, product];
+        : [...prev, newProduct];
 
       localStorage.setItem("cart", JSON.stringify(updatedCart));
       return updatedCart;
@@ -75,18 +73,13 @@ export const Provider = ({ children }) => {
 
   // add increase product quantity
   const handleIncrease = (imageId) => {
-    const existingProduct = currentImage.sideImages.some(
-      (product) => product.id === imageId
-    );
-    if (existingProduct) {
-      setCart((prev) => {
-        const productAdded = prev.map((item) =>
-          item.id === imageId ? { ...item, quantity: item.quantity + 1 } : item
-        );
-        localStorage.setItem("cart:", JSON.stringify(productAdded));
-        return productAdded;
-      });
-    }
+    setCart((prev) => {
+      const updated = prev.map((item) =>
+        item.id === imageId ? { ...item, quantity: item.quantity + 1 } : item
+      );
+      localStorage.setItem("cart", JSON.stringify(updated));
+      return updated;
+    });
   };
 
   // handle decrease product button
@@ -103,7 +96,7 @@ export const Provider = ({ children }) => {
   };
 
   const handleRemove = (imageId) => {
-    setCart((prev) => [...prev.filter((item) => item.id !== imageId)]);
+    setCart((prev) => [prev.filter((item) => item.id !== imageId)]);
   };
 
   const clearCart = () => setCart([]);
@@ -112,7 +105,7 @@ export const Provider = ({ children }) => {
     return cart.reduce((acc, item) => acc + item.price * item.quantity, 0);
   }, [cart]);
 
-  const getTotalQuantity = useMemo(() => {
+  const totalQuantity = useMemo(() => {
     return cart.reduce((acc, item) => acc + item.quantity, 0);
   }, [cart]);
 
@@ -123,9 +116,8 @@ export const Provider = ({ children }) => {
     handleRemove,
     clearCart,
     cart,
-    isAddedToCart,
     totalPrice,
-    getTotalQuantity,
+    totalQuantity,
   };
 
   return <cartContext.Provider value={values}>{children}</cartContext.Provider>;

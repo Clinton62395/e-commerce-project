@@ -33,8 +33,13 @@ import {
   ShoppingCart,
   Car,
   Inbox,
+  ShoppingBag,
+  ShoppingCartIcon,
 } from "lucide-react";
 import { UseCart } from "../../services/provider";
+import { Link } from "react-router-dom";
+import { ShopingCart } from "../../pages/shoping.Cart";
+import Badge from "@mui/material/Badge";
 
 // progress bar from Material UI
 const BorderLinearProgress = styled(LinearProgress)(({ theme }) => ({
@@ -58,8 +63,18 @@ const BorderLinearProgress = styled(LinearProgress)(({ theme }) => ({
 // Modal from Material UI
 
 export const SingleProductInfo = () => {
-  const { addProduct, handleDerease, handleIncrease, isAddedToCart, cart } =
-    UseCart();
+  const [isAddedToCart, setIsAddedToCart] = useState(false);
+  const [showPanel, setShowPanel] = useState(false);
+
+  const handleDismiss = () => setShowPanel(false);
+
+  const { addProduct, handleDerease, handleIncrease, cart } = UseCart();
+
+  // const handleAdd = (currentImage, imageUrl) => {
+  //   addProduct(currentImage, imageUrl);
+  //   setIsAddedToCart(true);
+  //   setTimeout(() => setIsAddedToCart(false), 1000);
+  // };
   // modal state
   const [open, setOpen] = useState(false);
 
@@ -86,8 +101,8 @@ export const SingleProductInfo = () => {
       ],
       title: "Casual Long Sleeve Graphic T-Shirt",
       description: "Perfect blend of style and comfort for everyday wear",
-      price: "$59.00",
-      reducePrice: "$39.00",
+      price: 59.00,
+      reducePrice: 39.00,
       rate: 5,
       view: "24 people are viewing this right now",
 
@@ -111,9 +126,25 @@ export const SingleProductInfo = () => {
       ? currentImage.sideImages[0]
       : currentImage.sideImages[selectedImage];
 
+  // const product= shopingImage[0];
+  // const imageId= product.
+
   return (
     <>
-      <div className="min-h-screen max-w-7xl mx-auto px-4 py-8">
+      <div className=" min-h-screen max-w-7xl mx-auto px-4 py-8">
+        <div className="fixed right-5 md:right-10 top-7 z-50 lg:right-20">
+          <button onClick={() => setShowPanel(true)}>
+            <Badge
+              badgeContent={cart.length}
+              color="primary"
+              overlap="circular"
+              showZero
+            >
+              <ShoppingCartIcon />
+            </Badge>
+          </button>
+          <ShopingCart open={showPanel} onClose={handleDismiss} />
+        </div>
         <div className="flex items-start gap-8">
           {/* Side Images Column */}
           <div className="w-24 flex-shrink-0">
@@ -242,42 +273,31 @@ export const SingleProductInfo = () => {
               <div className="md:grid md:grid-cols-2 flex  justify-center gap-5 items-center">
                 <div className="flex gap-5">
                   <button
-                    onClick={() =>
-                      addProduct(
-                        currentImage,
-                        currentImage.sideImages[selectedImage]
-                      )
-                    }
+                    onClick={() => handleDerease(displayImage)}
                     className="p-2 ring-2 hover:bg-slate-100  flex items-center justify-center focus:border border duration-300 transition-all hover:border-[#FDEFEE]  w-8 h-8 rounded-md"
                   >
                     <Minus size={20} />
                   </button>
-                  <div className="flex gap-2 bg-gray-100 text-gray-800 text-sm font-semibold px-3 py-1 rounded-full">
-                    {cart.map((item) => (
-                      <div key={item.id}>
-                        <p>Qty: {item.quantity}</p>
-                      </div>
-                    ))}
+                  <div className="flex gap-2 h-6 w-6 rounded-full  text-sm font-semibold px-3 py-1">
+                    <button>
+                      {cart.length === 0 ? (
+                        <p>0</p>
+                      ) : (
+                        cart.map((item) => (
+                          <span key={item.id}>{item.quantity}</span>
+                        ))
+                      )}
+                    </button>
                   </div>
                   <button
-                    onClick={() =>
-                      addProduct(
-                        currentImage,
-                        currentImage.sideImages[selectedImage]
-                      )
-                    }
+                    onClick={() => handleIncrease(displayImage)}
                     className="p-2 ring-2 hover:bg-slate-100  flex items-center justify-center focus:border border duration-300 transition-all border-[#FDEFEE] w-8 h-8 rounded-md"
                   >
                     <Plus size={20} />
                   </button>
                 </div>
                 <button
-                  onClick={() =>
-                    addProduct(
-                      currentImage,
-                      currentImage.sideImages[selectedImage]
-                    )
-                  }
+                  onClick={() => addProduct(currentImage, displayImage)}
                   disabled={isAddedToCart}
                   className={`
               relative overflow-hidden group

@@ -8,30 +8,27 @@ import {
   Target,
   Menu,
   X,
+  ShoppingBag,
 } from "lucide-react";
 
 import React, { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 
 export const defaultLinks = [
-  { name: "Home", icon: <House size={15} />, link: "/" },
-  { name: "Deals", icon: <LogIn size={15} />, link: "/deals" },
-  { name: "New Products", icon: <Sprout size={15} />, link: "/new-Products" },
-  { name: "Packages", icon: <Box size={15} />, link: "/packages" },
-  { name: "Page", icon: <SquareArrowUpRight size={15} />, link: "/page" },
-  { name: "Sign In", icon: <LogIn size={15} />, link: "/login" },
-  {
-    name: "Sign Up",
-    icon: <SquareArrowUpRight size={15} />,
-    link: "/register",
-  },
+  { name: "Home", link: "/" },
+  { name: "Deals", link: "/deals" },
+  { name: "New Products", link: "/new-Products" },
+  { name: "Packages", link: "/packages" },
+  { name: "Page", link: "/page" },
+  { name: "Sign In", link: "/login" },
+  { name: "Sign Up", link: "/register" },
 ];
 
 export const shopLinks = [
-  { name: "Home", icon: <House size={15} />, link: "/" },
-  { name: "Shop", icon: <LogIn size={15} />, link: "/shop" },
-  { name: "products", icon: <ShoppingBasket size={15} />, link: "/products" },
-  { name: "Page", icon: <Target size={15} />, link: "/shop-page" },
+  { name: "Home", link: "/" },
+  { name: "Shop", link: "/shop" },
+  { name: "products", link: "/products" },
+  // { name: <ShoppingBag size={20} />, link: "/shoping-cart" },
 ];
 export const NavLinks = ({ logo = "FASCO", pages = defaultLinks }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -41,20 +38,20 @@ export const NavLinks = ({ logo = "FASCO", pages = defaultLinks }) => {
 
   return (
     <div
-      className={`mb-10  relative  ${
+      className={`mb-10 sticky top-3 md:top-0 z-50  bg-white/70 shadow-sm py-3 backdrop-blur  ${
         isAuthPage
           ? "border-green-500 text-white font-bold"
           : "font-semibold text-gray-700"
       }`}
     >
       <button
-        className=" md:hidden absolute left-4 -top-6 z-20 bg-white p-2 rounded-md shadow-sm text-gray-700 hover:bg-gray-100"
+        className=" md:hidden absolute left-4 -top-6 z-20 bg-white/90 backdrop-blur p-2 rounded-md shadow-sm text-gray-700 hover:bg-gray-100"
         onClick={() => setIsMenuOpen(!isMenuOpen)}
       >
         {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
       </button>
       {isMenuOpen && (
-        <div className="mt-5 text-center w-full  max-w-full mx-auto bg-white shadow-md  flex flex-wrap justify-center min-w-0  items-center gap-2 md:gap-4 p-2  md:hidden z-10">
+        <div className="pt-5 text-center w-full max-w-full mx-auto bg-white shadow-md  flex flex-wrap justify-center min-w-0  items-center gap-2 md:gap-4 p-2  md:hidden z-10">
           {pages.map((page, index) => {
             const isActive = location.pathname === page.link;
             return (
@@ -79,12 +76,15 @@ export const NavLinks = ({ logo = "FASCO", pages = defaultLinks }) => {
         </div>
       )}
 
-      <div className="hidden  md:flex items-center justify-between mx-10">
-        <Link to="/" className="text-3xl font-bold leading-loose text-black ">
+      <div className="hidden    md:flex items-center justify-center mx-10">
+        <Link
+          to="/"
+          className="flex items-start justify-start text-3xl font-bold leading-loose text-black "
+        >
           FASCO
         </Link>
 
-        <div className="flex gap-10 me-5">
+        <div className="flex justify-center  gap-10 me-5 flex-1">
           {pages.map((page, index) => {
             const isActive = location.pathname === page.link;
             const isSignUp = page.link === "/register";

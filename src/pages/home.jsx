@@ -19,7 +19,7 @@ import { NewProduct } from "../landing_pages/new_product";
 export const Home = () => {
   return (
     <>
-      <main className="bg-white mt-10 overflow-x-hidden ">
+      <main id="home" className="bg-white mt-10 overflow-x-hidden ">
         <div className=" grid grid-cols-1 md:grid-cols-3 gap-10 md:gap-4 p-4 mx-auto max-w-6xl">
           <div className="bg-gray-100 rounded-t-lg flex items-end hover:scale-105 duration-300 shadow-sm hover:shadow-lg">
             <img
@@ -69,10 +69,20 @@ export const Home = () => {
           <span className="text-2xl tracking-tight">Calvin Klein</span>
           <span className="text-2xl font-bold tracking-widest">DENIM</span>
         </div>
-        <button className="fixed bottom-8 right-8 bg-black/80  text-white p-4 rounded-full shadow-lg hover:bg-gray-800 duration-200 transition-all z-[100] hover:shadow-md">
+        <Link
+          to="shop"
+          className="fixed bottom-8 right-8 bg-black/80  text-white p-4 rounded-full shadow-lg hover:bg-gray-800 duration-200 transition-all z-[100] hover:shadow-md"
+        >
           <ShoppingCart size={24} />
-        </button>
-        <button className="fixed bottom-24 right-8 hover:text-white bg-white text-black p-4 rounded-full shadow-lg border hover:bg-gray-900 duration-200 transition-all z-[100] hover:shadow-md">
+        </Link>
+        <button
+          onClick={() => {
+            document
+              .getElementById("home")
+              ?.scrollIntoView({ behavior: "smooth" });
+          }}
+          className="fixed bottom-24 right-8 hover:text-white bg-white text-black p-4 rounded-full shadow-lg border hover:bg-gray-900 duration-200 transition-all z-[100] hover:shadow-md"
+        >
           <ArrowUp size={24} />
         </button>
         <div className="my-5 flex flex-col space-y-4">
