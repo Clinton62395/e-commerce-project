@@ -26,14 +26,10 @@ import {
   Plus,
   Share2,
   Star,
-  Heart,
-  Truck,
-  ShieldCheck,
   Check,
   ShoppingCart,
   Car,
   Inbox,
-  ShoppingBag,
   ShoppingCartIcon,
 } from "lucide-react";
 import { UseCart } from "../../services/provider";
@@ -70,12 +66,6 @@ export const SingleProductInfo = () => {
 
   const { addProduct, handleDerease, handleIncrease, cart } = UseCart();
 
-  // const handleAdd = (currentImage, imageUrl) => {
-  //   addProduct(currentImage, imageUrl);
-  //   setIsAddedToCart(true);
-  //   setTimeout(() => setIsAddedToCart(false), 1000);
-  // };
-  // modal state
   const [open, setOpen] = useState(false);
 
   const handleClickOpen = () => {
@@ -101,8 +91,8 @@ export const SingleProductInfo = () => {
       ],
       title: "Casual Long Sleeve Graphic T-Shirt",
       description: "Perfect blend of style and comfort for everyday wear",
-      price: 59.00,
-      reducePrice: 39.00,
+      price: 59.0,
+      reducePrice: 39.0,
       rate: 5,
       view: "24 people are viewing this right now",
 
@@ -126,8 +116,9 @@ export const SingleProductInfo = () => {
       ? currentImage.sideImages[0]
       : currentImage.sideImages[selectedImage];
 
-  // const product= shopingImage[0];
-  // const imageId= product.
+  const productInCard = cart.find((item) => {
+    return item.image === displayImage;
+  });
 
   return (
     <>
@@ -279,14 +270,8 @@ export const SingleProductInfo = () => {
                     <Minus size={20} />
                   </button>
                   <div className="flex gap-2 h-6 w-6 rounded-full  text-sm font-semibold px-3 py-1">
-                    <button>
-                      {cart.length === 0 ? (
-                        <p>0</p>
-                      ) : (
-                        cart.map((item) => (
-                          <span key={item.id}>{item.quantity}</span>
-                        ))
-                      )}
+                    <button className="text-[tomato]/80 font-semibold">
+                      {productInCard ? productInCard.quantity : 0}
                     </button>
                   </div>
                   <button

@@ -16,6 +16,7 @@ import { Products } from "./pages/products";
 import { HomeLayout } from "./outlets/HomeLayout";
 import { ShopLayout } from "./outlets/ShopLayout";
 import { ShopingCart } from "./pages/shoping.Cart";
+import { Checkout } from "./landing_pages/checkout";
 
 function App() {
   return (
@@ -40,6 +41,7 @@ function App() {
               <Route path="/products" element={<Products />} />
               {/* <Route path="/shoping-cart" element={<ShopingCart />} /> */}
             </Route>
+            <Route path="/checkout" element={<Checkout />} />
           </Routes>
         </Provider>
       </BrowserRouter>

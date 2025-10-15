@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { BadgeCheck, Box, HandCoins, PhoneOutgoing, Star } from "lucide-react";
 import { CountdownTimer, dynamicImages } from "./slide_pagination";
 import { progress } from "framer-motion";
+import { Link } from "react-router-dom";
 
 export const ServiceTime = () => {
   return (
@@ -50,9 +51,12 @@ export const ServiceTime = () => {
 
             <p className="text-3xl font-bold mb-6">$100.00</p>
 
-            <button className="bg-black text-white px-8 py-3 rounded-lg hover:bg-gray-800 transition-colors">
+            <Link
+              to="/shop"
+              className="bg-black text-white px-8 py-3 rounded-lg hover:bg-gray-800 transition-colors"
+            >
               Buy Now
-            </button>
+            </Link>
           </div>
         </div>
       </div>

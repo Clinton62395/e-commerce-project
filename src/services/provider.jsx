@@ -17,6 +17,7 @@ export const UseCart = () => {
 
 export const Provider = ({ children }) => {
   const [cart, setCart] = useState([]);
+  console.log("===> 1", cart);
 
   // get cart from local storage
   useEffect(() => {
@@ -41,9 +42,10 @@ export const Provider = ({ children }) => {
 
   const addProduct = (product, selectedImageUrl) => {
     if (!product || !selectedImageUrl) return;
+    // const uniqueId = `${product.id}-${selectedImageUrl}`;
 
     const newProduct = {
-      id: selectedImageUrl,
+      id: selectedImageUrl, // identifiant unique
       image: selectedImageUrl,
       title: product.title,
       color: product.color1,
@@ -53,14 +55,14 @@ export const Provider = ({ children }) => {
       size: product.size,
       deadline: product.deadline,
       quantity: 1,
-      totalQuantity: 1,
     };
 
     setCart((prev) => {
-      const exists = prev.some((item) => item.id === selectedImageUrl);
+      const exists = prev.some((item) => item.id === newProduct.id);
+
       const updatedCart = exists
         ? prev.map((item) =>
-            item.id === selectedImageUrl
+            item.id === newProduct.id
               ? { ...item, quantity: item.quantity + 1 }
               : item
           )
@@ -72,10 +74,12 @@ export const Provider = ({ children }) => {
   };
 
   // add increase product quantity
-  const handleIncrease = (imageId) => {
+  const handleIncrease = (imageUrl) => {
     setCart((prev) => {
       const updated = prev.map((item) =>
-        item.id === imageId ? { ...item, quantity: item.quantity + 1 } : item
+        item.image === imageUrl
+          ? { ...item, quantity: item.quantity + 1 }
+          : item
       );
       localStorage.setItem("cart", JSON.stringify(updated));
       return updated;
@@ -83,23 +87,29 @@ export const Provider = ({ children }) => {
   };
 
   // handle decrease product button
-  const handleDerease = (imageId) => {
+  const handleDerease = (imageUrl) => {
     setCart((prev) => {
-      const updated = prev.map((item) =>
-        item.id === imageId && item.quantity > 1
-          ? { ...item, quantity: item.quantity - 1 }
-          : item
-      );
+      const updated = prev
+        .map((item) =>
+          item.image === imageUrl && item.quantity > 1
+            ? { ...item, quantity: item.quantity - 1 }
+            : item
+        )
+        .filter((item) => item.quantity > 0);
       localStorage.setItem("cart:", JSON.stringify(updated));
       return updated;
     });
   };
 
-  const handleRemove = (imageId) => {
-    setCart((prev) => [prev.filter((item) => item.id !== imageId)]);
+  const handleRemove = (imageUrl) => {
+    setCart((prev) => [prev.filter((item) => item.id !== imageUrl)]);
   };
 
   const clearCart = () => setCart([]);
+
+  const subTotal = useMemo(() => {
+    return cart.reduce((acc, item) => acc + item.price * item.quantity, 0);
+  }, [cart]);
 
   const totalPrice = useMemo(() => {
     return cart.reduce((acc, item) => acc + item.price * item.quantity, 0);
@@ -108,6 +118,19 @@ export const Provider = ({ children }) => {
   const totalQuantity = useMemo(() => {
     return cart.reduce((acc, item) => acc + item.quantity, 0);
   }, [cart]);
+
+  // const ProductPrice = ({ itemId, cart }) => {
+  //   const singlePrice = useMemo(() => {
+  //     const product = cart.find((item) => item.id === itemId);
+  //     return product ? product.price * product.quantity : 0;
+  //   }, [cart, itemId]);
+  //   return singlePrice;
+  // };
+
+  const ProductPrice = (itemId) => {
+    const product = cart.find((item) => item.id === itemId);
+    return product ? product.price * product.quantity : 0;
+  };
 
   const values = {
     addProduct,
@@ -118,6 +141,8 @@ export const Provider = ({ children }) => {
     cart,
     totalPrice,
     totalQuantity,
+    subTotal,
+    ProductPrice,
   };
 
   return <cartContext.Provider value={values}>{children}</cartContext.Provider>;

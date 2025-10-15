@@ -175,12 +175,14 @@ export const NewProduct = () => {
               className="group relative duration-200 transition-all rounded-md shadow-sm hover:shadow-md p-2"
             >
               <div className="relative overflow-hidden w-full h-72">
-                <img
-                  ref={(el) => (imageRefs.current[index] = el)}
-                  src={item.image}
-                  alt={item.description}
-                  className=" object-cover  scroll-image w-full h-full rounded-md transition-all duration-500 transform group-hover:-translate-x-2"
-                />
+                <Link to="/products">
+                  <img
+                    ref={(el) => (imageRefs.current[index] = el)}
+                    src={item.image}
+                    alt={item.description}
+                    className=" object-cover  scroll-image w-full h-full rounded-md transition-all duration-500 transform group-hover:-translate-x-2"
+                  />
+                </Link>
                 <div className="absolute inset-0 bg-black opacity-0 group-hover:opacity-50 transition-opacity duration-200 rounded-md pointer-events-none"></div>
               </div>
               <div className="flex justify-between my-2">
