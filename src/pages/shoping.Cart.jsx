@@ -23,6 +23,7 @@ export const ShopingCart = ({ open: isDrowerOpen, onClose }) => {
     totalQuantity,
     subTotal,
     ProductPrice,
+    toggleGiftWrap,
   } = UseCart();
 
   const DrawerList = (
@@ -96,8 +97,8 @@ export const ShopingCart = ({ open: isDrowerOpen, onClose }) => {
                   <div className="flex items-center gap-4">
                     <input
                       type="checkbox"
-                      checked={isGiftWrap}
-                      onChange={(e) => setIsGiftWrap(e.target.checked)}
+                      checked={item.giftwrap}
+                      onChange={(e) => toggleGiftWrap(item.image)}
                       className="accent-green-600 w-5 h-5"
                     />
                     <label

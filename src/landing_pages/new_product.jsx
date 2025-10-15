@@ -12,6 +12,7 @@ import sar from "/sar.jpg";
 import ssarclin from "/ssarclin.jpeg";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+
 gsap.registerPlugin(ScrollTrigger);
 
 export const NewProduct = () => {
@@ -175,7 +176,7 @@ export const NewProduct = () => {
               className="group relative duration-200 transition-all rounded-md shadow-sm hover:shadow-md p-2"
             >
               <div className="relative overflow-hidden w-full h-72">
-                <Link to="/products">
+                <Link to="/product-details">
                   <img
                     ref={(el) => (imageRefs.current[index] = el)}
                     src={item.image}

@@ -55,6 +55,7 @@ export const Provider = ({ children }) => {
       size: product.size,
       deadline: product.deadline,
       quantity: 1,
+      giftwrap: false,
     };
 
     setCart((prev) => {
@@ -107,30 +108,39 @@ export const Provider = ({ children }) => {
 
   const clearCart = () => setCart([]);
 
+  const toggleGiftWrap = (imageUrl) => {
+    setCart((prev) => {
+      const updated = prev.map((item) =>
+        item.image === imageUrl ? { ...item, giftwrap: !item.giftwrap } : item
+      );
+      localStorage.setItem("cart:", JSON.stringify(updated));
+      return updated;
+    });
+  };
+
   const subTotal = useMemo(() => {
     return cart.reduce((acc, item) => acc + item.price * item.quantity, 0);
   }, [cart]);
 
-  const totalPrice = useMemo(() => {
-    return cart.reduce((acc, item) => acc + item.price * item.quantity, 0);
-  }, [cart]);
+  // const totalPrice = useMemo(() => {
+  //   return cart.reduce((acc, item) => acc + item.price * item.quantity, 0);
+  // }, [cart]);
 
   const totalQuantity = useMemo(() => {
     return cart.reduce((acc, item) => acc + item.quantity, 0);
   }, [cart]);
 
-  // const ProductPrice = ({ itemId, cart }) => {
-  //   const singlePrice = useMemo(() => {
-  //     const product = cart.find((item) => item.id === itemId);
-  //     return product ? product.price * product.quantity : 0;
-  //   }, [cart, itemId]);
-  //   return singlePrice;
-  // };
-
   const ProductPrice = (itemId) => {
     const product = cart.find((item) => item.id === itemId);
     return product ? product.price * product.quantity : 0;
   };
+  const giftCharge = 10;
+  const calculateGiswrap = useMemo(() => {
+    const hasGiftWrap = cart.some((item) => item.giftwrap);
+    return hasGiftWrap ? giftCharge : 0;
+  }, [cart]);
+
+  const totalPrice = subTotal + calculateGiswrap;
 
   const values = {
     addProduct,
@@ -138,6 +148,7 @@ export const Provider = ({ children }) => {
     handleIncrease,
     handleRemove,
     clearCart,
+    toggleGiftWrap,
     cart,
     totalPrice,
     totalQuantity,

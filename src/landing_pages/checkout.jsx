@@ -2,7 +2,7 @@ import React from "react";
 import { Link } from "react-router-dom";
 import { UseCart } from "../services/provider";
 import Badge from "@mui/material/Badge";
-import { Minus, Plus } from "lucide-react";
+import { Lock, Minus, Plus } from "lucide-react";
 
 export const Checkout = ({ displayImage }) => {
   const {
@@ -42,90 +42,125 @@ export const Checkout = ({ displayImage }) => {
             <input
               type="email"
               placeholder="Email Address"
-              className="w-full border rounded-md px-4 py-2"
+              className="w-full border rounded-md px-4 py-3"
             />
           </div>
 
           {/* Livraison */}
           <div className="space-y-4">
             <h2 className="text-xl font-semibold">Delivery</h2>
-            <select className="w-full border rounded-md px-4 py-2">
+            <select
+              className="w-full border rounded-md px-4 py-4"
+              aria-label="list of countries"
+            >
+              <option disabled selected>
+                Country / Region{" "}
+              </option>
+              <option>Guinea</option>
               <option>Nigeria</option>
-              <option>Ghana</option>
-              <option>South Africa</option>
+              <option>Mali</option>
+              <option>Cote D'Ivoire</option>
             </select>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="bg-[#F5F5F5] space-y-3 rounded-sm shadow-md p-5">
+              <div className="grid grid-cols-2 gap-4">
+                <input
+                  type="text"
+                  placeholder="First Name"
+                  className="border rounded-md px-4 py-3"
+                />
+                <input
+                  type="text"
+                  placeholder="Last Name"
+                  className="border rounded-md px-4 py-3"
+                />
+              </div>
               <input
                 type="text"
-                placeholder="First Name"
-                className="border rounded-md px-4 py-2"
+                placeholder="Address"
+                className="w-full border rounded-md px-4 py-3"
               />
-              <input
-                type="text"
-                placeholder="Last Name"
-                className="border rounded-md px-4 py-2"
-              />
+              <div className="grid grid-cols-2 gap-4">
+                <input
+                  type="text"
+                  placeholder="City"
+                  className="border rounded-md px-4 py-3"
+                />
+                <input
+                  type="text"
+                  placeholder="Postal Code"
+                  className="border rounded-md px-4 py-3"
+                />
+              </div>
+              <label className="flex items-center gap-2 text-sm">
+                <input type="checkbox" className="w-5 h-5 accent-orange-500" />
+                Save this info for future
+              </label>
             </div>
-            <input
-              type="text"
-              placeholder="Address"
-              className="w-full border rounded-md px-4 py-2"
-            />
-            <div className="grid grid-cols-2 gap-4">
-              <input
-                type="text"
-                placeholder="City"
-                className="border rounded-md px-4 py-2"
-              />
-              <input
-                type="text"
-                placeholder="Postal Code"
-                className="border rounded-md px-4 py-2"
-              />
-            </div>
-            <label className="flex items-center gap-2 text-sm">
-              <input type="checkbox" />
-              Save this info for future
-            </label>
           </div>
 
           {/* Paiement */}
           <div className="space-y-4">
             <h2 className="text-xl font-semibold">Payment</h2>
-            <select className="w-full border rounded-md px-4 py-2">
-              <option>Credit Card</option>
-              <option>PayPal</option>
-            </select>
-            <input
-              type="text"
-              placeholder="Card Number"
-              className="w-full border rounded-md px-4 py-2"
-            />
-            <div className="grid grid-cols-2 gap-4">
-              <input
-                type="text"
-                placeholder="Expiration Date"
-                className="border rounded-md px-4 py-2"
-              />
-              <input
-                type="text"
-                placeholder="Security Code"
-                className="border rounded-md px-4 py-2"
-              />
+            <div className="space-y-2">
+              <div className="relative">
+                <select className="  w-full border rounded-md px-4 py-3 border-black ">
+                  <option>Credit Card</option>
+                  <option>PayPal</option>
+                  <option>Opay</option>
+                  <option>Orange Money</option>
+                </select>
+                <img
+                  src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSGxtlip6IJQaXvwoezxiZTUYnD3FRVxg0nqQ&s"
+                  className="h-5 absolute right-5 top-3"
+                />
+              </div>
+              <div className="bg-[#F5F5F5] space-y-3 rounded-sm shadow-md p-5">
+                <div className=" relative">
+                  <input
+                    type="text"
+                    placeholder="Card Number"
+                    className="w-full border rounded-md px-4 py-3"
+                  />
+                  <Lock className="absolute right-5 top-3" />
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <input
+                    type="text"
+                    placeholder="Expiration Date"
+                    className="border rounded-md px-4 py-3"
+                  />
+                  <input
+                    type="text"
+                    placeholder="Security Code"
+                    className="border rounded-md px-4 py-3"
+                  />
+                </div>
+                <input
+                  type="text"
+                  placeholder="Card Holder Name"
+                  className="w-full border rounded-md px-4 py-3"
+                />
+                <label className="flex items-center gap-2 text-sm">
+                  <input
+                    type="checkbox"
+                    className="w-4 h-4 accent-orange-500"
+                  />
+                  Save this info for future
+                </label>
+                <button className="w-full bg-black text-white py-2 rounded-md hover:bg-gray-800 transition">
+                  Pay Now
+                </button>
+              </div>
             </div>
-            <input
-              type="text"
-              placeholder="Card Holder Name"
-              className="w-full border rounded-md px-4 py-2"
-            />
-            <button className="w-full bg-black text-white py-2 rounded-md hover:bg-gray-800 transition">
-              Pay Now
-            </button>
           </div>
+          {/* Footer */}
+          <footer className="text-xs text-gray-500 pt-6 border-t">
+            © 2023 FASCO. All Rights Reserved.
+          </footer>
         </div>
 
         {/* Résumé de commande */}
-        <div className="bg-white p-6 rounded-md shadow-md space-y-6">
+        <div className="bg-[#F5F5F5] p-6 rounded-md shadow-md space-y-6">
           <h2 className="text-xl font-semibold">Order Summary</h2>
           {cart.length === 0 ? (
             <p className="text-[tomato]/90 font-semibold text-center">
@@ -214,11 +249,6 @@ export const Checkout = ({ displayImage }) => {
               <span>${totalPrice}</span>
             </div>
           </div>
-
-          {/* Footer */}
-          <footer className="text-xs text-gray-500 pt-6 border-t">
-            © 2023 FASCO. All Rights Reserved.
-          </footer>
         </div>
       </div>
     </>

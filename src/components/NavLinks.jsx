@@ -1,25 +1,13 @@
-import {
-  Box,
-  House,
-  LogIn,
-  ShoppingBasket,
-  Sprout,
-  SquareArrowUpRight,
-  Target,
-  Menu,
-  X,
-  ShoppingBag,
-} from "lucide-react";
+import { Menu, X } from "lucide-react";
 
 import React, { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 
 export const defaultLinks = [
   { name: "Home", link: "/" },
-  { name: "Deals", link: "/deals" },
+  // { name: "Deals", link: "/deals" },
   { name: "New Products", link: "/new-Products" },
-  { name: "Packages", link: "/packages" },
-  { name: "Page", link: "/page" },
+  // { name: "Packages", link: "/packages" },
   { name: "Sign In", link: "/login" },
   { name: "Sign Up", link: "/register" },
 ];
@@ -27,7 +15,7 @@ export const defaultLinks = [
 export const shopLinks = [
   { name: "Home", link: "/" },
   { name: "Shop", link: "/shop" },
-  { name: "products", link: "/products" },
+  { name: "products", link: "/product-details" },
   // { name: <ShoppingBag size={20} />, link: "/shoping-cart" },
 ];
 export const NavLinks = ({ logo = "FASCO", pages = defaultLinks }) => {

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   ChevronRight,
   ChevronDown,
@@ -13,8 +13,46 @@ import PaginationItem from "@mui/material/PaginationItem";
 import Stack from "@mui/material/Stack";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
+import ScrollTrigger from "gsap/ScrollTrigger";
+import gsap from "gsap";
+import { Link } from "react-router-dom";
+
+gsap.registerPlugin(ScrollTrigger);
 
 export const FashionShop = () => {
+  const sectionRef = useRef(null);
+
+  useEffect(() => {
+    const elements = sectionRef.current.querySelectorAll(".scroll-image");
+    gsap.fromTo(
+      elements,
+      {
+        opacity: 0,
+        y: 50,
+      },
+      {
+        opacity: 1,
+        y: 0,
+        duration: 1,
+        stagger: 0.3,
+        ease: "power2.out",
+        clearProps: "all",
+        scrollTrigger: {
+          trigger: elements,
+          start: "top 90%",
+          bottom: "bottom 10%",
+          toggleActions: "play reverse play reverse",
+
+          scrub: 1,
+          // toggleActions: "play reverse play reverse",
+        },
+      }
+    );
+    return () => {
+      ScrollTrigger.getAll().forEach((trigger) => trigger.kill());
+    };
+  }, []);
+
   const [show, setShow] = useState({
     size: true,
     color: true,
@@ -297,8 +335,6 @@ export const FashionShop = () => {
     page * itemsPerPage
   );
 
-
-
   const toggleSwitch = (key) => {
     setShow((prev) => ({ ...prev, [key]: !prev[key] }));
   };
@@ -317,13 +353,21 @@ export const FashionShop = () => {
   const clearFilters = () => setActiveFilters({});
 
   return (
-    <div className="min-h-screen bg-gradient-to-r from-gray-50 to-gray-100">
+    <div
+      ref={sectionRef}
+      className="min-h-screen bg-gradient-to-r from-gray-50 to-gray-100   "
+    >
       {/* Header */}
       <div className="bg-white border-b border-gray-200 sticky top-0 z-30 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2 text-sm">
-              <span className="font-semibold text-gray-900">Home</span>
+              <Link
+                to="/"
+                className="font-semibold text-gray-900 hover:text-blue-300 hover:underline duration-150 transition-all"
+              >
+                Home
+              </Link>
               <ChevronRight size={16} className="text-gray-400" />
               <span className="text-gray-600">Fashion</span>
             </div>
@@ -593,15 +637,17 @@ export const FashionShop = () => {
                     className={layout === "list" ? "flex-shrink-0 w-48" : ""}
                   >
                     <div
-                      className={`relative overflow-hidden bg-gray-100 ${
+                      className={`scroll-image relative overflow-hidden bg-gray-100 ${
                         layout === "list" ? "h-48 w-48" : "h-64 w-full"
                       }`}
                     >
-                      <img
-                        src={product.src}
-                        alt={product.title}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                      />
+                      <Link to="/product-details">
+                        <img
+                          src={product.src}
+                          alt={product.title}
+                          className="scroll-image w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                        />
+                      </Link>
                     </div>
                   </div>
                   <div
