@@ -21,22 +21,22 @@ export const Home = () => {
     <>
       <main id="home" className="bg-white mt-10 overflow-x-hidden ">
         <div className=" grid grid-cols-1 md:grid-cols-3 gap-10 md:gap-4 p-4 mx-auto max-w-6xl">
-          <div className="bg-gray-100 rounded-t-lg flex items-end hover:scale-105 duration-300 shadow-sm hover:shadow-lg">
+          <div className="bg-gray-100 rounded-t-lg flex md:items-end hover:scale-105 duration-300 shadow-sm hover:shadow-lg">
             <img
               src="image-p.png"
               alt="image 1"
-              className="object-contain h-full md:h-96 lg:h-full lg:pt-24"
+              className="object-contain h-full md:h-96 lg:h-full lg:pt-24 "
             />
           </div>
           <div className="bg-gray-100 rounded-t-lg flex flex-col items-center gap-2 hover:scale-105 duration-300 shadow-sm hover:shadow-lg">
             <img
               src="line.png"
               alt="image 2"
-              className="object-contain h-full md:h-96 lg:h-full"
+              className="object-contain  h-full md:h-96 lg:h-full"
             />
-            <h2 className="text-7xl font-bold  leading-none">ULTIMATE</h2>
+            <h2 className="text-5xl md:text-7xl font-bold  leading-none">ULTIMATE</h2>
             <h2
-              className="text-8xl font-bold leading-none"
+              className="text-5xl md:text-8xl font-bold leading-none"
               style={{
                 WebkitTextStroke: "2px black",
                 WebkitTextFillColor: "transparent",
@@ -60,7 +60,7 @@ export const Home = () => {
             />
           </div>
         </div>
-        <div className="flex items-center flex-wrap justify-center gap-4 md:gap-16 py-8 border-t hover:scale-105 duration-300 shadow-sm hover:shadow-lg">
+        <div className="flex items-center flex-wrap justify-center gap-4  md:gap-16 py-8 px-2 border-t hover:scale-105 duration-300 shadow-sm hover:shadow-lg">
           <span className="text-2xl font-serif font-bold">CHANEL</span>
           <span className="text-2xl font-serif tracking-wide">
             LOUIS VUITTON
@@ -104,8 +104,8 @@ export const Home = () => {
               slidesPerView={3}
               initialSlide={2}
               centeredSlides={false}
-              activeImageSize="w-52 h-52 md:w-80 md:h-full"
-              inactiveImageSize="w-36 h-36 md:w-56 md:h-56"
+              activeImageSize="w-36 h-36 md:w-80 md:h-full"
+              inactiveImageSize="w-24 h-24 md:w-56 md:h-56"
               autoplayDelay={5000}
               navigationPosition="absolute transform translate-x-1/2 z-10 flex"
             />

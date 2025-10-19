@@ -56,8 +56,8 @@ export const SlidePagination = ({
   showNavigation = true,
   showPagination = true,
   initialSlide = 0,
-  activeImageSize = "w-52 h-52 md:w-80 md:h-full ",
-  inactiveImageSize = "w-36 h-36 md:w-56 md:h-56",
+  activeImageSize = "w-40 h-40 md:w-80 md:h-full ",
+  inactiveImageSize = "w-24 h-24 md:w-56 md:h-56",
   containerMaxWidth = "max-w-6xl mx-auto",
   containerHeight = " h-52 md:h-96",
   navigationPosition = "absolute bottom-10 md:left-24  top-56 md:top-72 transform translate-x-1/2   flex justify-center items-center gap-2 z-50",
@@ -76,7 +76,7 @@ export const SlidePagination = ({
   }, [slideId]);
 
   return (
-    <div className="relative">
+    <div className="relative ">
       <Swiper
         ref={swiperRef}
         className={`${containerMaxWidth} ${containerHeight}`}
@@ -260,8 +260,8 @@ export const CountdownTimer = ({ children }) => {
     ];
 
     return (
-      <div className="text-center bg-white p-6 rounded-2xl shadow-sm  ">
-        <div>
+      <div className="text-center bg-white p-6 rounded-2xl shadow-sm ">
+        <div className="p-5">
           <h2 className="font-bold text-2xl font-Volkhov">
             Deals Of The Month
           </h2>
@@ -283,7 +283,7 @@ export const CountdownTimer = ({ children }) => {
           </h3>
         </div>
 
-        <div className="flex justify-center gap-2 md:gap-4 ">
+        <div className=" flex justify-center  md:gap-4 ">
           {timeUnits.map((unit, i) => {
             const digits = String(unit.value).padStart(2, "0").split("");
 

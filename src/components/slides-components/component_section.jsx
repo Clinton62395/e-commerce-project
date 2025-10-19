@@ -20,7 +20,7 @@ export const ServiceTime = () => {
           style={{
             clipPath: "polygon(20% 0, 100% 0, 100% 100%, 7% 100%)",
           }}
-          className=" relative bg-[#DADADA]  p-8 md:p-12"
+          className=" relative bg-[#DADADA]  p-8 md:p-12 "
         >
           <div
             style={{
@@ -60,7 +60,7 @@ export const ServiceTime = () => {
           </div>
         </div>
       </div>
-      <div className="flex  items-center bg-white shadow-md py-5 md:py-10 my-4 justify-evenly">
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4   bg-white shadow-md p-4 mx-auto">
         <div className="flex gap-3 items-center">
           <HandCoins size={20} />
           <div className="flex flex-col">
@@ -101,33 +101,45 @@ export const ServiceTime = () => {
 
 export const SubscriptNewLetter = () => {
   return (
-    <div className="h-creen p-5 flex items-center justify-center space-x-2 ">
-      <di>
-        <img src="/jacketstyle.png" alt="jacketstyle" />
-      </di>
+    <div className="min-h-screen p-5 flex flex-col md:flex-row items-center justify-center md:space-x-6 space-y-6 md:space-y-0 bg-gray-50">
+      {/* Image gauche */}
+      <div className="flex-shrink-0 w-40 sm:w-56 md:w-64 lg:w-72">
+        <img
+          src="/jacketstyle.png"
+          alt="jacketstyle"
+          className="w-full h-auto object-contain"
+        />
+      </div>
 
-      <div className="flex flex-col items-center">
-        <div className="bg-white/90 shadow-md rounded-md p-5 text-center">
-          <h2 className="text-2xl font-semibold leading-relaxed">
-            Subscribe To Our Newsletter
-          </h2>
-          <p className="text-sm leading-relaxed ">
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Scelerisque
-            duis ultrices sollicitudin aliquam sem. Scelerisque duis ultrices
-            sollicitudin{" "}
-          </p>
-          <p className="text-gray-700 text-xs text-start mt-5">
-            michael@ymail.com
-          </p>
-        </div>
-        <button className="my-5 py-2 rounded-md px-5 text-center flex items-center text-white bg-black/80 hover:bg-black duration-300 transition-all hover:text-white/80">
+      {/* Bloc texte + bouton */}
+      <div className="flex flex-col items-center p-4 sm:p-6 md:p-8 bg-white/90 shadow-md rounded-md w-full max-w-sm sm:max-w-md md:max-w-lg text-center">
+        <h2 className="text-lg sm:text-xl md:text-2xl font-semibold leading-relaxed text-gray-800">
+          Subscribe To Our Newsletter
+        </h2>
+
+        <p className="text-xs sm:text-sm md:text-base leading-relaxed mt-4 text-gray-600">
+          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Scelerisque
+          duis ultrices sollicitudin aliquam sem. Scelerisque duis ultrices
+          sollicitudin.
+        </p>
+
+        <p className="text-gray-700 text-xs sm:text-sm text-start mt-4 w-full break-all">
+          michael@ymail.com
+        </p>
+
+        <button className="w-full sm:w-auto mt-5 py-2 sm:py-3 rounded-md px-6 text-center flex items-center justify-center text-white bg-black/80 hover:bg-black duration-300 transition-all hover:text-white/80">
           Subscribe Now
         </button>
       </div>
 
-      <di>
-        <img src="/jacketwoman.png" alt="jacketwoman" />
-      </di>
+      {/* Image droite */}
+      <div className="flex-shrink-0 w-40 sm:w-56 md:w-64 lg:w-72">
+        <img
+          src="/jacketwoman.png"
+          alt="jacketwoman"
+          className="w-full h-auto object-contain"
+        />
+      </div>
     </div>
   );
 };

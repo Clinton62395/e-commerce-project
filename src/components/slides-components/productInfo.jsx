@@ -231,7 +231,7 @@ export const SingleProductInfo = () => {
     <>
       <div className="min-h-screen max-w-7xl mx-auto px-4 py-8">
         {/* Cart Button - Position responsive */}
-        <div
+        {/* <div
           className={`fixed z-50 ${
             isMobile
               ? "right-4 top-4"
@@ -254,7 +254,7 @@ export const SingleProductInfo = () => {
             </Badge>
           </button>
           <ShopingCart open={showPanel} onClose={handleDismiss} />
-        </div>
+        </div> */}
 
         {/* Main Content - Layout responsive */}
         <div

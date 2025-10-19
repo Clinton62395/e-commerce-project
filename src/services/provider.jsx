@@ -103,7 +103,7 @@ export const Provider = ({ children }) => {
   };
 
   const handleRemove = (imageUrl) => {
-    setCart((prev) => [prev.filter((item) => item.id !== imageUrl)]);
+    setCart((prev) => [...prev.filter((item) => item.id !== imageUrl)]);
   };
 
   const clearCart = () => setCart([]);
