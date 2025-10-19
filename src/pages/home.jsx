@@ -34,7 +34,9 @@ export const Home = () => {
               alt="image 2"
               className="object-contain  h-full md:h-96 lg:h-full"
             />
-            <h2 className="text-5xl md:text-7xl font-bold  leading-none">ULTIMATE</h2>
+            <h2 className="text-5xl md:text-7xl font-bold  leading-none">
+              ULTIMATE
+            </h2>
             <h2
               className="text-5xl md:text-8xl font-bold leading-none"
               style={{

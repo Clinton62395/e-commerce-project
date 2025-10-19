@@ -27,7 +27,7 @@ export const ShopingCart = ({ open: isDrowerOpen, onClose }) => {
   } = UseCart();
 
   const DrawerList = (
-    <Box sx={{ width: 350 }} role="presentation">
+    <Box role="presentation" className="w-[250px] md:w-[400px] lg:w-[500px]">
       <div className=" relative bg-gray-100 p-4">
         <Typography variant="h6" sx={{ mb: 2 }}>
           Shopping Cart
