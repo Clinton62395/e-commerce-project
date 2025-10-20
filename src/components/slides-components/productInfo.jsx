@@ -320,7 +320,7 @@ export const SingleProductInfo = () => {
             {zoom && (
               <div
                 onClick={() => setZoom(false)}
-                className="fixed inset-0 bg-black bg-opacity-90 z-50 flex items-center justify-center p-4 cursor-zoom-out"
+                className="fixed inset-0 bg-black/50 bg-opacity-90 z-50 flex items-center justify-center p-4 cursor-zoom-out"
               >
                 <img
                   src={displayImage}

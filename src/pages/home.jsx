@@ -113,9 +113,9 @@ export const Home = () => {
             />
             {/* promo card */}
 
-            <div className=" absolute bottom-4 z-10 text-center rounded-md shadow-md p-2  bg-slate-300 text-black w-32 h-16 md:w-36 md:h-20">
+            <div className=" absolute text-sm bottom-4 z-10 text-center rounded-md shadow-md p-2  bg-slate-300 text-black w-32 h-16 md:w-44 md:h-20">
               <h4>01 Spring Sale</h4>
-              <span className="text-lg md:text-3xl font-semibold">30% OFF</span>
+              <span className="text-lg md:text-xl font-semibold">30% OFF</span>
             </div>
           </div>
         </div>
@@ -158,6 +158,8 @@ export const Home = () => {
             Copyright © 2022 Xpro . All Rights Reseved.
           </span>
         </footer>
+
+        
       </main>
     </>
   );
