@@ -40,10 +40,10 @@ function App() {
               <Route index element={<Home />} />
               <Route path="/shop" element={<FashionShop />} />
               <Route path="/product-details" element={<Products />} />
-              <Route path="/success" element={<TransactionSuccess />} />
 
               {/* <Route path="/shoping-cart" element={<ShopingCart />} /> */}
             </Route>
+            <Route path="/success" element={<TransactionSuccess />} />
             <Route path="/checkout" element={<Checkout />} />
           </Routes>
         </Provider>
