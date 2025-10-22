@@ -1,7 +1,50 @@
-import React from "react";
-import { Link } from "react-router-dom";
+import React, { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import { PropagateLoader } from "react-spinners";
+
+import * as yup from "yup";
+import { api } from "../services/constant";
+import toast from "react-hot-toast";
+const schema = yup.object({
+  email: yup.string().email("Invalid email").required("Email is required"),
+  password: yup.string().required(),
+});
 
 export const Login = () => {
+  const [error, setError] = useState({});
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors, isSubmitting },
+  } = useForm({
+    resolver: yupResolver(schema),
+  });
+
+  const navigate = useNavigate();
+
+  const onLogin = async (data) => {
+    console.log("Login data submitted:", data);
+
+    try {
+      const res = await toast.promise(api.post("/auth/login", data), {
+        loading: "user login...",
+        success: "user logged successfully",
+        error: (err) => err.response.data?.message || err.response?.data,
+      });
+
+      const { token, data: userData } = res.data;
+      localStorage.setItem("token", token);
+      navigate("/shop");
+      reset();
+      console.log("Response from backend:", userData);
+    } catch (err) {
+      console.error("Login error:", err);
+    }
+  };
+
   return (
     <>
       {" "}
@@ -37,36 +80,60 @@ export const Login = () => {
               </span>
               <hr className="w-24 border-t border-[#838383]" />
             </div>
-            <form className=" flex flex-col gap-4">
-              <label htmlFor="password">
-                <input
-                  type="password"
-                  className=" outline-none w-full border-b-2 border-gray-[#9D9D9D] py-2 "
-                  placeholder="password"
-                />
-              </label>
+            <form
+              className=" flex flex-col gap-4"
+              onSubmit={handleSubmit(onLogin)}
+            >
               <label htmlFor="email">
                 <input
                   type="email"
-                  className=" outline-none w-full border-b-2 border-gray-[#9D9D9D] py-2 "
+                  {...register("email")}
+                  className=" outline-none w-full border-b-2 border-gray-[#9D9D9D] py-2 px-2 md:px-4"
                   placeholder="email"
                 />
+                <p className="text-xs text-red-500">{errors.email?.message}</p>
               </label>
 
-              <div className="flex flex-col space-y-2">
+              <label htmlFor="password">
+                <input
+                  type="password"
+                  {...register("password")}
+                  className=" outline-none w-full border-b-2 border-gray-[#9D9D9D] py-2 px-2 md:px-4 "
+                  placeholder="password"
+                />
+                <p className="text-xs text-red-500">
+                  {errors.password?.message}
+                </p>
+              </label>
+
+              <div className="flex flex-col space-y-4 w-full max-w-sm mx-auto">
                 <button
                   type="submit"
-                  className=" bg-[#000000] hover:bg-[#6C9BF8] text-white py-2 rounded-md duration-150 transition-all"
+                  disabled={isSubmitting}
+                  className={`flex items-center justify-center gap-2 bg-black text-white py-3 rounded-lg font-semibold transition-all duration-200 ${
+                    isSubmitting
+                      ? "opacity-70 cursor-not-allowed"
+                      : "hover:bg-gray-900"
+                  }`}
                 >
-                  sign In
+                  {isSubmitting ? (
+                    <span className="flex items-center gap-2">
+                      <PropagateLoader size={10} color="#FF6347" />
+                      <span className="text-sm">Signing in...</span>
+                    </span>
+                  ) : (
+                    <span className="text-sm">Sign In</span>
+                  )}
                 </button>
+
                 <Link
                   to="/register"
-                  className=" bg-gray-100 text-[#5B86E5] hover:text-white py-2 rounded-md hover:bg-[#6C9BF8] duration-150 transition-all"
+                  className="text-center py-3 rounded-lg bg-gray-100 text-blue-500 font-medium hover:bg-blue-600 hover:text-white transition-all duration-200"
                 >
-                  Register now
+                  Register Now
                 </Link>
               </div>
+
               <Link
                 className="text-[#5B86E5] hover:underline text-end"
                 to="/forget-password"

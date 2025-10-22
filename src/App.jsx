@@ -1,7 +1,7 @@
 import React from "react";
 import "./App.css";
 import "./index.css";
-import { ToastContainer } from "react-toastify";
+import toast, { Toaster } from "react-hot-toast";
 import { Home } from "./pages/home";
 import { Deals } from "./landing_pages/deals";
 import { Register } from "./pages/sign_up";
@@ -17,11 +17,12 @@ import { HomeLayout } from "./outlets/HomeLayout";
 import { ShopLayout } from "./outlets/ShopLayout";
 import { ShopingCart } from "./pages/shoping.Cart";
 import { Checkout } from "./landing_pages/checkout";
+import { TransactionSuccess } from "./landing_pages/transfer.success";
 
 function App() {
   return (
     <>
-      <ToastContainer />
+      <Toaster />
       <BrowserRouter>
         <Provider>
           <Routes>
@@ -39,6 +40,8 @@ function App() {
               <Route index element={<Home />} />
               <Route path="/shop" element={<FashionShop />} />
               <Route path="/product-details" element={<Products />} />
+              <Route path="/success" element={<TransactionSuccess />} />
+
               {/* <Route path="/shoping-cart" element={<ShopingCart />} /> */}
             </Route>
             <Route path="/checkout" element={<Checkout />} />
