@@ -2,7 +2,7 @@ import React from "react";
 import { data, Link } from "react-router-dom";
 import { UseCart } from "../services/provider";
 import Badge from "@mui/material/Badge";
-import { Lock, Minus, Plus } from "lucide-react";
+import { ChevronLeft, Lock, Minus, Plus } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
@@ -56,6 +56,10 @@ export const Checkout = ({ displayImage }) => {
   });
 
   const onSubmit = async (formData) => {
+    if (cart.length === 0) {
+      toast.error("no product selected yet");
+      return;
+    }
     try {
       const allData = {
         ...formData,
@@ -89,6 +93,12 @@ export const Checkout = ({ displayImage }) => {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8 p-6 bg-gray-50 min-h-screen ">
         {/* Formulaire de checkout */}
         <div className="space-y-8 bg-white p-6 rounded-md shadow-md">
+          <button
+            onClick={() => window.history.back()}
+            className="flex items-start"
+          >
+            <ChevronLeft size={20} />
+          </button>
           {/* Contact */}
           <form onSubmit={handleSubmit(onSubmit)}>
             <div className="space-y-4">
