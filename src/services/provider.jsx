@@ -17,7 +17,6 @@ export const UseCart = () => {
 
 export const Provider = ({ children }) => {
   const [cart, setCart] = useState([]);
-  console.log("===> 1", cart);
 
   // get cart from local storage
   useEffect(() => {
@@ -134,7 +133,7 @@ export const Provider = ({ children }) => {
     const product = cart.find((item) => item.id === itemId);
     return product ? product.price * product.quantity : 0;
   };
-  const giftCharge = 10;
+  const giftCharge = 2000;
   const calculateGiswrap = useMemo(() => {
     const hasGiftWrap = cart.some((item) => item.giftwrap);
     return hasGiftWrap ? giftCharge : 0;

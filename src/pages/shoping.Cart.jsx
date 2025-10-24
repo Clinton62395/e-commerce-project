@@ -43,7 +43,7 @@ export const ShopingCart = ({ open: isDrowerOpen, onClose }) => {
                   <div className="flex col-span-3 gap-2">
                     Buy more and get
                     <span className="font-bold text-lg">
-                      ${ProductPrice(item.image)}
+                      {ProductPrice(item.image).toLocaleString()} ₦
                     </span>
                     <span className="font-bold text-lg">free shipping</span>
                   </div>
@@ -63,15 +63,15 @@ export const ShopingCart = ({ open: isDrowerOpen, onClose }) => {
                   <div className="flex flex-col space-y-2 text-sm">
                     <Typography variant="body2">{item.title}</Typography>
                     <Typography variant="body2">
-                      Price: ${item.price}
+                      Price: {item.price.toLocaleString()} ₦
                     </Typography>
                     <Typography variant="body2">
                       Quantity: {item.quantity}
                     </Typography>
 
-                    <Typography variant="body2">
+                    <div>
                       Color: <div className={item.color1}></div>
-                    </Typography>
+                    </div>
                   </div>
                   <div className="flex w-full col-span-2  justify-center items-center gap-2 py-2 bg-[#F1F1F1] rounded-sm shadow ">
                     <Button
@@ -106,7 +106,7 @@ export const ShopingCart = ({ open: isDrowerOpen, onClose }) => {
                       className="text-sm text-gray-700 flex items-center gap-2"
                     >
                       <span className="font-medium">Gift wrap</span>
-                      <span className="text-gray-500">(+ $10.00)</span>
+                      <span className="text-gray-500">(+ ₦2000.00)</span>
                     </label>
                   </div>
 
@@ -132,12 +132,14 @@ export const ShopingCart = ({ open: isDrowerOpen, onClose }) => {
           }}
         >
           <Typography variant="h6" color="text.primary">
-            Subtotal: ${subTotal.toFixed(2)}
+            Subtotal: ₦{subTotal.toLocaleString()}
           </Typography>
 
           <Typography variant="h6" color="text.primary">
-            Total: $
-            {isGiftWrap ? (totalPrice + 10).toFixed(2) : totalPrice.toFixed(2)}
+            Total: ₦
+            {isGiftWrap
+              ? totalPrice.toLocaleString()
+              : totalPrice.toLocaleString()}
           </Typography>
 
           <Divider />

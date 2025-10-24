@@ -87,8 +87,8 @@ export const SingleProductInfo = () => {
       ],
       title: "Casual Long Sleeve Graphic T-Shirt",
       description: "Perfect blend of style and comfort for everyday wear",
-      price: 59.0,
-      reducePrice: 39.0,
+      price: 68000,
+      reducePrice: 62400,
       rate: 5,
       view: "24 people are viewing this right now",
       stockLeft: {
@@ -230,33 +230,6 @@ export const SingleProductInfo = () => {
   return (
     <>
       <div className="min-h-screen max-w-7xl mx-auto px-4 py-8">
-        {/* Cart Button - Position responsive */}
-        {/* <div
-          className={`fixed z-50 ${
-            isMobile
-              ? "right-4 top-4"
-              : isTablet
-              ? "right-8 top-6"
-              : "right-10 top-7"
-          }`}
-        >
-          <button
-            onClick={() => setShowPanel(true)}
-            className="bg-white p-2 rounded-full shadow-lg hover:shadow-xl transition-shadow"
-          >
-            <Badge
-              badgeContent={cart.length}
-              color="primary"
-              overlap="circular"
-              showZero
-            >
-              <ShoppingCartIcon className="w-5 h-5 lg:w-6 lg:h-6" />
-            </Badge>
-          </button>
-          <ShopingCart open={showPanel} onClose={handleDismiss} />
-        </div> */}
-
-        {/* Main Content - Layout responsive */}
         <div
           className={`flex flex-col lg:flex-row items-start gap-4 lg:gap-8 ${
             isMobile ? "mt-12" : "mt-0"
@@ -401,10 +374,10 @@ export const SingleProductInfo = () => {
             <div className="space-y-4">
               <div className="flex items-baseline gap-3">
                 <span className="text-2xl font-bold">
-                  ${currentImage.reducePrice}
+                  {currentImage.reducePrice.toLocaleString()}₦
                 </span>
                 <span className="text-gray-500 line-through">
-                  ${currentImage.price}
+                  {currentImage.price.toLocaleString()} ₦
                 </span>
               </div>
 

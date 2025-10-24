@@ -15,7 +15,6 @@ import {
   SubscriptNewLetter,
 } from "../components/slides-components/component_section";
 import { NewProduct } from "../landing_pages/new_product";
-import { TransactionSuccess } from "../landing_pages/transfer.success";
 
 export const Home = () => {
   return (
@@ -160,7 +159,6 @@ export const Home = () => {
           </span>
         </footer>
 
-        {/* <TransactionSuccess /> */}
       </main>
     </>
   );
