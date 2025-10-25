@@ -21,6 +21,14 @@ export const TransactionSuccess = () => {
   const [error, setError] = useState(null);
   const [showConfetti, setShowConfetti] = useState(true);
 
+  useEffect(() => {
+    if (payment?.shippingInfo && payment.shippingInfo.saveInfo === true) {
+      const { shippingInfo } = payment;
+
+      localStorage.setItem("shippingInfo", JSON.stringify(shippingInfo));
+    }
+  }, [payment]);
+
   const [searchParams] = useSearchParams();
   const reference = searchParams.get("reference");
 
@@ -334,11 +342,13 @@ export const TransactionSuccess = () => {
               </p>
               <div className="text-gray-600 mb-1 flex items-center justify-between">
                 <span>Country: {country?.label}</span>
-                <img
-                  src={country?.flag}
-                  alt={country.lable}
-                  className="w-5 h-5 rounded-sm mt-0.5"
-                />
+                {country?.flag && (
+                  <img
+                    src={country?.flag}
+                    alt={country.lable}
+                    className="w-5 h-5 rounded-sm mt-0.5"
+                  />
+                )}
               </div>
               <p className="text-gray-600 mb-1">City :{shippingInfo.city}</p>
               {shippingInfo.postalCode && (

@@ -45,7 +45,6 @@ export const Register = () => {
       const res = await signInWithPopup(auth, provider);
       if (res) {
         const user = res.user;
-        console.log("user from google", user);
         const token = await user.getIdToken();
 
         sendTokenToBackend(token);
@@ -67,6 +66,7 @@ export const Register = () => {
         }
       );
       console.log("backend response:", res.data);
+      navigate("/shop");
     } catch (error) {
       console.error("error sending token:", error);
     }

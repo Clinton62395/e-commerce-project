@@ -26,15 +26,11 @@ const bankdetailsShemat = yup.object({
     value: yup.string().required("country is required"),
     label: yup.string().required("country is required"),
   }),
-
-  // expiredDate: yup.string().required("county is required"),
-  // cardOwner: yup.string().required("county is required"),
-  // securityCode: yup.string().required("county is required"),
-  // cardNumber: yup.string().required("county is required"),
 });
 
 export const Checkout = ({ displayImage }) => {
   const [countries, setCountries] = useState([]);
+  const [formData, setFormData] = useState("");
   const {
     handleDerease,
     handleIncrease,
@@ -51,6 +47,20 @@ export const Checkout = ({ displayImage }) => {
     return found ? found.quantity : 0;
   };
 
+  // get shopping info from local storage
+  useEffect(() => {
+    const saved = localStorage.getItem("shippingInfo")
+      ? setFormData(JSON.parse(localStorage.getItem("shippingInfo")))
+      : null;
+    console.log("shipping info from storage==>", saved);
+  }, []);
+
+  const handleChange = (name, value) => {
+    setFormData({
+      ...formData,
+      [name]: value,
+    });
+  };
   // submit bank details
   const {
     register,
@@ -167,6 +177,8 @@ export const Checkout = ({ displayImage }) => {
                   type="email"
                   {...register("email")}
                   placeholder="Email Address"
+                  value={formData.userEmail}
+                  onChange={(e) => handleChange("userEmail", e.target.value)}
                   className="w-full border rounded-md px-4 py-2 md:py-3"
                 />
                 <p className="text-xs text-red-500">{errors.email?.message}</p>
@@ -188,8 +200,16 @@ export const Checkout = ({ displayImage }) => {
                       {...field}
                       options={countries}
                       formatOptionLabel={formatOption}
+                      value={formData.country}
+                      h
                       onChange={(selectdOption) => {
                         field.onChange(selectdOption);
+                        handleChange({
+                          target: {
+                            name: "country",
+                            value: selectdOption,
+                          },
+                        });
                       }}
                       getOptionValue={(options) => options.value}
                       isSearchable
@@ -209,6 +229,10 @@ export const Checkout = ({ displayImage }) => {
                     <input
                       type="text"
                       {...register("firstName")}
+                      onChange={(e) =>
+                        handleChange("firstName", e.target.value)
+                      }
+                      value={formData.firstName}
                       placeholder="First Name"
                       className="w-full border rounded-md px-4 py-2 md:py-3"
                     />
@@ -220,6 +244,8 @@ export const Checkout = ({ displayImage }) => {
                     <input
                       type="text"
                       {...register("lastName")}
+                      onChange={(e) => handleChange("lastName", e.target.value)}
+                      value={formData.lastName}
                       placeholder="Last Name"
                       className="w-full border rounded-md px-4 py-2 md:py-3"
                     />
@@ -231,6 +257,8 @@ export const Checkout = ({ displayImage }) => {
                 <div>
                   <input
                     type="text"
+                    onChange={(e) => handleChange("address", e.target.value)}
+                    value={formData.address}
                     placeholder="Address"
                     {...register("address")}
                     className="w-full border rounded-md px-4 py-2 md:py-3"
@@ -243,6 +271,8 @@ export const Checkout = ({ displayImage }) => {
                   <div>
                     <input
                       type="text"
+                      onChange={(e) => handleChange("city", e.target.value)}
+                      value={formData.city}
                       placeholder="City"
                       {...register("city")}
                       className="w-full border rounded-md px-4 py-2 md:py-3"
@@ -255,6 +285,10 @@ export const Checkout = ({ displayImage }) => {
                   <div>
                     <input
                       type="text"
+                      onChange={(e) =>
+                        handleChange("postalCode", e.target.value)
+                      }
+                      value={formData.postalCode}
                       {...register("postalCode")}
                       placeholder="Postal Code"
                       className="w-full border rounded-md px-4 py-2 md:py-3"
@@ -267,7 +301,10 @@ export const Checkout = ({ displayImage }) => {
                 <label className="flex items-center gap-2 text-sm">
                   <input
                     type="checkbox"
-                    className="w-5 h-5 accent-orange-500"
+                    {...register("saveInfo")}
+                    onChange={(e) => handleChange("saveInfo", e.target.checked)}
+                    checked={formData.saveInfo}
+                    className="w-5 h-5 accent-green-500 "
                   />
                   Save this info for future
                 </label>
