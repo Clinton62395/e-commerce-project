@@ -113,9 +113,9 @@ export const Home = () => {
             />
             {/* promo card */}
 
-            <div className=" absolute text-sm bottom-4 z-10 text-center rounded-md shadow-md p-2  bg-slate-300 text-black w-32 h-16 md:w-44 md:h-20">
-              <h4>01 Spring Sale</h4>
-              <span className="text-lg md:text-xl font-semibold">30% OFF</span>
+            <div className=" absolute text-sm bottom-4 z-10 text-center rounded-md shadow-md p-2  bg-slate-300 text-black w-32 h-18 md:w-44 md:h-20">
+              <h4 className="text-sm  md:text-lg font-semibold">01 Spring Sale</h4>
+              <span className="text-sm  md:text-xl font-semibold">30% OFF</span>
             </div>
           </div>
         </div>

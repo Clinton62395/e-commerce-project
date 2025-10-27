@@ -288,11 +288,13 @@ export const CountdownTimer = ({ children }) => {
             const digits = String(unit.value).padStart(2, "0").split("");
 
             return (
-              <div key={i} className="bg-gray-50 rounded-xl shadow-md p-2">
-                <div className="flex justify-center ">
-                  {digits.map((digit, idx) => (
-                    <SegmentDigit key={idx} digit={digit} />
-                  ))}
+              <div className="text-center">
+                <div key={i} className="bg-gray-50 rounded-xl shadow-md p-2">
+                  <div className="flex justify-center ">
+                    {digits.map((digit, idx) => (
+                      <SegmentDigit key={idx} digit={digit} />
+                    ))}
+                  </div>
                 </div>
                 <div className="text-xs text-gray-500 mt-2">{unit.label}</div>
               </div>

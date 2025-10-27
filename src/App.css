@@ -3,10 +3,8 @@
 }
 
 .swiper-slide {
-  display: flex !important;
-  justify-content: center;
-  padding: 10px;
-  align-items: center;
+  display: grid !important;
+  grid-template-columns: repeat(3, 1fr) max-content(200px);
   transform-style: preserve-3d;
   perspective: 1000px;
 }
@@ -17,6 +15,8 @@
   border: 4px solid #fff;
   animation: bounce 0.5s ease-out linear;
 }
+
+
 
 /* Animation qui combine scale ET rotateY */
 @keyframes bounce {
