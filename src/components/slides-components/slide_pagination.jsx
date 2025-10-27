@@ -265,7 +265,7 @@ export const CountdownTimer = ({ children }) => {
           <h2 className="font-bold text-2xl font-Volkhov">
             Deals Of The Month
           </h2>
-          <p className="text-sm leading-5 my-2">
+          <p className="text-sm leading-5 my-4 text-gray-600">
             Lorem ipsum dolor sit amet, consectetur adipiscing elit. Scelerisque
             duis ultrices sollicitudin aliquam sem. Scelerisque duis ultrices
             sollicitudin{" "}
@@ -273,12 +273,12 @@ export const CountdownTimer = ({ children }) => {
 
           <Link
             to="/shop"
-            className="bg-black/70 hover:bg-[#000000] duration-300 transition-all py-2 px-5 my-5 rounded-md text-white shadow-lg"
+            className="bg-black/70 hover:bg-[#000000] duration-300  transition-all py-2 px-5 my-5 rounded-md text-white shadow-lg"
           >
             Buy Now
           </Link>
 
-          <h3 className="text-center font-semibold text-2xl mb-6">
+          <h3 className="text-center font-semibold text-2xl mt-4 mb-2">
             Hurry, Before It’s Too Late!
           </h3>
         </div>

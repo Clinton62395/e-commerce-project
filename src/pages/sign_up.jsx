@@ -112,13 +112,13 @@ export const Register = () => {
         </p>
         <button
           onClick={signInWithGoogle}
-          className="relative outline-none border border-[#5B86E5] rounded-md py-2 w-full md:w-1/2 hover:bg-gray-400 duration-150 transition-all"
+          className="relative outline-none border border-[#5B86E5] text-sm md:text-lg rounded-md py-2 px-10 w-full md:w-1/2 hover:bg-gray-400 duration-150 transition-all"
         >
           <span>
             <img
               src="google-logo.png"
               alt="google"
-              className="absolute  left-2 top-0 h-10 "
+              className="absolute left-2 top-0 h-5 md:h-10 "
             />
           </span>
           Sign Up with Google
@@ -213,7 +213,7 @@ export const Register = () => {
                     <span className="text-sm">Signing in...</span>
                   </span>
                 ) : (
-                  <span className="text-sm">Sign In</span>
+                  <span className="text-sm">Sign Up</span>
                 )}
               </button>
               <p className="text-center mt-4 flex gap-2">
