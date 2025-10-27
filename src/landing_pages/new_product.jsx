@@ -30,16 +30,16 @@ export const NewProduct = () => {
   ];
 
   return (
-    <div className="container mx-auto p-4 bg-gradient-to-r from-purple-50/30 via-pink-50/50 to-red-50/30 backdrop:blur-md rounded-md my-10">
-      <h1 className="text-2xl font-bold mb-4 text-center">New Products</h1>
-      <div className="grid grid-cols-1 md:grid-cols-4 lg:grid-cols-5 gap-2 my-4 text-center px-10 md:px-20">
+    <div className="container mx-auto p-4 bg-gradient-to-r from-purple-50/30 via-pink-50/50 to-red-50/30 backdrop:blur-md rounded-md my-5 md:my-10">
+      <h1 className="text-lg md:text-2xl font-bold mb-4 text-center">New Products</h1>
+      <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-2 my-4 text-center px-5 md:px-20">
         {categories.map(
           ({ key, label, visible }) =>
             visible && (
               <button
                 key={key}
                 onClick={() => handleFilterClick(key)}
-                className={` rounded-md py-2 px-3 duration-300 transition-all ${
+                className={`text-sm md:text-base rounded-md py-2 px-2 duration-300 transition-all ${
                   isActive === key
                     ? "bg-[#000000] text-white/90 font-semibold"
                     : "bg-[#dcdbdb] text-gray-700"
