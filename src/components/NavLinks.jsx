@@ -23,7 +23,7 @@ export const NavLinks = ({ logo = "FASCO", pages = defaultLinks }) => {
 
   return (
     <nav
-      className={`w-full bg-white/70 backdrop-blur shadow-sm py-3 transition-all duration-300 ${
+      className={`  w-full bg-white/70 backdrop-blur shadow-sm py-3 transition-all duration-300 ${
         isAuthPage ? "text-white font-bold" : "font-semibold text-gray-700"
       }`}
     >
@@ -32,30 +32,32 @@ export const NavLinks = ({ logo = "FASCO", pages = defaultLinks }) => {
         {/* Logo */}
         <Link
           to="/"
-          className="text-2xl sm:text-3xl font-bold tracking-wide text-black"
+          className="text-2xl sm:text-3xl font-bold tracking-wide text-black "
         >
           {logo}
         </Link>
 
         {/* Desktop Links */}
-        <div className="hidden md:flex items-center gap-8">
+        <div className="hidden md:flex items-center justify-center  gap-8 w-full">
           {pages.map((page, index) => {
             const isActive = location.pathname === page.link;
             const isSignUp = page.link === "/register";
             return (
-              <Link
-                key={index}
-                to={page.link}
-                className={`transition-all duration-300 ${
-                  isSignUp
-                    ? "bg-black/80 text-white px-4 py-2 rounded-full shadow-md hover:bg-black"
-                    : isActive
-                    ? "text-green-500 font-bold border-b-2 border-green-500 pb-1"
-                    : "text-gray-700 hover:text-green-500"
-                }`}
-              >
-                {page.name}
-              </Link>
+              <div className="flex justify-center items-center ">
+                <Link
+                  key={index}
+                  to={page.link}
+                  className={`transition-all duration-300 ${
+                    isSignUp
+                      ? "bg-black/80 text-white px-4 py-2 rounded-full shadow-md hover:bg-black"
+                      : isActive
+                      ? "text-green-500 font-bold border-b-2 border-green-500 pb-1"
+                      : "text-gray-700 hover:text-green-500"
+                  }`}
+                >
+                  {page.name}
+                </Link>
+              </div>
             );
           })}
         </div>

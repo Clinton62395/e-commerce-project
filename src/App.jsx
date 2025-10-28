@@ -15,12 +15,18 @@ import { Route, Routes, BrowserRouter } from "react-router-dom";
 import { Products } from "./pages/products";
 import { HomeLayout } from "./outlets/HomeLayout";
 import { ShopLayout } from "./outlets/ShopLayout";
-import { ShopingCart } from "./pages/shoping.Cart";
 import { Checkout } from "./landing_pages/checkout";
 import { TransactionSuccess } from "./landing_pages/transfer.success";
 import { ResetPassword } from "./pages/reset_password";
-import AdminDashboard from "./components/dashboard/adminDahboard";
 import NotFound from "./pages/NotFound";
+import { Orders } from "./components/dashboard/Orders";
+import { Customers } from "./components/dashboard/Customers";
+import { Header } from "./components/dashboard/Headers";
+import { DashboardProducts } from "./components/dashboard/Products";
+import { Analytics } from "./components/dashboard/Analytics";
+import { DashboardLayout } from "./outlets/DashboardLayout";
+import { Sidebar } from "./components/dashboard/SideBar";
+import { AdminDashboard } from "./components/dashboard/adminDahboard";
 
 function App() {
   return (
@@ -49,7 +55,17 @@ function App() {
             <Route path="/success" element={<TransactionSuccess />} />
             <Route path="/checkout" element={<Checkout />} />
             <Route path="/reset-password" element={<ResetPassword />} />
-            <Route path="/admin-dashboard" element={<AdminDashboard />} />
+
+            {/* <AdminDashboard /> */}
+            <Route path="/admin-dashboard" element={<DashboardLayout />}>
+              <Route index element={<AdminDashboard />} />
+              <Route path="orders" element={<Orders />} />
+              <Route path="customers" element={<Customers />} />
+              <Route path="header" element={<Header />} />
+              <Route path="products" element={<DashboardProducts />} />
+              <Route path="analytics" element={<Analytics />} />
+              <Route path="sidebar" element={<Sidebar />} />
+            </Route>
             <Route path="*" element={<NotFound />} />
           </Routes>
         </Provider>

@@ -19,8 +19,8 @@ export const ShopLayout = () => {
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-50 relative">
-      {/* 🧭 Navigation */}
-      <nav className="sticky top-0 z-50">
+      {/*  Navigation */}
+      <nav className="sticky top-0 z-50 ">
         <NavLinks logo="FASCO"  pages={shopLinks} />
       </nav>
 
@@ -30,7 +30,7 @@ export const ShopLayout = () => {
             ? "right-4 top-16"
             : isTablet
             ? "right-8 top-20"
-            : "right-10 top-16"
+            : "right-5 top-2"
         }`}
       >
         <button
@@ -49,7 +49,7 @@ export const ShopLayout = () => {
         <ShopingCart open={showPanel} onClose={handleDismiss} />
       </div>
 
-      {/* 🧩 Contenu principal */}
+      {/*  Contenu principal */}
       <main className="flex-grow pt-20 px-4 sm:px-6 md:px-8 lg:px-10">
         <Outlet />
       </main>

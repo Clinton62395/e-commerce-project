@@ -87,7 +87,7 @@ export const WomenFashion = () => {
     {
       image: jacket,
       price: 95.5,
-      rate: <Star size={15} />,
+      rate: 5,
       description: "Shiny Dress",
       review: "(4.1k) Customer Reviews",
       spseudo: "Al Karam",
@@ -96,7 +96,7 @@ export const WomenFashion = () => {
     {
       image: whitedress,
       price: 95.5,
-      rate: <Star size={15} />,
+      rate: 5,
       description: "Long Dress",
       review: "(4.1k) Customer Reviews",
       spseudo: "Al Karam",
@@ -105,7 +105,7 @@ export const WomenFashion = () => {
     {
       image: sweater,
       price: 95.5,
-      rate: <Star size={15} />,
+      rate: 5,
       description: "Full Sweater",
       review: "(4.1k) Customer Reviews",
       spseudo: "Al Karam",
@@ -114,7 +114,7 @@ export const WomenFashion = () => {
     {
       image: dressblanc,
       price: 95.5,
-      rate: <Star size={15} />,
+      rate: 5,
       description: "White Dress",
       review: "(4.1k) Customer Reviews",
       spseudo: "Al Karam",
@@ -123,7 +123,7 @@ export const WomenFashion = () => {
     {
       image: colorfulldress,
       price: 95.5,
-      rate: <Star size={15} />,
+      rate: 5,
       description: "Colorful Dress",
       review: "(4.1k) Customer Reviews",
       spseudo: "Al Karam",
@@ -132,7 +132,7 @@ export const WomenFashion = () => {
     {
       image: shirtwhite,
       price: 95.5,
-      rate: <Star size={15} />,
+      rate: 5,
       description: "White Shirt",
       review: "(4.1k) Customer Reviews",
       spseudo: "Al Karam",
@@ -141,7 +141,7 @@ export const WomenFashion = () => {
     {
       image: sar,
       price: 95.5,
-      rate: <Star size={15} />,
+      rate: 5,
       description: "dress promuim",
       review: "(4.1k) Customer Reviews",
       spseudo: "Al Karam",
@@ -150,7 +150,7 @@ export const WomenFashion = () => {
     {
       image: sis,
       price: 95.5,
-      rate: <Star size={15} />,
+      rate: 5,
       description: "top dress at cheep price",
       review: "(4.1k) Customer Reviews",
       spseudo: "Al Karam",
@@ -159,13 +159,49 @@ export const WomenFashion = () => {
     {
       image: ssarclin,
       price: 95.5,
-      rate: <Star size={15} />,
+      rate: 5,
       description: "last modern dress",
       review: "(4.1k) Customer Reviews",
       spseudo: "Al Karam",
       status: "Almost Sold Out",
     },
   ];
+
+  const svgStar = {
+    noted: (
+      <svg
+        width="19"
+        height="19"
+        viewBox="0 0 19 19"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path
+          fill-rule="evenodd"
+          clip-rule="evenodd"
+          d="M11.6646 7.12771L9.5 0L7.33536 7.12771H0L5.93479 11.742L3.73214 19L9.5 14.5146L15.2679 19L13.0652 11.742L19 7.12771H11.6646Z"
+          fill="#FCA120"
+        />
+      </svg>
+    ),
+    noNoted: (
+      <svg
+        width="19"
+        height="19"
+        viewBox="0 0 19 19"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path
+          fill-rule="evenodd"
+          clip-rule="evenodd"
+          d="M11.6646 7.12771L9.5 0L7.33536 7.12771H0L5.93479 11.742L3.73214 19L9.5 14.5146L15.2679 19L13.0652 11.742L19 7.12771H11.6646Z"
+          fill="#b9b7b5"
+        />
+      </svg>
+    ),
+  };
+
   return (
     <div ref={sectionRef}>
       <main className="mx-auto w-full md:max-w-6xl p-2 overflow-x-hidden ">
@@ -178,7 +214,7 @@ export const WomenFashion = () => {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-2  ">
+        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-2  flex-shrink-0 mt-4">
           {newArrivals.map((item, index) => (
             <div
               onMouseEnter={() => handleHover(index)}
@@ -205,11 +241,13 @@ export const WomenFashion = () => {
                   {item.spseudo}
                 </span>
                 <div className="flex justify-end gap-1">
-                  {[...Array(5)].map((_, i) => (
-                    <span key={i} color="#FCA120" fill="#FCA120">
-                      {item.rate}
-                    </span>
-                  ))}
+                  {[...Array(5)].map((_, i) => {
+                    return i < item.rate ? (
+                      <span> {svgStar.noted}</span>
+                    ) : (
+                      <span> {svgStar.noNoted}</span>
+                    );
+                  })}
                 </div>
               </div>
               {item.review}

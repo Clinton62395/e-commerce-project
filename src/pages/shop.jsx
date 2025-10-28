@@ -60,6 +60,7 @@ export const FashionShop = () => {
     brands: true,
     collection: true,
     tags: true,
+    BestSelling: true,
   });
 
   const [layout, setLayout] = useState("grid");
@@ -75,6 +76,13 @@ export const FashionShop = () => {
     "bg-yellow-400",
     "bg-green-500",
     "bg-purple-500",
+    "bg-pink-500",
+    "bg-[tomato]",
+    "bg-orange-500",
+    "bg-teal-500",
+    "bg-sky-500",
+    "bg-lime-500",
+    "bg-indigo-500",
   ];
   const prices = ["$0 - $50", "$50 - $100", "$100 - $200", "$200+"];
   const brands = ["Nike", "Adidas", "Puma", "Gucci", "Zara"];
@@ -358,9 +366,10 @@ export const FashionShop = () => {
       className="min-h-screen bg-gradient-to-r from-gray-50 to-gray-100   "
     >
       {/* Header */}
-      <div className="bg-white border-b border-gray-200 sticky top-0 z-30 shadow-sm">
+      <div className="bg-white border-b border-gray-100 sticky top-0 z-30 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-center flex-col gap-2">
+            <h3 className="font-bold text-xl text-black">Fashion</h3>
             <div className="flex items-center gap-2 text-sm">
               <Link
                 to="/"
@@ -371,18 +380,15 @@ export const FashionShop = () => {
               <ChevronRight size={16} className="text-gray-400" />
               <span className="text-gray-600">Fashion</span>
             </div>
-            <h1 className="hidden sm:block font-bold text-2xl text-gray-900">
-              Best Selling
-            </h1>
           </div>
         </div>
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8 ">
           {/* Sidebar Filters */}
-          <div className="lg:col-span-1">
-            <div className="sticky top-0 h-screen space-y-6">
+          <div className="lg:col-span-1 w-full min-h-screen py-8 lg:pt-0">
+            <div className=" sticky top-0 min-h-screen ">
               {/* Clear Filters */}
               {hasActiveFilters && (
                 <button
@@ -439,12 +445,12 @@ export const FashionShop = () => {
                   )}
                 </button>
                 {show.color && (
-                  <div className="px-4 pb-4 pt-2 border-t border-gray-100 grid grid-cols-6 gap-2">
+                  <div className="px-4 pb-4 pt-2 border-t border-gray-100 grid grid-cols-7 gap-2">
                     {colors.map((color, i) => (
                       <button
                         key={i}
                         onClick={() => toggleFilter("color", i)}
-                        className={`w-8 h-8 rounded-lg ${color} transition-all ${
+                        className={`w-8 h-8 rounded-full ${color} transition-all ${
                           activeFilters.color === i
                             ? "ring-2 ring-offset-2 ring-gray-900"
                             : "hover:ring-2 hover:ring-offset-1 hover:ring-gray-400"
@@ -590,10 +596,24 @@ export const FashionShop = () => {
           {/* Main Content */}
           <div className="lg:col-span-3">
             {/* Controls */}
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl font-bold text-gray-900">
-                Showing {currentIndex.length} products
-              </h2>
+            <div className="flex  items-center gap-2 justify-between mb-6 w-full">
+              <div className="flex items-center gap-3 w-full text-sm font-bold text-gray-700 ">
+                {show.BestSelling ? (
+                  "Best selling"
+                ) : (
+                  <p>Showing {currentIndex.length} products</p>
+                )}
+                <button
+                  onClick={() => toggleSwitch("BestSelling")}
+                  className=" flex items-center justify-between p-4 hover:bg-gray-50 transition-colors"
+                >
+                  {show.BestSelling ? (
+                    <ChevronUp size={18} />
+                  ) : (
+                    <ChevronDown size={18} />
+                  )}
+                </button>
+              </div>
               <div className="flex gap-2 bg-white rounded-lg p-1 border border-gray-200">
                 <button
                   onClick={() => setLayout("list")}

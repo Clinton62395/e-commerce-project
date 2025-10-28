@@ -114,25 +114,27 @@ export const Home = () => {
             {/* promo card */}
 
             <div className=" absolute text-sm bottom-4 z-10 text-center rounded-md shadow-md p-2  bg-slate-300 text-black h-18  md:h-20">
-              <h4 className="text-sm  md:text-lg font-semibold">01 Spring Sale</h4>
+              <h4 className="text-sm  md:text-lg font-semibold">
+                01 Spring Sale
+              </h4>
               <span className="text-sm  md:text-xl font-semibold">30% OFF</span>
             </div>
           </div>
         </div>
 
-        <div className="min-h-screen flex flex-col  justify-center items-center">
+        <div className="min-h-screen flex flex-col  ">
           {/* new prouct monponent  */}
           <NewProduct />
           {/* service time component */}
           <ServiceTime />
+
+          {/* sociol media profile picture component  */}
+
+          <SocioMediaProfile />
+
+          {/* scribscript new letter component  */}
+          <SubscriptNewLetter />
         </div>
-
-        {/* sociol media profile picture component  */}
-
-        <SocioMediaProfile />
-
-        {/* scribscript new letter component  */}
-        <SubscriptNewLetter />
         {/* footer */}
         <footer className="p-5 border-2 border-t shadow-sm">
           <div className=" w-full py-4  flex items-center flex-wrap   md:justify-between max-w-4xl mx-auto">
@@ -158,7 +160,6 @@ export const Home = () => {
             Copyright © 2022 Xpro . All Rights Reseved.
           </span>
         </footer>
-
       </main>
     </>
   );
