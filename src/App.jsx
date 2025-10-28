@@ -19,6 +19,7 @@ import { ShopingCart } from "./pages/shoping.Cart";
 import { Checkout } from "./landing_pages/checkout";
 import { TransactionSuccess } from "./landing_pages/transfer.success";
 import { ResetPassword } from "./pages/reset_password";
+import AdminDashboard from "./components/dashboard/adminDahboard";
 
 function App() {
   return (
@@ -47,6 +48,7 @@ function App() {
             <Route path="/success" element={<TransactionSuccess />} />
             <Route path="/checkout" element={<Checkout />} />
             <Route path="/reset-password" element={<ResetPassword />} />
+            <Route path="/admin-dashboard" element={<AdminDashboard />} />
           </Routes>
         </Provider>
       </BrowserRouter>
