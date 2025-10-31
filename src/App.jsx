@@ -20,13 +20,16 @@ import { TransactionSuccess } from "./landing_pages/transfer.success";
 import { ResetPassword } from "./pages/reset_password";
 import NotFound from "./pages/NotFound";
 import { Orders } from "./components/dashboard/Orders";
-import { Customers } from "./components/dashboard/Customers";
+import { Revenus } from "./components/dashboard/Revenus";
 import { Header } from "./components/dashboard/Headers";
 import { DashboardProducts } from "./components/dashboard/Products";
-import { Analytics } from "./components/dashboard/Analytics";
+import { Categories } from "./components/dashboard/Categories";
 import { DashboardLayout } from "./outlets/DashboardLayout";
 import { Sidebar } from "./components/dashboard/SideBar";
 import { AdminDashboard } from "./components/dashboard/adminDahboard";
+import { AdminLogin } from "./components/dashboard/AdminLogin";
+import { AdminSignUp } from "./components/dashboard/AdminSignUp";
+import { Setting } from "./components/dashboard/Setting";
 
 function App() {
   return (
@@ -59,13 +62,17 @@ function App() {
             {/* <AdminDashboard /> */}
             <Route path="/admin-dashboard" element={<DashboardLayout />}>
               <Route index element={<AdminDashboard />} />
-              <Route path="orders" element={<Orders />} />
-              <Route path="customers" element={<Customers />} />
               <Route path="header" element={<Header />} />
-              <Route path="products" element={<DashboardProducts />} />
-              <Route path="analytics" element={<Analytics />} />
               <Route path="sidebar" element={<Sidebar />} />
+              <Route path="orders" element={<Orders />} />
+              <Route path="revenus" element={<Revenus />} />
+              <Route path="products" element={<DashboardProducts />} />
+              <Route path="categories" element={<Categories />} />
+              <Route path="settings" element={<Setting />} />
             </Route>
+
+            <Route path="/admin-login" element={<AdminLogin />} />
+            <Route path="/admin-up" element={<AdminSignUp />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </Provider>

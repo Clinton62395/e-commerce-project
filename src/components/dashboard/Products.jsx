@@ -2,6 +2,10 @@ import React, { useState } from "react";
 import { Edit, Eye, Filter, Plus, Save, Trash2, Upload, X } from "lucide-react";
 
 export const DashboardProducts = () => {
+  const [showProductModal, setShowProductModal] = useState(null);
+  const [editingProduct, setEditingProduct] = useState(null);
+
+  
   const [products, setProducts] = useState([
     {
       _id: "1",

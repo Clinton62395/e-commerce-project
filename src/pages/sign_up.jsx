@@ -8,6 +8,7 @@ import { PropagateLoader } from "react-spinners";
 import { getAuth, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 import { api } from "../services/constant";
 import app from "../services/firabase";
+import { Eye, EyeOff } from "lucide-react";
 
 const schema = yup.object({
   firstName: yup.string().min(3).max(15).required("first Name is required"),
@@ -25,6 +26,9 @@ const schema = yup.object({
 });
 export const Register = () => {
   const [error, setError] = useState({});
+  const [showPassword, setShowPassword] = useState(false);
+
+  const toggleShoPassword = () => setShowPassword((prev) => !prev);
 
   const navigate = useNavigate();
   const {
@@ -93,140 +97,219 @@ export const Register = () => {
       console.error("error occured when registering", err);
     }
   };
-
   return (
-    <div className=" bg-gray-50 flex flex-col md:flex-row mx-auto p-5 md:p-10  gap-2 rounded-lg shadow-lg">
-      <div className="group flex  justify-center items-center p-2 md:p-10 w-full  md:w-1/2">
-        <img
-          src="Rectangle 19280 (1).png"
-          alt="logo"
-          className="group-hover:shadow-md hover:rounded-md duration transition-all hover:scale-105"
-        />
-      </div>
-
-      <div className="flex flex-1 flex-col justify-center items-center   ">
-        <h2 className="text-3xl font-bold mb-6">FASCO</h2>
-
-        <p className="text-gray-500 my-2 lowercase  tracking-wide ">
-          Create Account
-        </p>
-        <button
-          onClick={signInWithGoogle}
-          className="relative outline-none border border-[#5B86E5] text-sm md:text-lg rounded-md py-2 px-10 w-full md:w-1/2 hover:bg-gray-400 duration-150 transition-all"
-        >
-          <span>
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center py-10 px-4">
+      <div className="max-w-5xl w-full bg-white rounded-2xl shadow-lg overflow-hidden">
+        <div className="grid grid-cols-1 md:grid-cols-2">
+          {/* Left: image (kept as-is) */}
+          <div className="flex items-center justify-center p-6">
             <img
-              src="google-logo.png"
-              alt="google"
-              className="absolute left-2 top-0 h-5 md:h-10 "
+              src="Rectangle 19280 (1).png"
+              alt="FASCO sign up"
+              className="group-hover:shadow-md hover:rounded-md duration-200 transition-all hover:scale-105 max-h-96 w-auto"
             />
-          </span>
-          Sign Up with Google
-        </button>
+          </div>
 
-        <div className="flex items-center my-6">
-          <hr className="w-10 border-t border-[#838383]" />
-          <span className="mx-2 text-gray-500 lowercase  tracking-widest">
-            or
-          </span>
-          <hr className="w-10 border-t border-[#838383]" />
-        </div>
-        <form onSubmit={handleSubmit(onSubmit)}>
-          <div className=" grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-2  w-full">
-            <label htmlFor="firstName">
-              <input
-                type="text"
-                {...register("firstName")}
-                className=" outline-none w-full border-b-2 border-gray-[#9D9D9D] py-2 px-2 md:px-4"
-                placeholder="First Name"
-              />
-              <p className=" text-xs text-red-500 font-semibold">
-                {errors.firstName?.message}
+          {/* Right: form */}
+          <div className="p-8 md:p-12 flex items-center">
+            <div className="w-full">
+              <h2 className="text-3xl font-bold text-gray-900 mb-1">
+                Create an account
+              </h2>
+              <p className="text-sm text-gray-600 mb-6">
+                Join FASCO — manage orders, save favorites and checkout faster.
               </p>
-            </label>
-            <label htmlFor="lastName">
-              <input
-                type="text"
-                {...register("lastName")}
-                className=" outline-none w-full border-b-2 border-gray-[#9D9D9D] py-2 px-2 md:px-4"
-                placeholder=" Last Name"
-              />
-              <p className=" text-xs text-red-500">
-                {errors.lastName?.message}
-              </p>
-            </label>
-            <label htmlFor="email">
-              <input
-                type="email"
-                {...register("email")}
-                className=" outline-none w-full border-b-2 border-gray-[#9D9D9D] py-2 px-2 md:px-4"
-                placeholder="Email Address"
-              />
-              <p className=" text-xs text-red-500">{errors.email?.message}</p>
-            </label>
-            <label htmlFor="phoneNumber">
-              <input
-                type="tel"
-                {...register("phoneNumber")}
-                className=" outline-none w-full border-b-2 border-gray-[#9D9D9D] py-2 px-2 md:px-4"
-                placeholder=" Phone number"
-              />
-              <p className=" text-xs text-red-500 font-semibold">
-                {errors.phoneNumber?.message}
-              </p>
-            </label>
-            <label htmlFor="password">
-              <input
-                type="password"
-                {...register("password")}
-                className=" outline-none w-full border-b-2 border-gray-[#9D9D9D] py-2 px-2 md:px-4"
-                placeholder=" Password"
-              />
-              <p className=" text-xs text-red-500 font-semibold">
-                {errors.password?.message}
-              </p>
-            </label>
-            <label htmlFor="confirmPassword">
-              <input
-                type="password"
-                {...register("confirmPassword")}
-                className=" outline-none w-full border-b-2 border-gray-[#9D9D9D] py-2 px-2 md:px-4"
-                placeholder="Confirm  Password"
-              />
-              <p className=" text-xs text-red-500 font-semibold">
-                {errors.confirmPassword?.message}
-              </p>
-            </label>
-            <div className="flex  items-center flex-col col-span-1 md:col-span-2">
+
               <button
-                type="submit"
-                disabled={isSubmitting}
-                className={`flex items-center justify-center gap-2 bg-black text-white py-3 w-full rounded-lg font-semibold transition-all duration-200 ${
-                  isSubmitting
-                    ? "opacity-70 cursor-not-allowed"
-                    : "hover:bg-gray-900"
-                }`}
+                onClick={signInWithGoogle}
+                className="w-full flex items-center justify-center gap-3 border border-[#5B86E5] text-[#0f172a] rounded-md py-2 px-4 mb-5 hover:bg-gray-100 transition-colors relative"
+                aria-label="Sign up with Google"
               >
-                {isSubmitting ? (
-                  <span className="flex items-center gap-2">
-                    <PropagateLoader size={10} color="#FF6347" />
-                    <span className="text-sm">Signing in...</span>
-                  </span>
-                ) : (
-                  <span className="text-sm">Sign Up</span>
-                )}
+                <img src="google-logo.png" alt="google" className="h-5" />
+                <span className="font-medium">Sign up with Google</span>
               </button>
-              <p className="text-center mt-4 flex gap-2">
-                Already have an account?{" "}
-                <Link to="/login" className="text-blue-500">
-                  Log in
-                </Link>
+
+              <div className="flex items-center gap-3 my-4">
+                <hr className="flex-1 border-t border-gray-200" />
+                <span className="text-xs text-gray-400">or</span>
+                <hr className="flex-1 border-t border-gray-200" />
+              </div>
+              <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                  <div>
+                    <label
+                      htmlFor="firstName"
+                      className="block text-xs font-medium text-gray-700 mb-1"
+                    >
+                      First name
+                    </label>
+                    <input
+                      id="firstName"
+                      type="text"
+                      {...register("firstName")}
+                      aria-invalid={errors.firstName ? "true" : "false"}
+                      className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#6C9BF8]"
+                      placeholder="Enter First Name"
+                    />
+                    <p className="text-xs text-red-500 mt-1">
+                      {errors.firstName?.message}
+                    </p>
+                  </div>
+
+                  <div>
+                    <label
+                      htmlFor="lastName"
+                      className="block text-xs font-medium text-gray-700 mb-1"
+                    >
+                      Last name
+                    </label>
+                    <input
+                      id="lastName"
+                      type="text"
+                      {...register("lastName")}
+                      aria-invalid={errors.lastName ? "true" : "false"}
+                      className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#6C9BF8]"
+                      placeholder="Enter Last Name"
+                    />
+                    <p className="text-xs text-red-500 mt-1">
+                      {errors.lastName?.message}
+                    </p>
+                  </div>
+                </div>
+
+                <div>
+                  <label
+                    htmlFor="email"
+                    className="block text-xs font-medium text-gray-700 mb-1"
+                  >
+                    Email address
+                  </label>
+                  <input
+                    id="email"
+                    type="email"
+                    {...register("email")}
+                    aria-invalid={errors.email ? "true" : "false"}
+                    className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#6C9BF8]"
+                    placeholder="your address email"
+                  />
+                  <p className="text-xs text-red-500 mt-1">
+                    {errors.email?.message}
+                  </p>
+                </div>
+
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                  <div>
+                    <label
+                      htmlFor="phoneNumber"
+                      className="block text-xs font-medium text-gray-700 mb-1"
+                    >
+                      Phone number
+                    </label>
+                    <input
+                      id="phoneNumber"
+                      type="tel"
+                      {...register("phoneNumber")}
+                      aria-invalid={errors.phoneNumber ? "true" : "false"}
+                      className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#6C9BF8]"
+                      placeholder="you phone number"
+                    />
+                    <p className="text-xs text-red-500 mt-1">
+                      {errors.phoneNumber?.message}
+                    </p>
+                  </div>
+
+                  <div>
+                    <label
+                      htmlFor="password"
+                      className="block text-xs font-medium text-gray-700 mb-1"
+                    >
+                      Password
+                    </label>
+                    <div className="relative">
+                      <input
+                        id="password"
+                        type={showPassword ? "text" : "password"}
+                        {...register("password")}
+                        aria-invalid={errors.password ? "true" : "false"}
+                        className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#6C9BF8]"
+                        placeholder="Create a password"
+                      />
+                      <button
+                        type="button"
+                        onClick={toggleShoPassword}
+                        className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500"
+                        aria-label={
+                          showPassword ? "Hide password" : "Show password"
+                        }
+                      >
+                        {showPassword ? (
+                          <EyeOff className="h-5 w-5" />
+                        ) : (
+                          <Eye className="h-5 w-5" />
+                        )}
+                      </button>
+                    </div>
+                    <p className="text-xs text-red-500 mt-1">
+                      {errors.password?.message}
+                    </p>
+                  </div>
+                </div>
+
+                <div>
+                  <label
+                    htmlFor="confirmPassword"
+                    className="block text-xs font-medium text-gray-700 mb-1"
+                  >
+                    Confirm password
+                  </label>
+                  <input
+                    id="confirmPassword"
+                    type={showPassword ? "text" : "password"}
+                    {...register("confirmPassword")}
+                    aria-invalid={errors.confirmPassword ? "true" : "false"}
+                    className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#6C9BF8]"
+                    placeholder="Confirm password"
+                  />
+                  <p className="text-xs text-red-500 mt-1">
+                    {errors.confirmPassword?.message}
+                  </p>
+                </div>
+
+                <div className="mt-2">
+                  <button
+                    type="submit"
+                    disabled={isSubmitting}
+                    className={`w-full flex items-center justify-center gap-2 py-3 rounded-md text-white bg-black hover:bg-gray-800 transition-colors ${
+                      isSubmitting ? "opacity-70 cursor-not-allowed" : ""
+                    }`}
+                  >
+                    {isSubmitting ? (
+                      <span className="flex items-center gap-2">
+                        <PropagateLoader size={8} color="#fff" />
+                        <span className="text-sm">Signing up...</span>
+                      </span>
+                    ) : (
+                      <span className="text-sm font-medium">
+                        Create account
+                      </span>
+                    )}
+                  </button>
+                </div>
+
+                <p className="text-center text-sm text-gray-600">
+                  Already have an account?{" "}
+                  <Link to="/login" className="text-[#5B86E5] hover:underline">
+                    Log in
+                  </Link>
+                </p>
+              </form>
+
+              <p className="text-xs text-gray-500 mt-6 text-center">
+                {" "}
+                <a href="#">FASCO Terms & Conditions</a>
               </p>
             </div>
           </div>
-        </form>
-        <div className="text-xs text-gray-500 mt-4 text-end w-3/4 ">
-          <a href="#">FASCO Terms & Conditions</a>
         </div>
       </div>
     </div>

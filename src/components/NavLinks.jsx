@@ -2,6 +2,7 @@ import { Menu, X } from "lucide-react";
 
 import React, { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
+import { SupervisorAccountSharp } from "@mui/icons-material";
 
 export const defaultLinks = [
   { name: "Home", link: "/" },
@@ -28,11 +29,11 @@ export const NavLinks = ({ logo = "FASCO", pages = defaultLinks }) => {
       }`}
     >
       {/* Container */}
-      <div className="max-w-7xl mx-auto flex items-center justify-between px-4 md:px-8">
+      <div className=" max-w-7xl mx-auto flex items-center justify-between px-4 md:px-8">
         {/* Logo */}
         <Link
           to="/"
-          className="text-2xl sm:text-3xl font-bold tracking-wide text-black "
+          className="hidden md:flex text-2xl sm:text-3xl font-bold tracking-wide text-black "
         >
           {logo}
         </Link>
@@ -69,6 +70,10 @@ export const NavLinks = ({ logo = "FASCO", pages = defaultLinks }) => {
         >
           {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
         </button>
+
+        <Link to="/admin-up" className="text-black flex gap-2 items-center">
+          <SupervisorAccountSharp /> Admin
+        </Link>
       </div>
 
       {/* Mobile Menu */}

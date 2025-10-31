@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { BeatLoader } from "react-spinners";
 import {
   BadgeCheck,
   Box,
@@ -8,18 +9,14 @@ import {
   Star,
 } from "lucide-react";
 import { CountdownTimer, dynamicImages } from "./slide_pagination";
-import { progress } from "framer-motion";
 import { Link } from "react-router-dom";
-import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
-import DialogTitle from "@mui/material/DialogTitle";
 import toast from "react-hot-toast";
 import { api } from "../../services/constant";
-import { set } from "react-hook-form";
 
 export const ServiceTime = () => {
   return (
@@ -120,6 +117,7 @@ export const SubscriptNewLetter = () => {
   const [open, setOpen] = useState(false);
   const [email, setEmail] = useState("");
   const [error, setError] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [existingEmail, setExistingEmail] = useState("");
 
   const handleClickOpen = () => {
@@ -142,33 +140,42 @@ export const SubscriptNewLetter = () => {
       setError("Please enter a valid email address");
       return;
     }
+
     try {
-      const res = await toast.promise(api.post("/auth/subscribe", { email }), {
-        loading: "Subscribing...",
-        success: (res) =>
-          res.data.status === "user already subscribed"
-            ? setExistingEmail(res.data.email)
-            : "Subscription successful.",
+      setIsSubmitting(true);
+      const res = await api.post("/auth/subscribe", { email });
 
-        error: (err) =>
-          err.response?.data?.message ||
-          err.response.data ||
-          "Subscription failed. Please try again later.",
-      });
-      setTimeout(() => {
-        setExistingEmail("");
-      }, 5000);
+      console.log("Full response:", res.data);
+
+      const status = res?.data?.status;
+      const existingEmail = res?.data?.email || res?.data?.data?.email || email; // fallback si aucune clé n’existe
+
+      if (!status) {
+        throw new Error("Invalid response from server");
+      }
+
+      const toastMessage =
+        status === "user already subscribed"
+          ? `L'email ${existingEmail} is already subscribed`
+          : "Subscription successful.";
+
+      toast.success(toastMessage);
+
+      if (status === "user already subscribed") {
+        setExistingEmail(existingEmail);
+        setTimeout(() => setExistingEmail(""), 5000);
+      }
     } catch (err) {
-      console.log("error occured when subscribing user", err);
+      console.error("error occured when subscribing user", err);
+      const errorMessage = err.response.data?.message || err.response?.data;
+      toast.error(errorMessage);
       setError("Subscription failed. Please try again later.");
-      return;
+    } finally {
+      setEmail("");
+      setError("");
+      setIsSubmitting(false);
     }
-    setEmail("");
-    setError("");
-
-    // handleClose();
   };
-
   return (
     <div className="min-h-screen p-5 flex flex-col md:flex-row items-center justify-center md:space-x-6 space-y-6 md:space-y-0 bg-gray-50">
       {/* Image gauche */}
@@ -186,7 +193,7 @@ export const SubscriptNewLetter = () => {
           Subscribe To Our Newsletter
         </h2>
 
-        <p className="text-xs sm:text-sm md:text-base leading-relaxed mt-4 text-gray-600">
+        <p className="text-sm  md:text-base leading-relaxed mt-4 text-gray-600">
           Lorem ipsum dolor sit amet, consectetur adipiscing elit. Scelerisque
           duis ultrices sollicitudin aliquam sem. Scelerisque duis ultrices
           sollicitudin.
@@ -231,7 +238,7 @@ export const SubscriptNewLetter = () => {
                     <p className="text-red-500 text-sm mt-2">{error}</p>
                   )}
                   {existingEmail && (
-                    <p className="text-blue-500 text-sm mt-2">
+                    <p className="text-blue-500  mt-2 text-base">
                       {existingEmail} is already subscribed.
                     </p>
                   )}
@@ -244,11 +251,23 @@ export const SubscriptNewLetter = () => {
                     Cancel
                   </button>
                   <button
+                    disabled={isSubmitting}
                     type="submit"
                     form="subscription-form"
-                    className="bg-black/80 duration-300 transition-all hover:bg-black py-2 px-5 rounded-md text-teal-50 hover:text-yellow-50"
+                    className={`bg-black/80 ${
+                      isSubmitting
+                        ? "text-gray-500 cursor-not-allowed"
+                        : "text-white cursor-auto"
+                    } duration-300 transition-all hover:bg-black py-2 px-5 rounded-md text-teal-50 hover:text-yellow-50`}
                   >
-                    Subscribe
+                    {isSubmitting ? (
+                      <p className="bg-gray-200 w-full text-green-400 text-xl py-2 px-5 rounded-md shadow-md">
+                        {" "}
+                        <BeatLoader />
+                      </p>
+                    ) : (
+                      "Subscribe"
+                    )}
                   </button>
                 </DialogActions>
               </form>

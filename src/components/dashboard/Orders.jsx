@@ -1,123 +1,90 @@
 import react, { useState } from "react";
-import { Calendar, Mail, MapPin } from "lucide-react";
+import { Calendar, Mail, MapPin, Search } from "lucide-react";
 export const Orders = () => {
-  const [orders, setOrders] = useState([
-    {
-      _id: "ORD001",
-      customer: "Marie Dubois",
-      email: "marie@email.com",
-      date: "2025-10-28",
-      total: 149.97,
-      status: "delivered",
-      items: 3,
-      address: "12 Rue de Paris, Lyon",
-    },
-    {
-      _id: "ORD002",
-      customer: "Jean Martin",
-      email: "jean@email.com",
-      date: "2025-10-27",
-      total: 89.99,
-      status: "pending",
-      items: 1,
-      address: "45 Avenue Victor Hugo, Marseille",
-    },
-    {
-      _id: "ORD003",
-      customer: "Sophie Bernard",
-      email: "sophie@email.com",
-      date: "2025-10-26",
-      total: 229.95,
-      status: "processing",
-      items: 5,
-      address: "8 Boulevard Saint-Germain, Paris",
-    },
-  ]);
-  
+  const [filterOrder, setFilterOrder] = useState("All");
+
+  const tableContent = Array.from({ length: 30 }, (_, i) => ({
+    image: "product image",
+    name: "Women’s high waist jeans",
+    quantity: 3,
+    OrdersId: `#FS0001${i + 1}`,
+    customer: "",
+    Price: "$31",
+    Date: "21/sept/2025",
+    Status: "complete",
+  }));
+
   return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <div className="flex space-x-3">
-          <select className="px-4 py-2 border rounded-lg">
-            <option>Tous les statuts</option>
-            <option>En attente</option>
-            <option>En cours</option>
-            <option>Livré</option>
-          </select>
-          <input
-            type="date"
-            className="px-4 py-2 border rounded-lg"
-            defaultValue="2025-10-28"
-          />
-        </div>
-      </div>
-
-      <div className="grid gap-4">
-        {orders.map((order) => (
-          <div
-            key={order._id}
-            className="bg-white p-6 rounded-lg shadow hover:shadow-lg transition"
-          >
-            <div className="flex justify-between items-start mb-4">
-              <div>
-                <div className="flex items-center space-x-3">
-                  <h3 className="font-semibold text-lg">{order.customer}</h3>
-                  <span
-                    className={`px-3 py-1 rounded-full text-sm ${
-                      order.status === "delivered"
-                        ? "bg-green-100 text-green-700"
-                        : order.status === "processing"
-                        ? "bg-blue-100 text-blue-700"
-                        : "bg-yellow-100 text-yellow-700"
-                    }`}
-                  >
-                    {order.status === "delivered"
-                      ? "Livré"
-                      : order.status === "processing"
-                      ? "En cours"
-                      : "En attente"}
-                  </span>
-                </div>
-                <p className="text-sm text-gray-500 mt-1">
-                  Commande #{order._id}
-                </p>
-              </div>
-              <div className="text-right">
-                <p className="text-2xl font-bold text-gray-800">
-                  €{order.total.toFixed(2)}
-                </p>
-                <p className="text-sm text-gray-500">{order.items} articles</p>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-3 gap-4 text-sm">
-              <div className="flex items-center text-gray-600">
-                <Mail size={16} className="mr-2" />
-                {order.email}
-              </div>
-              <div className="flex items-center text-gray-600">
-                <Calendar size={16} className="mr-2" />
-                {order.date}
-              </div>
-              <div className="flex items-center text-gray-600">
-                <MapPin size={16} className="mr-2" />
-                {order.address}
-              </div>
-            </div>
-
-            <div className="flex justify-end space-x-2 mt-4 pt-4 border-t">
-              <button className="px-4 py-2 border rounded-lg hover:bg-gray-50">
-                Détails
-              </button>
-              {order.status !== "delivered" && (
-                <button className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
-                  Mettre à jour
-                </button>
-              )}
+    <>
+      <div className="bg-white shadow-sm p-5 ">
+        <div className="flex items-center justify-between max-w-5xl mx-auto font-medium">
+          <div className=" flex items-center gap-4 text-[#777777]">
+            <button>All</button>
+            <button>Top Orders</button>
+            <button>Shipping</button>
+            <button>Complited</button>
+            <button>Canceled</button>
+          </div>
+          <div>
+            <div className="relative">
+              <Search
+                className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+                size={20}
+              />
+              <input
+                type="text"
+                placeholder="Rechercher..."
+                className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
             </div>
           </div>
-        ))}
+        </div>
+
+        <div>
+          {tableContent.map((item, i) => (
+            <table className="min-w-full border border-gray-200 rounded-lg shadow-sm overflow-hidden">
+              <thead className="bg-gray-100 text-gray-700 uppercase text-sm">
+                <tr>
+                  <th className="px-4 py-3 text-left">Product Name</th>
+                  <th className="px-4 py-3 text-left">Quantity</th>
+                  <th className="px-4 py-3 text-left">Order ID</th>
+                  <th className="px-4 py-3 text-left">Customer</th>
+                  <th className="px-4 py-3 text-left">Price</th>
+                  <th className="px-4 py-3 text-left">Date</th>
+                  <th className="px-4 py-3 text-left">Status</th>
+                </tr>
+              </thead>
+
+              <tbody className="divide-y divide-gray-200 text-gray-800">
+                {tableContent.map((item, i) => (
+                  <tr
+                    key={i}
+                    className="hover:bg-gray-50 transition-colors duration-150"
+                  >
+                    <td className="px-4 py-3 font-medium">{item.name}</td>
+                    <td className="px-4 py-3">QTY {item.QTY}</td>
+                    <td className="px-4 py-3">{item.OrdersId}</td>
+                    <td className="px-4 py-3">{item.customer || "N/A"}</td>
+                    <td className="px-4 py-3 font-semibold">{item.Price}</td>
+                    <td className="px-4 py-3">{item.Date}</td>
+                    <td
+                      className={`px-4 py-3 font-semibold ${
+                        item.Status === "complete"
+                          ? "text-green-600"
+                          : item.Status === "pending"
+                          ? "text-yellow-500"
+                          : "text-red-500"
+                      }`}
+                    >
+                      {item.Status}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          ))}
+        </div>
       </div>
-    </div>
+    </>
   );
 };

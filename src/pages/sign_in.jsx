@@ -3,10 +3,13 @@ import { Link, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { PropagateLoader } from "react-spinners";
+import { getAuth, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 
 import * as yup from "yup";
 import { api } from "../services/constant";
 import toast from "react-hot-toast";
+import app from "../services/firabase";
+import { Eye, EyeOff } from "lucide-react";
 const schema = yup.object({
   email: yup.string().email("Invalid email").required("Email is required"),
   password: yup.string().required(),
@@ -14,6 +17,45 @@ const schema = yup.object({
 
 export const Login = () => {
   const [error, setError] = useState({});
+  const [showPassword, setShowPassword] = useState(false);
+
+  const toggleShoPassword = () => setShowPassword((prev) => !prev);
+
+  const auth = getAuth(app);
+  const provider = new GoogleAuthProvider();
+
+  const signInWithGoogle = async () => {
+    try {
+      const res = await signInWithPopup(auth, provider);
+      if (res) {
+        const user = res.user;
+        const token = await user.getIdToken();
+
+        sendTokenToBackend(token);
+      }
+    } catch (err) {
+      console.log("error occured when google signing", err);
+    }
+  };
+
+  const sendTokenToBackend = async (token) => {
+    try {
+      const res = await toast.promise(
+        api.post("/auth/google", { token }),
+
+        {
+          loading: " login...",
+          success: "user login successfully",
+          error: (err) => err.response.data?.message || error.response?.data,
+        }
+      );
+      console.log("backend response:", res.data);
+      navigate("/shop");
+    } catch (error) {
+      console.error("error sending token:", error);
+    }
+  };
+
   const {
     register,
     handleSubmit,
@@ -62,7 +104,10 @@ export const Login = () => {
             <p className="text-gray-500 my-2 lowercase  tracking-wide ">
               Sign In To FASCO
             </p>
-            <button className="relative outline-none border border-[#5B86E5] rounded-md py-2 w-full md:w-1/2  hover:bg-gray-400 duration-150 transition-all">
+            <button
+              onClick={signInWithGoogle}
+              className="relative outline-none border border-[#5B86E5] rounded-md py-2 w-full md:w-1/2  hover:bg-gray-400 duration-150 transition-all"
+            >
               <span>
                 <img
                   src="google-logo.png"
@@ -94,9 +139,9 @@ export const Login = () => {
                 <p className="text-xs text-red-500">{errors.email?.message}</p>
               </label>
 
-              <label htmlFor="password">
+              <label htmlFor="password" className="relative">
                 <input
-                  type="password"
+                  type={showPassword ? "text" : "password"}
                   {...register("password")}
                   className=" outline-none w-full border-b-2 border-gray-[#9D9D9D] py-2 px-2 md:px-4 "
                   placeholder="password"
@@ -104,6 +149,18 @@ export const Login = () => {
                 <p className="text-xs text-red-500">
                   {errors.password?.message}
                 </p>
+                <button
+                  type="button"
+                  onClick={toggleShoPassword}
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500"
+                  aria-label={showPassword ? "Hide password" : "Show password"}
+                >
+                  {showPassword ? (
+                    <EyeOff className="h-5 w-5" />
+                  ) : (
+                    <Eye className="h-5 w-5" />
+                  )}
+                </button>
               </label>
 
               <div className="flex flex-col space-y-4 w-full max-w-sm mx-auto">
