@@ -1,11 +1,20 @@
 import React, { useState } from "react";
-import { Edit, Eye, Filter, Plus, Save, Trash2, Upload, X } from "lucide-react";
+import {
+  Edit,
+  Eye,
+  Filter,
+  Plus,
+  Save,
+  Search,
+  Trash2,
+  Upload,
+  X,
+} from "lucide-react";
 
 export const DashboardProducts = () => {
   const [showProductModal, setShowProductModal] = useState(null);
   const [editingProduct, setEditingProduct] = useState(null);
 
-  
   const [products, setProducts] = useState([
     {
       _id: "1",
@@ -14,8 +23,9 @@ export const DashboardProducts = () => {
       description: "T-shirt confortable en coton biologique",
       category: "men",
       price: 29.99,
-      quantity: 150,
-      rate: "4.5",
+      stock: 150,
+      status: [],
+      // status: ["In Stock", "Coming Soon", "Out of Stock"],
       picture:
         "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=300",
       newArrival: true,
@@ -24,6 +34,7 @@ export const DashboardProducts = () => {
       color: ["Blanc", "Noir"],
       brands: ["Nike"],
       tags: ["casual", "cotton"],
+      releaseDate: Date.now(),
     },
     {
       _id: "2",
@@ -32,8 +43,8 @@ export const DashboardProducts = () => {
       description: "Robe élégante pour occasions spéciales",
       category: "women",
       price: 89.99,
-      quantity: 75,
-      rate: "4.8",
+      stock: 150,
+      status: [],
       picture:
         "https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=300",
       newArrival: false,
@@ -42,6 +53,7 @@ export const DashboardProducts = () => {
       color: ["Rouge", "Noir"],
       brands: ["Zara"],
       tags: ["elegant", "soiree"],
+      releaseDate: Date.now(),
     },
     {
       _id: "3",
@@ -50,8 +62,9 @@ export const DashboardProducts = () => {
       description: "Jean slim fit confortable",
       category: "men",
       price: 59.99,
-      quantity: 200,
-      rate: "4.3",
+      stock: 0,
+      // status: ["In Stock", "Coming Soon", "Out of Stock"],
+      status: [],
       picture:
         "https://images.unsplash.com/photo-1542272604-787c3835535d?w=300",
       newArrival: true,
@@ -60,37 +73,37 @@ export const DashboardProducts = () => {
       color: ["Bleu"],
       brands: ["Levi's"],
       tags: ["denim", "casual"],
+      releaseDate: Date.now(),
     },
   ]);
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <div className="flex space-x-3">
-          <button className="flex items-center px-4 py-2 bg-gray-100 rounded-lg hover:bg-gray-200">
-            <Filter size={18} className="mr-2" />
-            Filtrer
-          </button>
-          <select className="px-4 py-2 border rounded-lg">
-            <option>Toutes catégories</option>
-            <option>Hommes</option>
-            <option>Femmes</option>
-            <option>Enfants</option>
-          </select>
+      <div className="flex justify-center md:justify-between items-center flex-wrap gap-3 ">
+        <div className="relative">
+          <input
+            type="text"
+            placeholder="Rechercher..."
+            className="pl-10 pr-4 py-2 border bg-[#0000000D] border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-300 shadow-md"
+          />
+          <Search
+            className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+            size={20}
+          />
         </div>
         <button
           onClick={() => {
             setEditingProduct(null);
             setShowProductModal(true);
           }}
-          className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+          className="flex items-center px-4 py-2 duration-300 transition-all bg-black/80 text-white rounded-lg hover:bg-black"
         >
           <Plus size={18} className="mr-2" />
-          Nouveau Produit
+          Add Products
         </button>
       </div>
 
-      <div className="bg-white rounded-lg shadow overflow-hidden">
+      <div className="bg-white rounded-lg shadow ">
         <table className="w-full">
           <thead className="bg-gray-50 border-b">
             <tr>
@@ -107,7 +120,7 @@ export const DashboardProducts = () => {
                 Stock
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                Note
+                Status
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
                 Actions
@@ -122,7 +135,7 @@ export const DashboardProducts = () => {
                     <img
                       src={product.picture}
                       alt={product.clotheName}
-                      className="w-12 h-12 object-cover rounded"
+                      className="w-12 h-12 object-cover rounded-full border border-black"
                     />
                     <div className="ml-3">
                       <p className="font-medium text-gray-800">
@@ -138,19 +151,43 @@ export const DashboardProducts = () => {
                   </span>
                 </td>
                 <td className="px-6 py-4 font-medium">€{product.price}</td>
-                <td className="px-6 py-4">
+                <td className="px-6 py-4 font-medium">
                   <span
                     className={`${
-                      product.quantity < 50 ? "text-red-600" : "text-green-600"
+                      product.stock < 50 ? "text-red-600" : "text-green-600"
                     }`}
                   >
-                    {product.quantity}
+                    {product.stock}
                   </span>
                 </td>
                 <td className="px-6 py-4">
                   <div className="flex items-center">
                     <span className="text-yellow-500 mr-1">⭐</span>
-                    {product.rate}
+                    <span>
+                      {(() => {
+                        const today = new Date();
+
+                        if (product.stock > 0 && product.releaseDate <= today) {
+                          return (
+                            <span className=" font-medium text-[#166A42]">
+                              In stock
+                            </span>
+                          );
+                        } else if (product.releaseDate > today) {
+                          return (
+                            <span className=" font-medium text-[#5479CB]">
+                              Coming soon
+                            </span>
+                          );
+                        } else {
+                          return (
+                            <span className=" font-medium text-[#FF2929]">
+                              Coming soon
+                            </span>
+                          );
+                        }
+                      })()}
+                    </span>
                   </div>
                 </td>
                 <td className="px-6 py-4">

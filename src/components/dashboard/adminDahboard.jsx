@@ -7,8 +7,68 @@ import {
   TrendingUp,
   DollarSign,
 } from "lucide-react";
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend,
+} from "chart.js";
+import { Line } from "react-chartjs-2";
+
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend
+);
 
 export const AdminDashboard = () => {
+  const options = {
+    responsive: true,
+    plugins: {
+      legend: { display: false },
+      title: {
+        display: true,
+        text: "Revenue This Week",
+        font: { size: 18 },
+      },
+      tooltip: {
+        callbacks: {
+          label: function (context) {
+            return `$${context.parsed.y.toLocaleString()}`;
+          },
+        },
+      },
+    },
+    elements: {
+      point: {
+        radius: (ctx) => (ctx.dataIndex === 3 ? 6 : 3), // Highlight October
+        backgroundColor: (ctx) => (ctx.dataIndex === 3 ? "#3b82f6" : "#1e40af"), // Blue for October
+      },
+    },
+  };
+
+  const data = {
+    labels: ["Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+    datasets: [
+      {
+        label: "Revenue",
+        data: [85000, 92000, 110000, 126390, 118000, 130000],
+        borderColor: "#1e40af",
+        backgroundColor: "rgba(30, 64, 175, 0.1)",
+        tension: 0.4,
+        pointHoverRadius: 8,
+      },
+    ],
+  };
+
   // Données simulées
   const [products] = useState([
     {
@@ -61,73 +121,98 @@ export const AdminDashboard = () => {
   return (
     <div className="space-y-6">
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 w-full md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <div className="bg-white p-6 rounded-lg shadow">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-gray-600">Produits Total</p>
-              <h3 className="text-2xl font-bold text-gray-800 mt-1">
-                {stats.totalProducts}
-              </h3>
+      <div className="grid grid-cols-1 lg:grid-cols-6 gap-4">
+        {/* Statistiques principales */}
+        <div className="col-span-1 md:col-span-3 lg:col-span-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {/* Total Sales */}
+            <div className="bg-white p-6 rounded-xl shadow flex flex-col justify-between">
+              <div className="flex items-center justify-between mb-4">
+                <p className="text-lg font-medium text-gray-600">Total Sales</p>
+                <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                  <Package className="text-blue-600" size={24} />
+                </div>
+              </div>
+              <p className="text-2xl font-bold text-gray-800">$879</p>
               <p className="text-xs text-green-600 mt-2 flex items-center">
-                <TrendingUp size={14} className="mr-1" /> +12% ce mois
+                <TrendingUp size={14} className="mr-1" /> +12% this month
               </p>
             </div>
-            <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-              <Package className="text-blue-600" size={24} />
-            </div>
-          </div>
-        </div>
 
-        <div className="bg-white p-6 rounded-lg shadow">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-gray-600">Commandes</p>
-              <h3 className="text-2xl font-bold text-gray-800 mt-1">
-                {stats.totalOrders}
-              </h3>
+            {/* Average Order */}
+            <div className="bg-white p-6 rounded-xl shadow flex flex-col justify-between">
+              <div className="flex items-center justify-between mb-4">
+                <p className="text-lg font-medium text-gray-600">
+                  Average Order
+                </p>
+                <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
+                  <ShoppingCart className="text-green-600" size={24} />
+                </div>
+              </div>
+              <p className="text-2xl font-bold text-gray-800">
+                ${stats.totalOrders}
+              </p>
               <p className="text-xs text-green-600 mt-2 flex items-center">
-                <TrendingUp size={14} className="mr-1" /> +8% ce mois
+                <TrendingUp size={14} className="mr-1" /> +8% this week
               </p>
             </div>
-            <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
-              <ShoppingCart className="text-green-600" size={24} />
-            </div>
-          </div>
-        </div>
 
-        <div className="bg-white p-6 rounded-lg shadow">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-gray-600">Revenu Total</p>
-              <h3 className="text-2xl font-bold text-gray-800 mt-1">
+            {/* Total Revenue */}
+            <div className="bg-white p-6 rounded-xl shadow flex flex-col justify-between">
+              <div className="flex items-center justify-between mb-4">
+                <p className="text-lg font-medium text-gray-600">
+                  Total Revenue
+                </p>
+                <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
+                  <DollarSign className="text-purple-600" size={24} />
+                </div>
+              </div>
+              <p className="text-2xl font-bold text-gray-800">
                 €{stats.totalRevenue.toFixed(2)}
-              </h3>
+              </p>
               <p className="text-xs text-green-600 mt-2 flex items-center">
-                <TrendingUp size={14} className="mr-1" /> +23% ce mois
+                <TrendingUp size={14} className="mr-1" /> +5% growth
               </p>
             </div>
-            <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
-              <DollarSign className="text-purple-600" size={24} />
-            </div>
+          </div>
+          {/* chart */}
+          <div>
+            {/* <Bar options={options} data={data} /> */}
+            <Line options={options} data={data} />
           </div>
         </div>
 
-        <div className="bg-white p-6 rounded-lg shadow">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-gray-600">Clients Actifs</p>
-              <h3 className="text-2xl font-bold text-gray-800 mt-1">
-                {stats.newCustomers}
-              </h3>
-              <p className="text-xs text-green-600 mt-2 flex items-center">
-                <TrendingUp size={14} className="mr-1" /> +5% ce mois
-              </p>
-            </div>
-            <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center">
-              <Users className="text-orange-600" size={24} />
-            </div>
-          </div>
+        {/* Top Countries */}
+        <div className="col-span-1 lg:col-span-2 bg-white p-6 rounded-xl shadow">
+          <h2 className="text-lg font-semibold text-gray-800 mb-4">
+            Top Countries by Sales
+          </h2>
+          {/* Placeholder for country list or chart */}
+          <ul className="space-y-2 text-sm text-gray-600">
+            {[
+              { america: { label: "United States", flags: null, rate: "25k" } },
+              { germany: { label: "Germany", flags: null, rate: "25k" } },
+              { china: { label: "China", flags: null, rate: "25k" } },
+              {
+                southCoreah: {
+                  label: "South Korea",
+                  flags: null,
+                  rate: "25k",
+                },
+              },
+              { india: { label: "India", flags: null, rate: "25k" } },
+              { france: { label: "France", flags: null, rate: "25k" } },
+              {
+                singapour: { label: "Singapour", flags: null, rate: "25k" },
+              },
+              { quatar: { label: "Quatar", flags: null, rate: "25k" } },
+              { guinea: { label: "Guinea", flags: null, rate: "25k" } },
+            ]}
+            <li>Nigeria — $2,300</li>
+            <li>USA — $1,850</li>
+            <li>UK — $1,200</li>
+            <li>Germany — $950</li>
+          </ul>
         </div>
       </div>
 

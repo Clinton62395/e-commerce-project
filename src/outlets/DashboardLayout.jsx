@@ -11,21 +11,25 @@ export const DashboardLayout = () => {
   };
 
   return (
-    <div className="flex flex-col  bg-gray-50">
-      <header className="shadow bg-white ">
-        <Header toggleOpen={toggleSwicht} />
+    <div className="flex flex-col  bg-gray-50 ">
+      <header className="shadow bg-white  sticky top-0  z-[1000]">
+        <Header toggleOpen={toggleSwicht} isOpen={sidebarOpen} />
       </header>
       {/* Sidebar */}
 
       {/* Main content area */}
-      <div className="flex  flex-1 justify-center">
-        <aside className="sticky top-0 left-0 h-screen w-52 ">
-          <Sidebar isOpen={setSidebarOpen} />
+      <div className="flex">
+        <aside
+          className={`sticky top-0  h-screen shadow-md z-50 transition-transform duration-300 ${
+            sidebarOpen ? "translate-x-0 w-64 p-2" : "-translate-x-full w-0 p-0"
+          }`}
+        >
+          <Sidebar isOpen={sidebarOpen} />
         </aside>
         {/* Header */}
 
         {/* Page content */}
-        <main className="flex-1 p-6 overflow-y-auto mx-auto">
+        <main className="flex-grow p-6 overflow-y-auto z-20">
           <Outlet />
         </main>
       </div>
