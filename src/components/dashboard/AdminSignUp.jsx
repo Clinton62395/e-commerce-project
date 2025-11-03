@@ -295,14 +295,16 @@ export const AdminSignUp = () => {
                 </div>
 
                 {/* Admin Secret */}
-                <div className="grid grid-cols-2 gap-2 place-items-center p-2">
-                  <label
-                    htmlFor="adminSecret"
-                    className="block text-sm font-medium text-gray-700 mb-2 px-2 w-15"
-                  >
-                    System Secret Code
-                  </label>
-                  <div className="flex-1 w-full">
+                <div className=" flex flex-wrap items-center justify-center md:grid grid-cols-1 md:grid-cols-2 gap-2 mx-auto max-w-2xl w-full p-2">
+                  <div>
+                    <label
+                      htmlFor="adminSecret"
+                      className="text-lg font-medium md:text-black  text-gray-700 mb-2 px-2 w-full md:w-24 "
+                    >
+                      System Secret Code
+                    </label>
+                  </div>
+                  <div className="">
                     <OtpInput
                       value={formData.adminSecret}
                       onChange={handleOtpInput}
