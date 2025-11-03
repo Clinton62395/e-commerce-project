@@ -6,6 +6,7 @@ import { api } from "../../services/constant";
 import toast from "react-hot-toast";
 
 export const AdminSignUp = () => {
+  const [masqueOtp, setMasqueOpt] = useState(false);
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     name: "",
@@ -161,11 +162,11 @@ export const AdminSignUp = () => {
   }, [isOtpValid]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-100 to-gray-200 py-8 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-6xl mx-auto bg-white rounded-2xl shadow-xl overflow-hidden">
+    <div className="h-screen bg-gradient-to-br overflow-hidden from-gray-100 to-gray-200 py-15 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-5xl mx-auto bg-white rounded-2xl shadow-xl   ">
         <div className="grid grid-cols-1 md:grid-cols-2">
           {/* Image Section (hidden on small screens) */}
-          <div className="relative hidden md:block">
+          <div className="relative hidden md:block max-h-full">
             <img
               src="/adminPicture.jpg"
               alt="Admin onboarding"
@@ -180,7 +181,18 @@ export const AdminSignUp = () => {
           </div>
 
           {/* Form Section */}
-          <div className="p-8 lg:p-12">
+          <div className="p-8 lg:p-10">
+            {/* alert */}
+            {otpError.err && (
+              <p
+                role="alert"
+                className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg shadow-sm text-sm font-medium"
+              >
+                <span className="font-semibold"> ⚠️ Alert:</span> Any attempt to
+                access this account will automatically prevent you from using
+                this website.
+              </p>
+            )}
             <p className="text-xl font-semibold text-gray-800 text-center my-5">
               This page is only for Admins
             </p>
@@ -304,7 +316,7 @@ export const AdminSignUp = () => {
                       System Secret Code
                     </label>
                   </div>
-                  <div className="">
+                  <div className=" relative">
                     <OtpInput
                       value={formData.adminSecret}
                       onChange={handleOtpInput}
@@ -315,13 +327,31 @@ export const AdminSignUp = () => {
                       inputStyle={{
                         width: "2rem",
                       }}
-                      renderInput={(props) => (
-                        <input
-                          {...props}
-                          className=" w-25 h-8 p-1 mx-2 shadow-sm focus:shadow-teal-100 focus:shadow-md text-center border border-gray-300 rounded-md text-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900"
-                        />
-                      )}
+                      renderInput={(props, index) => {
+                        const maskValue = masqueOtp
+                          ? "*"
+                          : formData.adminSecret[index];
+                        return (
+                          <input
+                            {...props}
+                            value={maskValue}
+                            className=" w-25 h-8 p-1 mx-2 shadow-sm focus:shadow-teal-100 focus:shadow-md text-center border border-gray-300 rounded-md text-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900"
+                          />
+                        );
+                      }}
                     />
+                    <button
+                      type="button"
+                      onClick={() => setMasqueOpt(!masqueOtp)}
+                      className="absolute inset-y-0 right-0 pr-3 flex items-center top-14 left-16"
+                      aria-label={masqueOtp ? "Hide otp" : "Show otp"}
+                    >
+                      {masqueOtp ? (
+                        <EyeOff className="h-5 w-5 text-gray-400 hover:text-gray-600" />
+                      ) : (
+                        <Eye className="h-5 w-5 text-gray-400 hover:text-gray-600" />
+                      )}
+                    </button>
 
                     {errors.adminSecret && (
                       <p className="mt-1 text-sm text-red-500">
@@ -355,12 +385,12 @@ export const AdminSignUp = () => {
                   {isOtpValid ? "Creating account..." : "Create Admin Account"}
                 </button> */}
 
-                <div className="flex items-center justify-between">
+                <div className="">
                   <Link
                     to="/admin-login"
                     className="text-sm text-[#5B86E5] hover:underline"
                   >
-                    Back to login
+                    Back to Login
                   </Link>
                 </div>
 
@@ -372,18 +402,6 @@ export const AdminSignUp = () => {
                   <ArrowLeft className="h-4 w-4" />
                   Return
                 </button>
-
-                {/* alert */}
-                {otpError.err && (
-                  <p
-                    role="alert"
-                    className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg shadow-sm text-sm font-medium"
-                  >
-                    <span className="font-semibold"> ⚠️ Alert:</span> Any
-                    attempt to access this account will automatically prevent
-                    you from using this website.
-                  </p>
-                )}
               </form>
             </div>
           </div>
