@@ -6,7 +6,7 @@ import { api } from "../../services/constant";
 import toast from "react-hot-toast";
 
 export const AdminSignUp = () => {
-  const [masqueOtp, setMasqueOpt] = useState(false);
+  const [masqueOtp, setMasqueOpt] = useState(true);
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     name: "",
@@ -19,6 +19,13 @@ export const AdminSignUp = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isOtpValid, setIsOtpValid] = useState(false);
   const [otpError, setOtpError] = useState({});
+
+  const toggleSwich = () => {
+    setMasqueOpt((prev) => !prev);
+    setTimeout(() => {
+      setMasqueOpt(false);
+    }, 200);
+  };
 
   //   fetch otp for verification and auto submit form
 
@@ -162,7 +169,7 @@ export const AdminSignUp = () => {
   }, [isOtpValid]);
 
   return (
-    <div className="h-screen bg-gradient-to-br overflow-hidden from-gray-100 to-gray-200 py-15 px-4 sm:px-6 lg:px-8">
+    <div className="h-screen bg-gradient-to-br md:overflow-hidden from-gray-100 to-gray-200 py-15 px-4 sm:px-6 lg:px-8">
       <div className="max-w-5xl mx-auto bg-white rounded-2xl shadow-xl   ">
         <div className="grid grid-cols-1 md:grid-cols-2">
           {/* Image Section (hidden on small screens) */}
@@ -181,7 +188,7 @@ export const AdminSignUp = () => {
           </div>
 
           {/* Form Section */}
-          <div className="p-8 lg:p-10">
+          <div className="p-8 lg:p-10 h-full">
             {/* alert */}
             {otpError.err && (
               <p
@@ -202,7 +209,7 @@ export const AdminSignUp = () => {
                 <p className="text-gray-600">Admin Sign Up</p>
               </div>
 
-              <form className="space-y-5">
+              <form className="space-y-4">
                 {/* Name */}
                 <div>
                   <label
@@ -307,7 +314,7 @@ export const AdminSignUp = () => {
                 </div>
 
                 {/* Admin Secret */}
-                <div className=" flex flex-wrap items-center justify-center md:grid grid-cols-1 md:grid-cols-2 gap-2 mx-auto max-w-2xl w-full p-2">
+                <div className="otp relative flex flex-col  items-center justify-center  mx-auto max-w-2xl w-full p-2">
                   <div>
                     <label
                       htmlFor="adminSecret"
@@ -316,7 +323,7 @@ export const AdminSignUp = () => {
                       System Secret Code
                     </label>
                   </div>
-                  <div className=" relative">
+                  <div className="relative ">
                     <OtpInput
                       value={formData.adminSecret}
                       onChange={handleOtpInput}
@@ -328,25 +335,25 @@ export const AdminSignUp = () => {
                         width: "2rem",
                       }}
                       renderInput={(props, index) => {
-                        const maskValue = masqueOtp
+                        const maskValue = !masqueOtp
                           ? "*"
                           : formData.adminSecret[index];
                         return (
                           <input
                             {...props}
                             value={maskValue}
-                            className=" w-25 h-8 p-1 mx-2 shadow-sm focus:shadow-teal-100 focus:shadow-md text-center border border-gray-300 rounded-md text-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900"
+                            className=" w-25 h-8 p-1 mx-2 ring-offset-1 ring-0 shadow-sm focus:shadow-teal-100 focus:shadow-md text-center border border-gray-300 rounded-md text-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900"
                           />
                         );
                       }}
                     />
                     <button
                       type="button"
-                      onClick={() => setMasqueOpt(!masqueOtp)}
-                      className="absolute inset-y-0 right-0 pr-3 flex items-center top-14 left-16"
+                      onClick={toggleSwich}
+                      className="absolute  w-25 h-8 p-1 border  items-center justify-center pr-3 flex rounded-md top-0 ps-2 ring-1 outline-fuchsia-200 ring-offset-1  -left-10"
                       aria-label={masqueOtp ? "Hide otp" : "Show otp"}
                     >
-                      {masqueOtp ? (
+                      {!masqueOtp ? (
                         <EyeOff className="h-5 w-5 text-gray-400 hover:text-gray-600" />
                       ) : (
                         <Eye className="h-5 w-5 text-gray-400 hover:text-gray-600" />

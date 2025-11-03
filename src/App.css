@@ -34,3 +34,11 @@
 .swiper-slide:not(.swiper-slide-active) {
   z-index: 10 !important;
 }
+
+@media(max-width: 776px){
+  .otp{
+display: flex;
+flex-direction: column;
+
+  }
+}
