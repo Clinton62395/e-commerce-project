@@ -240,6 +240,9 @@ export const AdminDashboard = () => {
                     Total Sales
                   </p>
                   <p className="text-xl font-semibold text-black">$879</p>
+                  <p className="text-xs text-green-600 mt-2 flex items-center">
+                    <TrendingUp size={14} className="mr-1" /> +8% this week
+                  </p>
                 </div>
               </div>
             </div>
@@ -256,6 +259,9 @@ export const AdminDashboard = () => {
                     Average Order
                   </p>
                   <p className="text-xl font-semibold text-black">$879</p>
+                  <p className="text-xs text-green-600 mt-2 flex items-center">
+                    <TrendingUp size={14} className="mr-1" /> +3% this week
+                  </p>
                 </div>
               </div>
             </div>
@@ -264,50 +270,20 @@ export const AdminDashboard = () => {
               <div className="flex items-center gap-4">
                 {/* Icône à gauche */}
                 <div className=" p-2 rounded-full  bg-purple-800 text-yellow-50 mt-2 flex items-center w-10 h-10">
-                 <AddShoppingCartIcon/>
+                  <AddShoppingCartIcon />
                 </div>
 
                 {/* Texte centré verticalement */}
                 <div className="text-center">
                   <p className="text-sm text-gray-500 font-medium">
-                    Total Sales
+                    Total Orders
                   </p>
                   <p className="text-xl font-semibold text-black">$879</p>
+                  <p className="text-xs text-green-600 mt-2 flex items-center">
+                    <TrendingUp size={14} className="mr-1" /> +5% this week
+                  </p>
                 </div>
               </div>
-            </div>
-
-            {/* Average Order */}
-            <div className="bg-white p-6 rounded-xl shadow flex flex-col justify-between">
-              <div className="flex items-center justify-between mb-4">
-                <p className="text-lg font-medium text-gray-600">
-                  Average Order
-                </p>
-              </div>
-              <p className="text-2xl font-bold text-gray-800">
-                ${stats.totalOrders}
-              </p>
-              <p className="text-xs text-green-600 mt-2 flex items-center">
-                <TrendingUp size={14} className="mr-1" /> +8% this week
-              </p>
-            </div>
-
-            {/* Total Revenue */}
-            <div className="bg-white p-6 rounded-xl shadow flex flex-col justify-between">
-              <div className="flex items-center justify-between mb-4">
-                <p className="text-lg font-medium text-gray-600">
-                  Total Revenue
-                </p>
-                <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
-                  <DollarSign className="text-purple-600" size={24} />
-                </div>
-              </div>
-              <p className="text-2xl font-bold text-gray-800">
-                €{stats.totalRevenue.toFixed(2)}
-              </p>
-              <p className="text-xs text-green-600 mt-2 flex items-center">
-                <TrendingUp size={14} className="mr-1" /> +5% growth
-              </p>
             </div>
           </div>
           {/* chart */}
