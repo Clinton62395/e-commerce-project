@@ -30,6 +30,7 @@ import { AdminDashboard } from "./components/dashboard/adminDahboard";
 import { AdminLogin } from "./components/dashboard/AdminLogin";
 import { AdminSignUp } from "./components/dashboard/AdminSignUp";
 import { Setting } from "./components/dashboard/Setting";
+import { UserLogout } from "./components/dashboard/Logout";
 
 function App() {
   return (
@@ -69,6 +70,7 @@ function App() {
               <Route path="products" element={<DashboardProducts />} />
               <Route path="categories" element={<Categories />} />
               <Route path="settings" element={<Setting />} />
+              <Route path="Logout" element={<UserLogout />} />
             </Route>
 
             <Route path="/admin-login" element={<AdminLogin />} />

@@ -2,9 +2,11 @@ import { Outlet } from "react-router-dom";
 import { Sidebar } from "../components/dashboard/SideBar";
 import { Header } from "../components/dashboard/Headers";
 import React, { useState } from "react";
+import { UserLogout } from "../components/dashboard/Logout";
 
 export const DashboardLayout = () => {
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [modalOpen, setMdalOpen] = useState(false);
 
   const toggleSwicht = () => {
     setSidebarOpen((prev) => !prev);
@@ -24,7 +26,10 @@ export const DashboardLayout = () => {
             sidebarOpen ? "translate-x-0 w-64 p-2" : "-translate-x-full w-0 p-0"
           }`}
         >
-          <Sidebar isOpen={sidebarOpen} />
+          <Sidebar
+            isOpen={sidebarOpen}
+            onClickLogout={() => setMdalOpen(true)}
+          />
         </aside>
         {/* Header */}
 
@@ -32,6 +37,11 @@ export const DashboardLayout = () => {
         <main className="flex-grow p-6 overflow-y-auto z-20">
           <Outlet />
         </main>
+        {modalOpen && (
+          <div>
+            <UserLogout onClose={() => setMdalOpen(false)} />
+          </div>
+        )}
       </div>
     </div>
   );

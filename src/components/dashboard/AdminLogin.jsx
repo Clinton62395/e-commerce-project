@@ -41,6 +41,8 @@ export const AdminLogin = () => {
             err.response.data ||
             "something went wrong",
         });
+
+        
         if (res.data) {
           localStorage.setItem("adminData", JSON.stringify(res.data.data));
           setIsLoading(false);
@@ -72,15 +74,15 @@ export const AdminLogin = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-100 to-gray-200 py-8 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-6xl mx-auto bg-white rounded-2xl shadow-xl overflow-hidden">
-        <div className="grid grid-cols-1 md:grid-cols-2">
+    <div className="min-h-screen bg-gradient-to-br  from-gray-100 to-gray-200 p px-4 sm:px-6 ">
+      <div className="relative max-w-6xl mx-auto bg-white rounded-2xl shadow-xl min-h-full">
+        <div className="grid grid-cols-1 md:grid-cols-2 items-center ">
           {/* Image Section */}
-          <div className="relative hidden md:block">
+          <div className="relative hidden md:block min-h-full ">
             <img
               src="/adminPicture.jpg"
               alt="Admin dashboard"
-              className="h-full w-full object-cover"
+              className="h-screen w-full object-"
             />
             <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
               <div className="text-center text-white p-6">
@@ -93,7 +95,7 @@ export const AdminLogin = () => {
           </div>
 
           {/* Form Section */}
-          <div className="p-8 lg:p-12">
+          <div className="p-8 lg:p-12 ">
             <button onClick={() => window.history.back()}>
               <Undo2 size={20} />
             </button>
