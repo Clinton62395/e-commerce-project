@@ -10,10 +10,22 @@ import {
   Upload,
   X,
 } from "lucide-react";
+import { ProductUploadForm } from "./uploadFiles";
 
 export const DashboardProducts = () => {
   const [showProductModal, setShowProductModal] = useState(null);
+  const [showUploadModal, setShowUploadModal] = useState(false);
   const [editingProduct, setEditingProduct] = useState(null);
+
+  const [selectedImage, setSelectedImage] = useState(null);
+  const [previewUrl, setPreviewUrl] = useState(null);
+
+  // Revoke object URL when preview changes to avoid memory leaks
+  React.useEffect(() => {
+    return () => {
+      if (previewUrl) URL.revokeObjectURL(previewUrl);
+    };
+  }, [previewUrl]);
 
   const [products, setProducts] = useState([
     {
@@ -79,7 +91,7 @@ export const DashboardProducts = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-center md:justify-between items-center flex-wrap gap-3 ">
+      <div className="flex justify-center md:justify-between items-center flex-wrap gap-3 max-w-7xl mx-auto">
         <div className="relative">
           <input
             type="text"
@@ -92,15 +104,16 @@ export const DashboardProducts = () => {
           />
         </div>
         <button
-          onClick={() => {
-            setEditingProduct(null);
-            setShowProductModal(true);
-          }}
+          onClick={() => setShowUploadModal(true)}
           className="flex items-center px-4 py-2 duration-300 transition-all bg-black/80 text-white rounded-lg hover:bg-black"
         >
           <Plus size={18} className="mr-2" />
           Add Products
         </button>
+
+        {showUploadModal && (
+          <ProductUploadForm onClose={() => setShowUploadModal(false)} />
+        )}
       </div>
 
       <div className="bg-white rounded-lg shadow ">
@@ -314,12 +327,48 @@ export const DashboardProducts = () => {
                 <label className="block text-sm font-medium mb-1">
                   Image du produit
                 </label>
-                <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
-                  <Upload className="mx-auto text-gray-400 mb-2" size={32} />
-                  <p className="text-sm text-gray-600">
-                    Cliquez pour uploader ou glissez-déposez
-                  </p>
-                  <input type="file" className="hidden" />
+                <div
+                  className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center cursor-pointer relative"
+                  onDrop={(e) => {
+                    e.preventDefault();
+                    const file = e.dataTransfer.files?.[0];
+                    if (file) {
+                      setSelectedImage(file);
+                      setPreviewUrl(URL.createObjectURL(file));
+                    }
+                  }}
+                  onDragOver={(e) => e.preventDefault()}
+                >
+                  {previewUrl ? (
+                    <img
+                      src={previewUrl}
+                      alt="preview"
+                      className="mx-auto mb-2 max-h-48 object-contain"
+                    />
+                  ) : (
+                    <>
+                      <Upload
+                        className="mx-auto text-gray-400 mb-2"
+                        size={32}
+                      />
+                      <p className="text-sm text-gray-600">
+                        Cliquez pour uploader ou glissez-déposez
+                      </p>
+                    </>
+                  )}
+
+                  <input
+                    type="file"
+                    accept="image/*"
+                    className="absolute inset-0 opacity-0 w-full h-full cursor-pointer"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) {
+                        setSelectedImage(file);
+                        setPreviewUrl(URL.createObjectURL(file));
+                      }
+                    }}
+                  />
                 </div>
               </div>
 
