@@ -69,12 +69,14 @@ export const Orders = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   // Utiliser les données par défaut au départ
-  const [transactions, setTransactions] = useState(defaultOrders);
+  const [transactions, setTransactions] = useState([]);
   const [isConnected, setIsConnected] = useState(socket.connected);
 
   useEffect(() => {
-    console.log("🔌 [Orders] Initialisation Socket.IO...");
+    // Charger l'historique
+    loadTransactionHistory();
 
+    console.log("🔌 [Orders] Initialisation Socket.IO...");
     const handleConnect = () => {
       console.log("✅ [Orders] Connecté:", socket.id);
       setIsConnected(true);
@@ -92,31 +94,18 @@ export const Orders = () => {
 
       // const transactionData = payload.data;
 
-      setTransactions((prev) => [payment, ...prev]);
-
-      const amount = (payment.amount / 100).toFixed(2);
-      toast.success(`💰 Nouvelle commande de ₦${amount}`, {
-        duration: 5000,
-        icon: "🎉",
+      setTransactions((prev) => {
+        const exists = prev.some(
+          (order) => order.reference === payment.reference
+        );
+        return exists
+          ? prev.map((order) =>
+              order.reference === payment.reference ? payment : order
+            )
+          : [payment, ...prev];
       });
-    };
-    const handleOrderUpdated = (payment) => {
-      console.log("💰 [Orders] Transaction reçue:", payment);
-
-      // const transactionData = payload.data;
-
-      setTransactions((prev) =>
-        prev.map((order) =>
-          order.reference === payment.reference ? payment : order
-        )
-      );
-
       toast.success(
-        `💰 order of payement reference ${payment.reference} updated`,
-        {
-          duration: 5000,
-          icon: "🎉",
-        }
+        `💰 order of payement reference ${payment.reference} updated`
       );
     };
 
@@ -125,22 +114,19 @@ export const Orders = () => {
     socket.on("disconnect", handleDisconnect);
 
     socket.on("order:new", handleNewOrder);
-    socket.on("order:updated", handleOrderUpdated);
+    socket.on("order:updated", handleNewOrder);
 
     // Si déjà connecté
     if (socket.connected) {
       handleConnect();
     }
 
-    // Charger l'historique
-    loadTransactionHistory();
-
     // Nettoyage
     return () => {
       socket.off("connect", handleConnect);
       socket.off("disconnect", handleDisconnect);
       socket.off("order:new", handleNewOrder);
-      socket.off("order:updated", handleOrderUpdated);
+      socket.off("order:updated", handleNewOrder);
     };
   }, []);
 
@@ -280,9 +266,9 @@ export const Orders = () => {
                     className="hover:bg-gray-50 transition"
                   >
                     <td className="px-6 py-4 flex items-center gap-3">
-                      {mainItem.image && (
+                      {transaction.picture && (
                         <img
-                          src={mainItem.image}
+                          src={transaction.picture}
                           alt={mainItem.title}
                           className="w-10 h-10 rounded-full object-cover shadow-sm"
                           onError={(e) => {
@@ -300,7 +286,7 @@ export const Orders = () => {
                       {mainItem.quantity || "-"}
                     </td>
                     <td className="px-6 py-4 font-mono text-xs text-gray-700">
-                      {transaction.reference}
+                      {transaction.reference.slice(6)}
                     </td>
                     <td className="px-6 py-4 text-gray-700">
                       {transaction.firstName} {transaction.lastName}
