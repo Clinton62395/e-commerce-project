@@ -1,412 +1,230 @@
-import react, { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { Search } from "lucide-react";
+// CORRECTION: Changement du chemin d'accès relatif pour résoudre l'erreur de compilation
+import toast from "react-hot-toast";
 import { socket } from "../../socket";
+import { api } from "../../services/constant";
+
+const getStatusClasses = (status) => {
+  switch (status) {
+    case "completed":
+    case "successful":
+      return "bg-green-100 text-green-700";
+    case "processing":
+      return "bg-yellow-100 text-yellow-700";
+    case "cancelled":
+      return "bg-red-100 text-red-700";
+    case "delivered":
+      return "bg-blue-100 text-blue-700";
+    default:
+      return "bg-gray-100 text-gray-700";
+  }
+};
+
+const defaultOrders = [
+  // Vos données initiales sont toujours utiles pour remplir le tableau au départ
+  {
+    reference: "#FS0001",
+    amount: 29.99,
+    status: "completed",
+    paidAt: new Date().toISOString(),
+    cartItems: [
+      {
+        title: "T-shirt Casual",
+        quantity: 1,
+        image:
+          "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=300",
+      },
+    ],
+    shippingInfo: {
+      firstName: "Keira",
+      lastName: "Griffin",
+      userEmail: "keira@example.com",
+    },
+  },
+  {
+    reference: "#FS0002",
+    amount: 59.99,
+    status: "processing",
+    paidAt: new Date().toISOString(),
+    cartItems: [
+      {
+        title: "Robe Élégante",
+        quantity: 2,
+        image:
+          "https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=300",
+      },
+    ],
+    shippingInfo: {
+      firstName: "Richard",
+      lastName: "Duncan",
+      userEmail: "richard@example.com",
+    },
+  },
+  // Remplacer les 18 autres objets par le même format si vous voulez qu'ils s'affichent
+];
+
 export const Orders = () => {
   const [filterOrder, setFilterOrder] = useState("All");
   const [searchTerm, setSearchTerm] = useState("");
-  const [transactions, setTransactions] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  // Utiliser les données par défaut au départ
+  const [transactions, setTransactions] = useState(defaultOrders);
+  const [isConnected, setIsConnected] = useState(socket.connected);
 
   useEffect(() => {
-    // ... (Code de connexion et join-dashboard ci-dessus)
+    console.log("🔌 [Orders] Initialisation Socket.IO...");
 
-    // 3. Écouter l'événement de nouvelle transaction
-    socket.on("new-successful-transaction", (transactionData) => {
-      console.log("🔔 Nouvelle Transaction Reçue:", transactionData.data);
+    const handleConnect = () => {
+      console.log("✅ [Orders] Connecté:", socket.id);
+      setIsConnected(true);
+      toast.success("Dashboard connecté en temps réel");
+    };
 
-      // Ajouter la nouvelle transaction à l'état local pour l'afficher
-      setTransactions((prevTransactions) => [
-        transactionData.data,
-        ...prevTransactions,
-      ]);
+    const handleDisconnect = () => {
+      console.log("❌ [Orders] Déconnecté");
+      setIsConnected(false);
+      toast.error("Connexion perdue");
+    };
 
-      // Optionnel : Afficher une notification (toast, alerte, etc.)
-      alert(`Nouvelle commande de ${transactionData.data.amount} reçue !`);
-    });
+    const handleNewOrder = (payment) => {
+      console.log("💰 [Orders] Transaction reçue:", payment);
 
-    // Nettoyage : retirer l'écouteur lors du démontage
+      // const transactionData = payload.data;
+
+      setTransactions((prev) => [payment, ...prev]);
+
+      const amount = (payment.amount / 100).toFixed(2);
+      toast.success(`💰 Nouvelle commande de ₦${amount}`, {
+        duration: 5000,
+        icon: "🎉",
+      });
+    };
+    const handleOrderUpdated = (payment) => {
+      console.log("💰 [Orders] Transaction reçue:", payment);
+
+      // const transactionData = payload.data;
+
+      setTransactions((prev) =>
+        prev.map((order) =>
+          order.reference === payment.reference ? payment : order
+        )
+      );
+
+      toast.success(
+        `💰 order of payement reference ${payment.reference} updated`,
+        {
+          duration: 5000,
+          icon: "🎉",
+        }
+      );
+    };
+
+    // Enregistrer les listeners
+    socket.on("connect", handleConnect);
+    socket.on("disconnect", handleDisconnect);
+
+    socket.on("order:new", handleNewOrder);
+    socket.on("order:updated", handleOrderUpdated);
+
+    // Si déjà connecté
+    if (socket.connected) {
+      handleConnect();
+    }
+
+    // Charger l'historique
+    loadTransactionHistory();
+
+    // Nettoyage
     return () => {
-      socket.off("new-successful-transaction");
-      socket.disconnect();
+      socket.off("connect", handleConnect);
+      socket.off("disconnect", handleDisconnect);
+      socket.off("order:new", handleNewOrder);
+      socket.off("order:updated", handleOrderUpdated);
     };
   }, []);
 
-  const getYear = new Date();
-  const formatDate = new Intl.DateTimeFormat("en-US", {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-  }).format(getYear);
+  const loadTransactionHistory = async () => {
+    try {
+      setIsLoading(true);
+      const { data } = await api.get(`/payment/all`);
 
-  const [products, setProducts] = useState([
-    {
-      _id: "1",
-      clotheName: "T-shirt Casual",
-      quantity: 150,
+      if (data.success) {
+        console.log(`✅ ${data.data.length} transactions historiques chargées`);
+        console.log("data transaction ==>", data.data);
+        console.log("data transaction ==>", typeof data.data);
+        console.log("data transaction ==>", !!data.data);
+        setTransactions(data.data || data);
+      }
+    } catch (err) {
+      console.error("❌ Erreur chargement:", err);
+      toast.error("Erreur de chargement de l'historique");
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
-      orderId: "#FS0001",
-      customers: "Keira Griffin",
-      price: 29.99,
-      newArrival: true,
-      stacts: {
-        status: "completed",
-        paymenMethod: "cash_on_delivery",
-        newArrival: true,
-      },
-      releaseDate: formatDate,
-      picture:
-        "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=300",
-    },
-    {
-      _id: "2",
-      clotheName: "Robe Élégante",
-      quantity: 200,
-
-      orderId: "#FS0002",
-      customers: "Richard Duncan",
-      price: 29.99,
-      picture:
-        "https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=300",
-      releaseDate: formatDate,
-    },
-    {
-      _id: "3",
-      clotheName: "Richard Duncan",
-      price: 59.99,
-      quantity: 200,
-      orderId: "#FS0003",
-      customers: "Keira Griffin",
-      stacts: {
-        status: "cancelled",
-        paymenMethod: "cash_on_delivery",
-        newArrival: true,
-      },
-
-      picture:
-        "https://images.unsplash.com/photo-1542272604-787c3835535d?w=300",
-      releaseDate: formatDate,
-    },
-    {
-      _id: "4",
-      clotheName: "Richard Duncan",
-      price: 59.99,
-      quantity: 200,
-      orderId: "#FS0004",
-      customers: "Keira Griffin",
-
-      stacts: {
-        status: "completed",
-        newArrival: false,
-      },
-
-      picture:
-        "https://images.unsplash.com/photo-1542272604-787c3835535d?w=300",
-      releaseDate: formatDate,
-    },
-    {
-      _id: "5",
-      clotheName: "Richard Duncan",
-      price: 57.99,
-      quantity: 20,
-      orderId: "#FS0005",
-      stacts: {
-        status: "completed",
-        paymenMethod: "cash_on_delivery",
-        newArrival: true,
-      },
-      customers: "Keira Griffin",
-
-      picture:
-        "https://images.unsplash.com/photo-1542272604-787c3835535d?w=300",
-      releaseDate: formatDate,
-    },
-    {
-      _id: "6",
-      clotheName: "Richard Duncan",
-      price: 59.99,
-      quantity: 207,
-      customers: "Keira Griffin",
-
-      orderId: "#FS0006",
-      // status: ["In Stock", "Coming Soon", "Out of Stock"],
-      stacts: {
-        status: "processing",
-        paymenMethod: "cash_on_delivery",
-        newArrival: true,
-      },
-      picture:
-        "https://images.unsplash.com/photo-1542272604-787c3835535d?w=300",
-      releaseDate: formatDate,
-    },
-    {
-      _id: "7",
-      clotheName: "Richard Duncan",
-      price: 9.99,
-      quantity: 280,
-      orderId: "#FS0007",
-      customers: "Keira Griffin",
-
-      // status: ["In Stock", "Coming Soon", "Out of Stock"],
-      stacts: {
-        status: "processing",
-        newArrival: false,
-      },
-      picture:
-        "https://images.unsplash.com/photo-1542272604-787c3835535d?w=300",
-      releaseDate: formatDate,
-    },
-    {
-      _id: "8",
-      clotheName: "Richard Duncan",
-      price: 90.99,
-      quantity: 980,
-      orderId: "#FS0008",
-      customers: "Keira Griffin",
-
-      stacts: {
-        status: "completed",
-        newArrival: false,
-      },
-      picture:
-        "https://images.unsplash.com/photo-1542272604-787c3835535d?w=300",
-      releaseDate: formatDate,
-    },
-    {
-      _id: "9",
-      clotheName: "Richard Duncan",
-      price: 90.99,
-      quantity: 280,
-      customers: "Keira Griffin",
-
-      orderId: "#FS0009",
-      stacts: {
-        status: "cancelled",
-        paymenMethod: "cash_on_delivery",
-        newArrival: false,
-      },
-      picture:
-        "https://images.unsplash.com/photo-1542272604-787c3835535d?w=300",
-      releaseDate: formatDate,
-    },
-    {
-      _id: "10",
-      clotheName: "Richard Duncan",
-      price: 21.99,
-      quantity: 80,
-      customers: "Keira Griffin",
-
-      orderId: "#FS00010",
-      stacts: {
-        status: "completed",
-        newArrival: false,
-      },
-      picture:
-        "https://images.unsplash.com/photo-1542272604-787c3835535d?w=300",
-      releaseDate: formatDate,
-    },
-    {
-      _id: "11",
-      clotheName: "T-shirt Casual",
-      quantity: 150,
-
-      orderId: "#FS00011",
-      customers: "Keira Griffin",
-      price: 29.99,
-      stacts: {
-        status: "completed",
-        paymenMethod: "cash_on_delivery",
-        newArrival: true,
-      },
-
-      releaseDate: formatDate,
-      picture:
-        "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=300",
-    },
-    {
-      _id: "12",
-      clotheName: "Robe Élégante",
-      quantity: 200,
-
-      orderId: "#FS00012",
-      customers: "Richard Duncan",
-      price: 29.99,
-      stacts: {
-        status: "completed",
-        paymenMethod: "cash_on_delivery",
-        newArrival: true,
-      },
-      picture:
-        "https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=300",
-      releaseDate: formatDate,
-    },
-    {
-      _id: "13",
-      clotheName: "Richard Duncan",
-      price: 59.99,
-      quantity: 200,
-      orderId: "#FS00013",
-      stacts: {
-        status: "completed",
-        paymenMethod: "cash_on_delivery",
-        newArrival: true,
-      },
-      customers: "Keira Griffin",
-
-      picture:
-        "https://images.unsplash.com/photo-1542272604-787c3835535d?w=300",
-      releaseDate: formatDate,
-    },
-    {
-      _id: "14",
-      clotheName: "Richard Duncan",
-      price: 59.99,
-      quantity: 200,
-      orderId: "#FS00014",
-      stacts: {
-        status: "completed",
-        paymenMethod: "cash_on_delivery",
-        newArrival: true,
-      },
-      customers: "Keira Griffin",
-
-      picture:
-        "https://images.unsplash.com/photo-1542272604-787c3835535d?w=300",
-      releaseDate: formatDate,
-    },
-    {
-      _id: "15",
-      clotheName: "Richard Duncan",
-      price: 57.99,
-      quantity: 20,
-      orderId: "#FS00015",
-      customers: "Keira Griffin",
-
-      stacts: {
-        status: "completed",
-        paymenMethod: "cash_on_delivery",
-        newArrival: true,
-      },
-      picture:
-        "https://images.unsplash.com/photo-1542272604-787c3835535d?w=300",
-      releaseDate: formatDate,
-    },
-    {
-      _id: "16",
-      clotheName: "Richard Duncan",
-      price: 59.99,
-      quantity: 207,
-      orderId: "#FS00016",
-      customers: "Keira Griffin",
-      stacts: {
-        status: "completed",
-        paymenMethod: "cash_on_delivery",
-      },
-      picture:
-        "https://images.unsplash.com/photo-1542272604-787c3835535d?w=300",
-      releaseDate: formatDate,
-    },
-    {
-      _id: "17",
-      clotheName: "Richard Duncan",
-      price: 9.99,
-      quantity: 280,
-      orderId: "#FS00017",
-      customers: "Keira Griffin",
-      stacts: {
-        status: "delevered",
-        paymenMethod: "cash_on_delivery",
-        newArrival: true,
-      },
-      picture:
-        "https://images.unsplash.com/photo-1542272604-787c3835535d?w=300",
-      releaseDate: formatDate,
-    },
-    {
-      _id: "18",
-      clotheName: "Richard Duncan",
-      price: 90.99,
-      quantity: 980,
-      orderId: "#FS00018",
-      customers: "Keira Griffin",
-      stacts: {
-        status: "completed",
-      },
-      picture:
-        "https://images.unsplash.com/photo-1542272604-787c3835535d?w=300",
-      newArrival: true,
-      releaseDate: formatDate,
-    },
-    {
-      _id: "19",
-      clotheName: "Richard Duncan",
-      price: 90.99,
-      quantity: 280,
-      orderId: "#FS0019",
-      customers: "Keira Griffin",
-      stacts: {
-        status: "completed",
-        paymenMethod: "cash_on_delivery",
-      },
-      picture:
-        "https://images.unsplash.com/photo-1542272604-787c3835535d?w=300",
-      newArrival: true,
-      releaseDate: formatDate,
-    },
-    {
-      _id: "20",
-      clotheName: "Richard Duncan",
-      price: 21.99,
-      quantity: 80,
-      orderId: "#FS00020",
-      customers: "Keira Griffin",
-      stacts: {
-        status: "delevered",
-        paymenMethod: "cash_on_delivery",
-      },
-      picture:
-        "https://images.unsplash.com/photo-1542272604-787c3835535d?w=300",
-      releaseDate: formatDate,
-    },
-  ]);
-
-  const filteredProducts = products.filter((item) => {
-    const name = item.clotheName.toLowerCase();
-    const customers = item.customers.toLowerCase();
-    // const price = item.price.toLowerCase();
-    const orderId = item.orderId.toLowerCase();
+  // LOGIQUE DE FILTRAGE
+  const filteredTransactions = transactions.filter((transaction) => {
     const search = searchTerm.toLowerCase();
+    const customerName = `${transaction.firstName || ""} ${
+      transaction.lastName || ""
+    }`.toLowerCase();
 
-    let isItemMatch = false;
-    if (filterOrder === "All") return true;
-    if (filterOrder === "Top Orders") return item.quantity > 200;
-    if (filterOrder === "Shipping")
-      return status === "processing" || status === "delivered";
-    if (filterOrder === "Completed") return status === "completed";
-    if (filterOrder === "Cancelled") return status === "cancelled";
+    // Gestion des cartItems (ATTENTION: le payload du backend devrait avoir cartItems comme un ARRAY)
+    // Prenons le premier article pour la recherche
+    const itemTitle = transaction.cartItems?.[0]?.title?.toLowerCase() || "";
 
-    const matchesItems =
-      name.includes(search) ||
-      customers.includes(search) ||
-      price.includes(search) ||
-      orderId.includes(search);
+    // Filtrage par terme de recherche
+    const matchesSearch =
+      itemTitle.includes(search) ||
+      customerName.includes(search) ||
+      transaction.reference?.toLowerCase().includes(search);
 
-    return isItemMatch && matchesItems;
+    // Filtrage par statut de commande
+    const status = transaction.status?.toLowerCase() || "";
+    let matchesFilter = true;
+
+    switch (filterOrder) {
+      case "Top Orders":
+        // Logique de Top Orders basée sur la quantité ou le montant total
+        // Ceci est un exemple, ajustez-le à votre définition de "Top Orders"
+        matchesFilter = transaction.amount > 50;
+        break;
+      case "Shipping":
+        matchesFilter = status === "processing" || status === "delivered";
+        break;
+      case "Completed":
+        matchesFilter = status === "completed" || status === "successful";
+        break;
+      case "Cancelled":
+        matchesFilter = status === "cancelled";
+        break;
+      case "All":
+      default:
+        matchesFilter = true;
+        break;
+    }
+
+    return matchesFilter && matchesSearch;
   });
 
   return (
-    <>
-      <div className="bg-white shadow-sm p-5  space-y-6">
-        <div className="flex items-center justify-between max-w-5xl mx-auto font-medium">
-          <div className="flex items-center gap-2 md:gap-4 text-[#777777] flex-wrap">
-            <div className="grid grid-cols-2 md:flex items-start text-start">
+    <div className="p-4 sm:p-6 lg:p-8">
+      <div className="bg-white shadow-xl rounded-xl p-5 space-y-6">
+        <div className="flex items-center justify-between flex-wrap gap-4 font-medium">
+          {/* Filtres et Recherche */}
+          <div className="flex flex-col md:flex-row items-center gap-4 text-[#777777] flex-wrap w-full md:w-auto">
+            <div className="grid grid-cols-3 sm:flex items-start text-start bg-gray-100 p-1 rounded-lg shadow-inner">
               {["All", "Top Orders", "Shipping", "Completed", "Cancelled"].map(
                 (item, i) => (
                   <button
                     onClick={() => setFilterOrder(item)}
                     key={i}
-                    className={` px-5 py-2 text-sm  rounded-md duration-300 transition-all  font-medium text-center md:text-lg ${
+                    className={`px-3 py-1 text-xs sm:px-5 sm:py-2 sm:text-sm rounded-md duration-300 transition-all font-medium text-center ${
                       filterOrder === item
-                        ? "bg-black/80 hover:bg-black text-white "
-                        : " text-gray-500 hover:bg-gray-50"
+                        ? "bg-black/90 hover:bg-black text-white shadow-md"
+                        : "text-gray-600 hover:bg-white"
                     }`}
                   >
                     {item}
@@ -415,29 +233,30 @@ export const Orders = () => {
               )}
             </div>
 
-            <div className="relative md:order-2 order-1">
+            <div className="relative w-full md:w-auto">
               <Search
-                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"
-                size={20}
+                className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+                size={18}
               />
               <input
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 type="text"
-                placeholder="Rechercher..."
-                className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-200"
+                placeholder="Rechercher par Référence, Client..."
+                className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-gray-200"
               />
             </div>
           </div>
         </div>
 
-        <div className="overflow-x-auto rounded-lg shadow-md bg-white">
+        {/* Tableau des Commandes */}
+        <div className="overflow-x-auto rounded-lg shadow-xl border border-gray-100">
           <table className="min-w-full divide-y divide-gray-200 text-sm text-left">
-            <thead className="bg-gray-100 text-gray-700 uppercase tracking-wider text-xs">
+            <thead className="bg-gray-50 text-gray-600 uppercase tracking-wider text-xs">
               <tr>
                 <th className="px-6 py-3">Product</th>
                 <th className="px-6 py-3">Qty</th>
-                <th className="px-6 py-3">Order ID</th>
+                <th className="px-6 py-3">Reference</th>
                 <th className="px-6 py-3">Customer</th>
                 <th className="px-6 py-3">Price</th>
                 <th className="px-6 py-3">Date</th>
@@ -445,49 +264,77 @@ export const Orders = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
-              {transactions.map((item) => (
-                <tr
-                  key={item.reference}
-                  className="hover:bg-gray-50 transition"
-                >
-                  <td className="px-6 py-4 flex items-center gap-3">
-                    {item.cartItems.image && (
-                      <img
-                        src={item.cartItems.image}
-                        alt={item.cartItems.title}
-                        className="w-10 h-10 rounded-full object-cover shadow-sm"
-                      />
-                    )}
-                    <span className="font-medium text-gray-800">
-                      {item.cartItems.title}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 text-gray-700">{item.quantity}</td>
-                  <td className="px-6 py-4 text-gray-700">{item.reference}</td>
-                  <td className="px-6 py-4 text-gray-700">{item.firstName}</td>
-                  <td className="px-6 py-4 text-gray-700">${item.price}</td>
-                  <td className="px-6 py-4 text-gray-700">
-                    {item.releaseDate}
-                  </td>
-                  <td className="px-6 py-4">
-                    <span
-                      className={`inline-block px-2 py-1 text-xs font-semibold rounded-full ${
-                        item.status === "paid"
-                          ? " text-[#166A42]"
-                          : item.status === "pending"
-                          ? " text-[#D4A611]"
-                          : ""
-                      }`}
-                    >
-                      {item?.status || "Waiting"}
-                    </span>
+              {filteredTransactions.map((transaction) => {
+                // IMPORTANT : Assurez-vous que cartItems est un tableau, même s'il ne contient qu'un seul élément
+                const mainItem = transaction.cartItems?.[0] || {};
+                const createAt = transaction.createAt;
+                const formattedDate = new Intl.DateTimeFormat("en-US", {
+                  year: "numeric",
+                  month: "short",
+                  day: "numeric",
+                }).format(createAt);
+
+                return (
+                  <tr
+                    key={transaction.reference}
+                    className="hover:bg-gray-50 transition"
+                  >
+                    <td className="px-6 py-4 flex items-center gap-3">
+                      {mainItem.image && (
+                        <img
+                          src={mainItem.image}
+                          alt={mainItem.title}
+                          className="w-10 h-10 rounded-full object-cover shadow-sm"
+                          onError={(e) => {
+                            e.target.onerror = null;
+                            e.target.src =
+                              "https://placehold.co/40x40/cccccc/333333?text=?";
+                          }}
+                        />
+                      )}
+                      <span className="font-medium text-gray-800">
+                        {mainItem.title || "N/A"}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 text-gray-700">
+                      {mainItem.quantity || "-"}
+                    </td>
+                    <td className="px-6 py-4 font-mono text-xs text-gray-700">
+                      {transaction.reference}
+                    </td>
+                    <td className="px-6 py-4 text-gray-700">
+                      {transaction.firstName} {transaction.lastName}
+                    </td>
+                    <td className="px-6 py-4 font-semibold text-gray-800">
+                      $
+                      {transaction.amount
+                        ? transaction.amount.toFixed(2)
+                        : "0.00"}
+                    </td>
+                    <td className="px-6 py-4 text-gray-500">{formattedDate}</td>
+                    <td className="px-6 py-4">
+                      <span
+                        className={`inline-block px-3 py-1 text-xs font-semibold rounded-full uppercase tracking-wider ${getStatusClasses(
+                          transaction.status
+                        )}`}
+                      >
+                        {transaction.status || "Pending"}
+                      </span>
+                    </td>
+                  </tr>
+                );
+              })}
+              {filteredTransactions.length === 0 && (
+                <tr>
+                  <td colSpan="7" className="text-center py-8 text-gray-500">
+                    Aucune commande trouvée correspondant aux filtres.
                   </td>
                 </tr>
-              ))}
+              )}
             </tbody>
           </table>
         </div>
       </div>
-    </>
+    </div>
   );
 };

@@ -12,36 +12,6 @@ import {
 import { Chart } from "./chart";
 
 export const AdminDashboard = () => {
-  useEffect(() => {
-    // Étape A: Gérer la connexion
-    socket.on("connect", () => {
-      console.log("🟢 Connecté au serveur Socket.IO (ID:", socket.id, ")");
-
-      // 2. Rejoindre la Room d'Administration
-      // C'est l'étape CRUCIALE qui correspond à votre socket.on("join-dashboard", ...) côté backend
-      socket.emit("join-dashboard", {
-        userName: "AdminUser",
-        /* ... autres données d'identification si nécessaire ... */
-      });
-
-      // Écouter le message de confirmation du backend
-      socket.on("dashboard-connected", (data) => {
-        console.log("Backend confirmation:", data.message);
-      });
-    });
-
-    // Étape B: Gérer la déconnexion
-    socket.on("disconnect", () => {
-      console.log("🔴 Déconnecté du serveur Socket.IO");
-    });
-
-    // Nettoyage lors du démontage du composant
-    return () => {
-      socket.disconnect();
-    };
-  }, []); // Exécuter une seule fois au montage
-
-  // socket order reel time
   // Données simulées
   const [products] = useState([
     {
