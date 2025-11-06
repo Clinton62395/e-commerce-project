@@ -1,6 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import AddShoppingCartIcon from "@mui/icons-material/AddShoppingCart";
-
+import { socket } from "../../socket";
 import {
   Package,
   ShoppingCart,
@@ -12,6 +12,36 @@ import {
 import { Chart } from "./chart";
 
 export const AdminDashboard = () => {
+  useEffect(() => {
+    // Étape A: Gérer la connexion
+    socket.on("connect", () => {
+      console.log("🟢 Connecté au serveur Socket.IO (ID:", socket.id, ")");
+
+      // 2. Rejoindre la Room d'Administration
+      // C'est l'étape CRUCIALE qui correspond à votre socket.on("join-dashboard", ...) côté backend
+      socket.emit("join-dashboard", {
+        userName: "AdminUser",
+        /* ... autres données d'identification si nécessaire ... */
+      });
+
+      // Écouter le message de confirmation du backend
+      socket.on("dashboard-connected", (data) => {
+        console.log("Backend confirmation:", data.message);
+      });
+    });
+
+    // Étape B: Gérer la déconnexion
+    socket.on("disconnect", () => {
+      console.log("🔴 Déconnecté du serveur Socket.IO");
+    });
+
+    // Nettoyage lors du démontage du composant
+    return () => {
+      socket.disconnect();
+    };
+  }, []); // Exécuter une seule fois au montage
+
+  // socket order reel time
   // Données simulées
   const [products] = useState([
     {
@@ -28,18 +58,7 @@ export const AdminDashboard = () => {
     },
   ]);
 
-  const [orders] = useState([
-    {
-      _id: "1",
-      total: 150,
-      status: "completed",
-    },
-    {
-      _id: "2",
-      total: 250,
-      status: "pending",
-    },
-  ]);
+  const [orders, setOrders] = useState([]);
 
   const [customers] = useState([
     {
@@ -53,13 +72,6 @@ export const AdminDashboard = () => {
       status: "inactive",
     },
   ]);
-
-  const stats = {
-    totalProducts: products.length,
-    totalOrders: orders.length,
-    totalRevenue: orders.reduce((sum, order) => sum + order.total, 0),
-    newCustomers: customers.filter((c) => c.status === "active").length,
-  };
 
   const topCountriesBySales = [
     {
@@ -230,7 +242,7 @@ export const AdminDashboard = () => {
           {/* chart */}
           <div className="border border-[#484848] my-2 shadow-md rounded-md">
             {/* <Bar options={options} data={data} /> */}
-            <Chart/>
+            <Chart />
           </div>
         </div>
 

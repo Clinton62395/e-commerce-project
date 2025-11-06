@@ -1,8 +1,34 @@
-import react, { useState } from "react";
+import react, { useState, useEffect } from "react";
 import { Search } from "lucide-react";
+import { socket } from "../../socket";
 export const Orders = () => {
   const [filterOrder, setFilterOrder] = useState("All");
   const [searchTerm, setSearchTerm] = useState("");
+  const [transactions, setTransactions] = useState([]);
+
+  useEffect(() => {
+    // ... (Code de connexion et join-dashboard ci-dessus)
+
+    // 3. Écouter l'événement de nouvelle transaction
+    socket.on("new-successful-transaction", (transactionData) => {
+      console.log("🔔 Nouvelle Transaction Reçue:", transactionData.data);
+
+      // Ajouter la nouvelle transaction à l'état local pour l'afficher
+      setTransactions((prevTransactions) => [
+        transactionData.data,
+        ...prevTransactions,
+      ]);
+
+      // Optionnel : Afficher une notification (toast, alerte, etc.)
+      alert(`Nouvelle commande de ${transactionData.data.amount} reçue !`);
+    });
+
+    // Nettoyage : retirer l'écouteur lors du démontage
+    return () => {
+      socket.off("new-successful-transaction");
+      socket.disconnect();
+    };
+  }, []);
 
   const getYear = new Date();
   const formatDate = new Intl.DateTimeFormat("en-US", {
@@ -419,23 +445,26 @@ export const Orders = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
-              {filteredProducts.map((item) => (
-                <tr key={item.id} className="hover:bg-gray-50 transition">
+              {transactions.map((item) => (
+                <tr
+                  key={item.reference}
+                  className="hover:bg-gray-50 transition"
+                >
                   <td className="px-6 py-4 flex items-center gap-3">
-                    {item.picture && (
+                    {item.cartItems.image && (
                       <img
-                        src={item.picture}
-                        alt={item.clotheName}
+                        src={item.cartItems.image}
+                        alt={item.cartItems.title}
                         className="w-10 h-10 rounded-full object-cover shadow-sm"
                       />
                     )}
                     <span className="font-medium text-gray-800">
-                      {item.clotheName}
+                      {item.cartItems.title}
                     </span>
                   </td>
                   <td className="px-6 py-4 text-gray-700">{item.quantity}</td>
-                  <td className="px-6 py-4 text-gray-700">{item.orderId}</td>
-                  <td className="px-6 py-4 text-gray-700">{item.customers}</td>
+                  <td className="px-6 py-4 text-gray-700">{item.reference}</td>
+                  <td className="px-6 py-4 text-gray-700">{item.firstName}</td>
                   <td className="px-6 py-4 text-gray-700">${item.price}</td>
                   <td className="px-6 py-4 text-gray-700">
                     {item.releaseDate}
@@ -443,16 +472,14 @@ export const Orders = () => {
                   <td className="px-6 py-4">
                     <span
                       className={`inline-block px-2 py-1 text-xs font-semibold rounded-full ${
-                        item.stacts?.status === "completed"
+                        item.status === "paid"
                           ? " text-[#166A42]"
-                          : item.stacts?.status === "processing"
+                          : item.status === "pending"
                           ? " text-[#D4A611]"
-                          : item.stacts?.paymenMethod === "cash_on_delivery"
-                          ? " text-[#767676]"
-                          : "bg-white "
+                          : ""
                       }`}
                     >
-                      {item.stacts?.status || "Waiting"}
+                      {item?.status || "Waiting"}
                     </span>
                   </td>
                 </tr>
