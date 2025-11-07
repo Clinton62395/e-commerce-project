@@ -27,6 +27,7 @@ const schema = yup.object({
 export const Register = () => {
   const [error, setError] = useState({});
   const [showPassword, setShowPassword] = useState(false);
+  const [isRedirected, setIsRedirected] = useState(false);
 
   const toggleShoPassword = () => setShowPassword((prev) => !prev);
 
@@ -45,20 +46,24 @@ export const Register = () => {
   const provider = new GoogleAuthProvider();
 
   const signInWithGoogle = async () => {
+    setIsRedirected(true);
     try {
       const res = await signInWithPopup(auth, provider);
       if (res) {
         const user = res.user;
         const token = await user.getIdToken();
 
-        sendTokenToBackend(token);
+        await sendTokenToBackend(token);
       }
     } catch (err) {
       console.log("error occured when google signing", err);
+    } finally {
+      setIsRedirected(false);
     }
   };
 
   const sendTokenToBackend = async (token) => {
+    setIsRedirected(true);
     try {
       const res = await toast.promise(
         api.post("/auth/google", { token }),
@@ -73,9 +78,12 @@ export const Register = () => {
       navigate("/shop");
     } catch (error) {
       console.error("error sending token:", error);
+    } finally {
+      setIsRedirected(false);
     }
   };
   const onSubmit = async (data) => {
+    setIsRedirected(true);
     try {
       console.log("data submited register side==>", data);
       const res = await toast.promise(
@@ -95,6 +103,8 @@ export const Register = () => {
       reset();
     } catch (err) {
       console.error("error occured when registering", err);
+    } finally {
+      setIsRedirected(false);
     }
   };
   return (
@@ -121,8 +131,13 @@ export const Register = () => {
               </p>
 
               <button
+                disabled={isRedirected}
                 onClick={signInWithGoogle}
-                className="w-full flex items-center justify-center gap-3 border border-[#5B86E5] text-[#0f172a] rounded-md py-2 px-4 mb-5 hover:bg-gray-100 transition-colors relative"
+                className={`w-full flex items-center ${
+                  isRedirected
+                    ? "bg-gray-200 text-gray-500 cursor-not-allowed"
+                    : "border border-[#5B86E5] text-[#0f172a]"
+                }  justify-center gap-3  rounded-md py-2 px-4 mb-5 hover:bg-gray-100 transition-colors relative`}
                 aria-label="Sign up with Google"
               >
                 <img src="google-logo.png" alt="google" className="h-5" />
