@@ -98,12 +98,21 @@ export const Orders = () => {
         const exists = prev.some(
           (order) => order.reference === payment.reference
         );
+        console.log(
+          "📌 Références existantes:",
+          prev.map((o) => o.reference)
+        );
+        console.log("🔥 Événement reçu dans React:  1", payment);
         return exists
           ? prev.map((order) =>
               order.reference === payment.reference ? payment : order
             )
           : [payment, ...prev];
       });
+
+      console.log("📌 Référence reçue:", payment.reference);
+
+      console.log("🔥 Événement reçu dans React:  2", payment);
       toast.success(
         `💰 order of payement reference ${payment.reference} updated`
       );
