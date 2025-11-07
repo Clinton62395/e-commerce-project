@@ -2,7 +2,7 @@ import { Outlet } from "react-router-dom";
 import { Sidebar } from "../components/dashboard/SideBar";
 import { Header } from "../components/dashboard/Headers";
 import React, { useState } from "react";
-import { UserLogout } from "../components/dashboard/Logout";
+import { UserLogout } from "../components/dashboard/UserLogout";
 
 export const DashboardLayout = () => {
   const [sidebarOpen, setSidebarOpen] = useState(true);

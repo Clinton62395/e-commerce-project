@@ -30,7 +30,7 @@ import { AdminDashboard } from "./components/dashboard/adminDahboard";
 import { AdminLogin } from "./components/dashboard/AdminLogin";
 import { AdminSignUp } from "./components/dashboard/AdminSignUp";
 import { Setting } from "./components/dashboard/Setting";
-import { UserLogout } from "./components/dashboard/Logout";
+import { UserLogout } from "./components/dashboard/UserLogout";
 
 function App() {
   return (
