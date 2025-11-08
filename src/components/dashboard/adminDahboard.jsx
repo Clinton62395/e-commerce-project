@@ -10,8 +10,63 @@ import {
   ArrowLeftRight,
 } from "lucide-react";
 import { Chart } from "./chart";
+import { api } from "../../services/constant";
+import { useQuery } from "@tanstack/react-query";
 
 export const AdminDashboard = () => {
+  const { data: payment = [], isPending } = useQuery({
+    queryKey: ["allPayments"],
+    queryFn: () => api.get("/payment/all").then((res) => res.data.data),
+  });
+  console.log("payment from admin dashboard", payment);
+
+  // total sall by country
+
+  const totalByCountry = payment.reduce((acc, payment) => {
+    const countryName = payment.country?.label;
+    const flag = payment.country?.flag;
+    const amount = payment.amount || 0;
+
+    if (!acc[countryName]) {
+      acc[countryName] = {
+        countryFlag: flag,
+        total: 0,
+      };
+    }
+
+    acc[countryName].total += amount;
+
+    return acc;
+  }, {});
+
+  const topCountry = Object.entries(totalByCountry).sort((a, b) => b[1] - a[1]);
+
+  // new order filterd by updated date
+
+  const paymentsSorted = payment
+    .slice()
+    .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+  // récupérer tous les produits avec la date du paiement
+  const productsWithDate = paymentsSorted.flatMap((payment) =>
+    payment.cartItems.map((item) => ({
+      ...item,
+      paymentCreatedAt: payment.createdAt,
+      paymentCountry: payment.country, // si tu veux le drapeau et le pays
+    }))
+  );
+
+  console.log(productsWithDate);
+
+  const productsSortedByNew = productsWithDate
+    .slice()
+    .sort(
+      (a, b) => new Date(b.paymentCreatedAt) - new Date(a.paymentCreatedAt)
+    );
+
+  const sortedItems = productsSortedByNew.slice(0, 7);
+
+  console.log("producct sorted by new", productsSortedByNew);
   // Données simulées
   const [products] = useState([
     {
@@ -28,77 +83,11 @@ export const AdminDashboard = () => {
     },
   ]);
 
-  const [orders, setOrders] = useState([]);
-
-  const [customers] = useState([
-    {
-      _id: "1",
-      name: "Client 1",
-      status: "active",
-    },
-    {
-      _id: "2",
-      name: "Client 2",
-      status: "inactive",
-    },
-  ]);
-
-  const topCountriesBySales = [
-    {
-      label: "United States",
-      flags:
-        "https://cdn.britannica.com/79/4479-050-6EF87027/flag-Stars-and-Stripes-May-1-1795.jpg",
-      rate: "25k",
-    },
-    {
-      label: "Germany",
-      flags:
-        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQmMuZZnHhZce51YjZijUFyG3eu_mgpIW4Jbg&s",
-      rate: "20k",
-    },
-    {
-      label: "China",
-      flags:
-        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQnGzRJtLcLkfxp8quNclrmPlI-rd5RTWk1dA&s",
-      rate: "19k",
-    },
-    {
-      label: "South Korea",
-      flags:
-        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSRTOfWm2Rff9Sa_404Z4YGtgUvubnDCTcR-Q&s",
-      rate: "15k",
-    },
-    {
-      label: "India",
-      flags:
-        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQqcKuRNDPZguvauwuR1f_RCHDiwmuNR5fIzA&s",
-      rate: "13k",
-    },
-    {
-      label: "France",
-      flags:
-        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS5leDJ40Yi0rNza2mnEK_FH-3fmTWDFTkt_A&s",
-      rate: "11k",
-    },
-    {
-      label: "Singapour",
-      flags:
-        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRmxiNA_N1RHFascIX3JXhAQJ1Jj53g2p85sg&s",
-      rate: "9k",
-    },
-    {
-      label: "Quatar",
-      flags:
-        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTk4iYAqC79jOv0_0J5PZryVhI6jAD1juXdcA&s",
-      rate: "7k",
-    },
-    {
-      label: "Guinea",
-      flags:
-        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTuUhoLBi7tR1qn7EqpRzc4Ku1Mn-I06ARmEQ&s",
-      rate: "8k",
-    },
-  ];
+  const formatedDate = () => {
+    const dateFormat = new Date.Intl.DateTimeFormat({
+      dateStyle: "short",
+    });
+  };
   const topProducts = [
     {
       name: "Women's high waist jeans",
@@ -210,7 +199,7 @@ export const AdminDashboard = () => {
             </div>
           </div>
           {/* chart */}
-          <div className="border border-[#484848] my-2 shadow-md rounded-md">
+          <div className="border border-[#484848] my-2 shadow-md rounded-md mt-9 md:mt-24">
             {/* <Bar options={options} data={data} /> */}
             <Chart />
           </div>
@@ -222,27 +211,26 @@ export const AdminDashboard = () => {
             Top Countries by Sales
           </h2>
           {/* Placeholder for country list or chart */}
-          <ul className=" space-y-4 text-sm text-gray-600">
-            {topCountriesBySales.map((country, i) => (
-              <div key={i} className="flex items-center justify-between ">
-                <div className=" my-2 gap-4 flex items-centerm text-sm font-meduim">
-                  {country.flags && (
+          <ul className="space-y-4 text-sm text-gray-600">
+            {topCountry.map(([country, info]) => (
+              <li key={country} className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  {info.countryFlag && (
                     <img
-                      src={country.flags}
-                      alt={country.label}
+                      src={info.countryFlag}
+                      alt={info.label || country}
                       className="h-5 w-5 rounded-full object-cover"
                     />
                   )}
-                  {country.label}
+                  <span className="font-medium">{info.label || country}</span>
                 </div>
+
                 <div>
-                  {country.rate && (
-                    <span className="text-[#777777] text-sm ms-10">
-                      {country.rate}
-                    </span>
-                  )}
+                  <span className="text-[#777777] text-sm">
+                    {info.total.toLocaleString()}k
+                  </span>
                 </div>
-              </div>
+              </li>
             ))}
           </ul>
         </div>
@@ -291,28 +279,31 @@ export const AdminDashboard = () => {
             </table>
           </div>
         </div>
-        <div className="col-span-1 md:col-span-2 py-4  h-full  shadow-sm border border-[#484848] bg-white rounded-md  px-2">
+        <div className="col-span-1 md:col-span-2 py-4  shadow-sm border border-[#484848] bg-white rounded-md  px-2">
           <h2 className="text-xl  font-medium text-black text-center">
             Recent Orders
           </h2>
-          <ul className=" space-y-10 p-4">
-            {[
-              { title: "Women’s high waist jeans", price: "$31" },
-              { title: "Men’s crew neck T-shirt", price: "$19" },
-              { title: "Women’s winter jacket", price: "$35" },
-              { title: "Women’s Denim Skirt", price: "$23" },
-              { title: "Men’s sweatshirt", price: "$44" },
-            ].map((item, i) => (
-              <li
-                key={i}
-                className="flex gap-4 w-full items-center text-gray-700"
-              >
-                <span className="text-lg text-[#000000] font-medium">
-                  {item.title}
-                </span>
-                <span className="text-sm font-semibold">{item.price}</span>
-              </li>
-            ))}
+          <ul className="space-y-2 p-2">
+            {sortedItems.map((item, i) => {
+              // Vérifie que paymentCreatedAt est une date ou convertible en date
+              const date = new Date(item.paymentCreatedAt);
+              const formattedDate = new Intl.DateTimeFormat("en-US").format(
+                date
+              );
+
+              return (
+                <li
+                  key={i}
+                  className="flex gap-2 w-full items-center justify-between text-gray-700"
+                >
+                  <span className="text-sm text-[#000000] font-medium">
+                    {item.title}
+                  </span>
+                  <span className="text-xs font-semibold flex gap-1">{item.price}k</span>
+                  <span className="text-xs font-semibold">{formattedDate}</span>
+                </li>
+              );
+            })}
           </ul>
         </div>
       </div>

@@ -1,9 +1,16 @@
 import React, { useState, useEffect } from "react";
 import { Bell, Menu, Search, User, X } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { api } from "../../services/constant";
+import { Link } from "react-router-dom";
 
 export const Header = ({ toggleOpen, isOpen }) => {
   const [adminData, setAdminData] = useState("");
   // get adminInfo from local storage
+  const { data: payement = [], isPending } = useQuery({
+    queryKey: ["allPayments"],
+    queryFn: () => api.get("/payment/all").then((res) => res.data.data),
+  });
 
   useEffect(() => {
     try {
@@ -28,17 +35,25 @@ export const Header = ({ toggleOpen, isOpen }) => {
               <b>{adminData.firstName}</b>
             </span>
           </p>
-          <button onClick={toggleOpen} className="flex md:hidden duration-500 transition-all justify-center items-center h-8 w-8 rounded-full bg-slate-200 hover:bg-slate-800 hover:text-white  hover:ring-2 focus:ring-offset-2">
-            {isOpen ? <X /> : <Menu size={20} /> }
+          <button
+            onClick={toggleOpen}
+            className="flex md:hidden duration-500 transition-all justify-center items-center h-8 w-8 rounded-full bg-slate-200 hover:bg-slate-800 hover:text-white  hover:ring-2 focus:ring-offset-2"
+          >
+            {isOpen ? <X /> : <Menu size={20} />}
           </button>
         </div>
 
         <div className="flex items-center space-x-4">
           <button className="p-2 rounded-lg hover:bg-gray-100 relative">
             <Bell size={20} />
-            <span className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full w-5 h-5 text-xs flex items-center justify-center">
-              3
-            </span>
+            {!isPending && (
+              <Link
+                to="/admin-dashboard/orders"
+                className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full w-5 h-5 text-xs flex items-center justify-center"
+              >
+                {payement.length}
+              </Link>
+            )}
           </button>
 
           <div className="flex items-center space-x-3">

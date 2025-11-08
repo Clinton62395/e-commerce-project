@@ -42,9 +42,13 @@ export const AdminLogin = () => {
             "something went wrong",
         });
 
-        
         if (res.data) {
+          const { token } = res.data || res.data.data;
+
+          localStorage.setItem("token", token);
+          console.log("token from admin sign in==>", token);
           localStorage.setItem("adminData", JSON.stringify(res.data.data));
+
           setIsLoading(false);
           navigate("/admin-dashboard");
         }

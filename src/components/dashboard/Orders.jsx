@@ -4,13 +4,14 @@ import { Search } from "lucide-react";
 import toast from "react-hot-toast";
 import { socket } from "../../socket";
 import { api } from "../../services/constant";
+import { useQuery } from "@tanstack/react-query";
 
 const getStatusClasses = (status) => {
   switch (status) {
-    case "completed":
+    case "success":
     case "successful":
       return "bg-green-100 text-green-700";
-    case "processing":
+    case "pending":
       return "bg-yellow-100 text-yellow-700";
     case "cancelled":
       return "bg-red-100 text-red-700";
@@ -21,49 +22,6 @@ const getStatusClasses = (status) => {
   }
 };
 
-const defaultOrders = [
-  // Vos données initiales sont toujours utiles pour remplir le tableau au départ
-  {
-    reference: "#FS0001",
-    amount: 29.99,
-    status: "completed",
-    paidAt: new Date().toISOString(),
-    cartItems: [
-      {
-        title: "T-shirt Casual",
-        quantity: 1,
-        image:
-          "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=300",
-      },
-    ],
-    shippingInfo: {
-      firstName: "Keira",
-      lastName: "Griffin",
-      userEmail: "keira@example.com",
-    },
-  },
-  {
-    reference: "#FS0002",
-    amount: 59.99,
-    status: "processing",
-    paidAt: new Date().toISOString(),
-    cartItems: [
-      {
-        title: "Robe Élégante",
-        quantity: 2,
-        image:
-          "https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=300",
-      },
-    ],
-    shippingInfo: {
-      firstName: "Richard",
-      lastName: "Duncan",
-      userEmail: "richard@example.com",
-    },
-  },
-  // Remplacer les 18 autres objets par le même format si vous voulez qu'ils s'affichent
-];
-
 export const Orders = () => {
   const [filterOrder, setFilterOrder] = useState("All");
   const [searchTerm, setSearchTerm] = useState("");
@@ -72,9 +30,24 @@ export const Orders = () => {
   const [transactions, setTransactions] = useState([]);
   const [isConnected, setIsConnected] = useState(socket.connected);
 
+  const { isPending, error, data } = useQuery({
+    queryKey: ["allPayments"],
+    queryFn: () => api.get("/payment/all").then((res) => res.data.data),
+  });
+
+
+  if (isPending) return "Loading...";
+
+  if (error) return "An error has occurred: " + error.message;
+
+  useEffect(() => {
+    if (data) {
+      setTransactions(data);
+    }
+  },[data]);
+
   useEffect(() => {
     // Charger l'historique
-    loadTransactionHistory();
 
     console.log("🔌 [Orders] Initialisation Socket.IO...");
     const handleConnect = () => {
@@ -92,17 +65,11 @@ export const Orders = () => {
     const handleNewOrder = (payment) => {
       console.log("💰 [Orders] Transaction reçue:", payment);
 
-      // const transactionData = payload.data;
-
       setTransactions((prev) => {
         const exists = prev.some(
           (order) => order.reference === payment.reference
         );
-        console.log(
-          "📌 Références existantes:",
-          prev.map((o) => o.reference)
-        );
-        console.log("🔥 Événement reçu dans React:  1", payment);
+
         return exists
           ? prev.map((order) =>
               order.reference === payment.reference ? payment : order
@@ -110,9 +77,6 @@ export const Orders = () => {
           : [payment, ...prev];
       });
 
-      console.log("📌 Référence reçue:", payment.reference);
-
-      console.log("🔥 Événement reçu dans React:  2", payment);
       toast.success(
         `💰 order of payement reference ${payment.reference} updated`
       );
@@ -137,27 +101,7 @@ export const Orders = () => {
       socket.off("order:new", handleNewOrder);
       socket.off("order:updated", handleNewOrder);
     };
-  }, []);
-
-  const loadTransactionHistory = async () => {
-    try {
-      setIsLoading(true);
-      const { data } = await api.get(`/payment/all`);
-
-      if (data.success) {
-        console.log(`✅ ${data.data.length} transactions historiques chargées`);
-        console.log("data transaction ==>", data.data);
-        console.log("data transaction ==>", typeof data.data);
-        console.log("data transaction ==>", !!data.data);
-        setTransactions(data.data || data);
-      }
-    } catch (err) {
-      console.error("❌ Erreur chargement:", err);
-      toast.error("Erreur de chargement de l'historique");
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  }, [data]);
 
   // LOGIQUE DE FILTRAGE
   const filteredTransactions = transactions.filter((transaction) => {
@@ -187,10 +131,10 @@ export const Orders = () => {
         matchesFilter = transaction.amount > 50;
         break;
       case "Shipping":
-        matchesFilter = status === "processing" || status === "delivered";
+        matchesFilter = status === "pending" || status === "success";
         break;
       case "Completed":
-        matchesFilter = status === "completed" || status === "successful";
+        matchesFilter = status === "success";
         break;
       case "Cancelled":
         matchesFilter = status === "cancelled";

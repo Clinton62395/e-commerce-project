@@ -10,7 +10,7 @@ export const UserLogout = ({ onClose }) => {
   const navigate = useNavigate();
 
   const handleLogout = () => {
-    const token = localStorage.getItem("adminData");
+    const token = localStorage.getItem("token");
     if (!token) {
       setError("token Missing");
       isLoading(true);
@@ -19,7 +19,7 @@ export const UserLogout = ({ onClose }) => {
     }
 
     setIsloading(true);
-    localStorage.removeItem("adminData");
+    localStorage.removeItem("token");
 
     setTimeout(() => {
       toast.success("secured login out");

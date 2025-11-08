@@ -181,7 +181,10 @@ export const AdminSignUp = () => {
       );
 
       console.log("Admin signup data:", res.data);
+      const { token } = res.data || res.data.data;
       localStorage.setItem("adminData", JSON.stringify(res.data.data));
+      localStorage.setItem("token", token);
+      console.log("token from admin sign up==>", token);
 
       // Réinitialiser le formulaire
       setFormData({

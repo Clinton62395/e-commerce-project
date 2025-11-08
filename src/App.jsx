@@ -31,54 +31,80 @@ import { AdminLogin } from "./components/dashboard/AdminLogin";
 import { AdminSignUp } from "./components/dashboard/AdminSignUp";
 import { Setting } from "./components/dashboard/Setting";
 import { UserLogout } from "./components/dashboard/UserLogout";
+import Unauthorized from "./pages/Unauthorized";
+import { ProtectedRoute } from "./services/ProtectedRoute";
+import UserProvider from "./services/user_context";
+
+// react tanstack for API query
+import {
+  QueryClient,
+  QueryClientProvider,
+  useQuery,
+} from "@tanstack/react-query";
+
+const queryClient = new QueryClient();
 
 function App() {
   return (
     <>
       <Toaster />
-      <BrowserRouter>
-        <Provider>
-          <Routes>
-            <Route element={<HomeLayout />}>
-              <Route index element={<Home />} />
-              <Route path="/deals" element={<Deals />} />
-              <Route path="/new-products" element={<NewProduct />} />
-              <Route path="/packages" element={<Package />} />
-              <Route path="/register" element={<Register />} />
-              <Route path="/login" element={<Login />} />
-              <Route path="/forget-password" element={<ForgetPassword />} />
-            </Route>
+      {/* react tanstack query client provider */}
+      <QueryClientProvider client={queryClient}>
+        <UserProvider>
+          <BrowserRouter>
+            <Provider>
+              <Routes>
+                <Route element={<HomeLayout />}>
+                  <Route index element={<Home />} />
+                  <Route path="/deals" element={<Deals />} />
+                  <Route path="/new-products" element={<NewProduct />} />
+                  <Route path="/packages" element={<Package />} />
+                  <Route path="/register" element={<Register />} />
+                  <Route path="/login" element={<Login />} />
+                  <Route path="/forget-password" element={<ForgetPassword />} />
+                </Route>
 
-            <Route element={<ShopLayout />}>
-              <Route index element={<Home />} />
-              <Route path="/shop" element={<FashionShop />} />
-              <Route path="/product-details" element={<Products />} />
+                <Route element={<ShopLayout />}>
+                  <Route index element={<Home />} />
+                  <Route path="/shop" element={<FashionShop />} />
+                  <Route path="/product-details" element={<Products />} />
 
-              {/* <Route path="/shoping-cart" element={<ShopingCart />} /> */}
-            </Route>
-            <Route path="/success" element={<TransactionSuccess />} />
-            <Route path="/checkout" element={<Checkout />} />
-            <Route path="/reset-password" element={<ResetPassword />} />
+                  {/* <Route path="/shoping-cart" element={<ShopingCart />} /> */}
+                </Route>
+                <Route path="/success" element={<TransactionSuccess />} />
+                <Route path="/checkout" element={<Checkout />} />
+                <Route path="/reset-password" element={<ResetPassword />} />
 
-            {/* <AdminDashboard /> */}
-            <Route path="/admin-dashboard" element={<DashboardLayout />}>
-              <Route index element={<AdminDashboard />} />
-              <Route path="header" element={<Header />} />
-              <Route path="sidebar" element={<Sidebar />} />
-              <Route path="orders" element={<Orders />} />
-              <Route path="revenus" element={<Revenus />} />
-              <Route path="products" element={<DashboardProducts />} />
-              <Route path="categories" element={<Categories />} />
-              <Route path="settings" element={<Setting />} />
-              <Route path="Logout" element={<UserLogout />} />
-            </Route>
+                {/* <AdminDashboard /> */}
 
-            <Route path="/admin-login" element={<AdminLogin />} />
-            <Route path="/admin-up" element={<AdminSignUp />} />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </Provider>
-      </BrowserRouter>
+                <Route
+                  path="/admin-dashboard"
+                  element={
+                    <ProtectedRoute>
+                      <DashboardLayout />
+                    </ProtectedRoute>
+                  }
+                >
+                  <Route index element={<AdminDashboard />} />
+                  <Route path="header" element={<Header />} />
+                  <Route path="sidebar" element={<Sidebar />} />
+                  <Route path="orders" element={<Orders />} />
+                  <Route path="revenus" element={<Revenus />} />
+                  <Route path="products" element={<DashboardProducts />} />
+                  <Route path="categories" element={<Categories />} />
+                  <Route path="settings" element={<Setting />} />
+                  <Route path="Logout" element={<UserLogout />} />
+                </Route>
+
+                <Route path="/admin-login" element={<AdminLogin />} />
+                <Route path="/admin-up" element={<AdminSignUp />} />
+                <Route path="/unauthorized" element={<Unauthorized />} />
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </Provider>
+          </BrowserRouter>
+        </UserProvider>
+      </QueryClientProvider>
     </>
   );
 }
