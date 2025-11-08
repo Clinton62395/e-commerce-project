@@ -16,6 +16,7 @@ const UserProvider = ({ children }) => {
         const decoded = jwtDecode(token);
 
         setUser(decoded);
+        setLoading(false);
       } catch (err) {
         console.error("error to decod token", err);
         localStorage.removeItem("token");
