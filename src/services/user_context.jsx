@@ -14,16 +14,13 @@ const UserProvider = ({ children }) => {
     if (token) {
       try {
         const decoded = jwtDecode(token);
-
         setUser(decoded);
-        setLoading(false);
       } catch (err) {
-        console.error("error to decod token", err);
+        console.error("Erreur lors du décodage du token", err);
         localStorage.removeItem("token");
-      } finally {
-        setLoading(false);
       }
     }
+    setLoading(false); // Appelé une seule fois à la fin
   }, []);
 
   return (

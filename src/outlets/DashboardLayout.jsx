@@ -22,7 +22,7 @@ export const DashboardLayout = () => {
       {/* Main content area */}
       <div className="flex">
         <aside
-          className={`sticky top-0  h-screen shadow-md z-50 transition-transform duration-300 ${
+          className={`sticky  top-0  h-screen shadow-md z-50 transition-transform duration-300 ${
             sidebarOpen ? "translate-x-0 w-64 p-2" : "-translate-x-full w-0 p-0"
           }`}
         >
@@ -34,7 +34,7 @@ export const DashboardLayout = () => {
         {/* Header */}
 
         {/* Page content */}
-        <main className="flex-grow p-6 overflow-y-auto z-20">
+        <main className="flex-grow p-6 overflow-y-auto z-10">
           <Outlet />
         </main>
         {modalOpen && (

@@ -18,7 +18,6 @@ export const AdminDashboard = () => {
     queryKey: ["allPayments"],
     queryFn: () => api.get("/payment/all").then((res) => res.data.data),
   });
-  console.log("payment from admin dashboard", payment);
 
   // total sall by country
 
@@ -68,68 +67,54 @@ export const AdminDashboard = () => {
 
   console.log("producct sorted by new", productsSortedByNew);
   // Données simulées
-  const [products] = useState([
-    {
-      _id: "1",
-      name: "Produit 1",
-      price: 100,
-      category: "cat1",
-    },
-    {
-      _id: "2",
-      name: "Produit 2",
-      price: 200,
-      category: "cat2",
-    },
-  ]);
 
-  const formatedDate = () => {
-    const dateFormat = new Date.Intl.DateTimeFormat({
-      dateStyle: "short",
-    });
-  };
-  const topProducts = [
-    {
-      name: "Women's high waist jeans",
-      date: "17 Sep, 2025",
-      category: "Bottoms",
-      stock: "In Stock",
-      price: "$31",
-      totalSales: "$13,450",
-    },
-    {
-      name: "Men's crew neck T-shirt",
-      date: "4 Oct, 2025",
-      category: "T-shirts",
-      stock: "In Stock",
-      price: "$19",
-      totalSales: "$47,280",
-    },
-    {
-      name: "Women's winter jacket",
-      date: "23 Jun, 2025",
-      category: "Outerwear",
-      stock: "In Stock",
-      price: "$60",
-      totalSales: "$88,340",
-    },
-    {
-      name: "Women's blazer",
-      date: "9 Aug, 2025",
-      category: "Outerwear",
-      stock: "Out Of Stock",
-      price: "$37",
-      totalSales: "$126,170",
-    },
-    {
-      name: "Men's sweatshirt",
-      date: "16 Sep, 2025",
-      category: "Outerwear",
-      stock: "In Stock",
-      price: "$44",
-      totalSales: "$20,300",
-    },
-  ];
+  // top product sale
+
+  const resul = Array.isArray(payment)
+    ? payment.slice().reduce(
+        (acc, item) => {
+          const { updatedAt, amount = 0, cartItems = [] } = item;
+
+          acc.totalAmount += amount;
+
+          const category = item.category || null;
+          const stock = item.stock || null;
+
+          cartItems.forEach(({ title, quantity, price }) => {
+            if (!acc.products[title]) {
+              acc.products[title] = {
+                title,
+                price,
+                quantity: 0,
+                category,
+                stock,
+                updatedAt,
+              };
+            }
+            acc.products[title].quantity += quantity;
+            // acc.products[title].dates.push(updatedAt);
+          });
+          return acc;
+        },
+        { totalAmount: 0, products: {} }
+      )
+    : { totalAmount: 0, products: {} };
+
+  const topProduct = Object.values(resul.products).sort(
+    (a, b) => b.quantity - a.quantity
+  );
+
+  // total sale
+  // const totalAmount = Array.isArray(payment)
+  //   ? payment.reduce((acc, item) => acc + (item.amount || 0), 0)
+  //   : 0;
+
+  // total orders
+  const totalOrders = Array.isArray(payment) ? payment.length : 0;
+  // average orders
+
+  const averageAmount =
+    totalOrders > 0 ? resul.totalAmount / totalOrders.toFixed(2) : 0;
 
   return (
     <div className="space-y-6">
@@ -137,7 +122,7 @@ export const AdminDashboard = () => {
       <div className="grid grid-cols-1 lg:grid-cols-7 gap-4">
         {/* Statistiques principales */}
         <div className="col-span-1  lg:col-span-5 min-w-full h-full">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 place-items-center items-center md:grid-cols-3 gap-4">
             {/* Total Sales */}
             <div className="flex items-center justify-center bg-white border border-gray-300 rounded-xl  p-2 w-full max-w-xs shadow-sm">
               <div className="flex items-center gap-4">
@@ -151,7 +136,9 @@ export const AdminDashboard = () => {
                   <p className="text-sm text-gray-500 font-medium">
                     Total Sales
                   </p>
-                  <p className="text-xl font-semibold text-black">$879</p>
+                  <p className="text-xl font-semibold text-black">
+                    {resul.totalAmount.toLocaleString()}k
+                  </p>
                   <p className="text-xs text-green-600 mt-2 flex items-center">
                     <TrendingUp size={14} className="mr-1" /> +8% this week
                   </p>
@@ -168,9 +155,11 @@ export const AdminDashboard = () => {
                 {/* Texte centré verticalement */}
                 <div className="text-center">
                   <p className="text-sm text-gray-500 font-medium">
-                    Average Order
+                    Average amount
                   </p>
-                  <p className="text-xl font-semibold text-black">$879</p>
+                  <p className="text-xl font-semibold text-black">
+                    {averageAmount.toLocaleString()}k
+                  </p>
                   <p className="text-xs text-green-600 mt-2 flex items-center">
                     <TrendingUp size={14} className="mr-1" /> +3% this week
                   </p>
@@ -190,7 +179,9 @@ export const AdminDashboard = () => {
                   <p className="text-sm text-gray-500 font-medium">
                     Total Orders
                   </p>
-                  <p className="text-xl font-semibold text-black">$879</p>
+                  <p className="text-xl font-semibold text-black">
+                    {totalOrders}
+                  </p>
                   <p className="text-xs text-green-600 mt-2 flex items-center">
                     <TrendingUp size={14} className="mr-1" /> +5% this week
                   </p>
@@ -199,7 +190,7 @@ export const AdminDashboard = () => {
             </div>
           </div>
           {/* chart */}
-          <div className="border border-[#484848] my-2 shadow-md rounded-md mt-9 md:mt-24">
+          <div className="border w-full  border-[#484848] my-2 shadow-md rounded-md mt-9 md:mt-24">
             {/* <Bar options={options} data={data} /> */}
             <Chart />
           </div>
@@ -255,11 +246,17 @@ export const AdminDashboard = () => {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200">
-                {topProducts.map((item, index) => (
+                {topProduct.map((item, index) => (
                   <tr key={index} className="hover:bg-gray-50 transition">
-                    <td className="px-4 py-3 text-gray-800">{item.name}</td>
-                    <td className="px-4 py-3 text-gray-600">{item.date}</td>
-                    <td className="px-4 py-3 text-gray-600">{item.category}</td>
+                    <td className="px-4 py-3 text-gray-800">{item.title}</td>
+                    <td className="px-4 py-3 text-gray-600">
+                      {new Intl.DateTimeFormat("en-US").format(
+                        new Date(item.updatedAt)
+                      )}
+                    </td>
+                    <td className="px-4 py-3 text-gray-600">
+                      {item.category || "no category yet"}
+                    </td>
                     <td
                       className={`px-4 py-3 font-medium ${
                         item.stock === "Out Of Stock"
@@ -267,11 +264,13 @@ export const AdminDashboard = () => {
                           : "text-green-600"
                       }`}
                     >
-                      {item.stock}
+                      {item.stock || "not set yet"}
                     </td>
-                    <td className="px-4 py-3 text-gray-700">{item.price}</td>
                     <td className="px-4 py-3 text-gray-700">
-                      {item.totalSales}
+                      {item.price || "—"}k
+                    </td>
+                    <td className="px-4 py-3 text-gray-700">
+                      {resul.totalAmount.toLocaleString()}k
                     </td>
                   </tr>
                 ))}
@@ -299,7 +298,9 @@ export const AdminDashboard = () => {
                   <span className="text-sm text-[#000000] font-medium">
                     {item.title}
                   </span>
-                  <span className="text-xs font-semibold flex gap-1">{item.price}k</span>
+                  <span className="text-xs font-semibold flex gap-1">
+                    {item.price}k
+                  </span>
                   <span className="text-xs font-semibold">{formattedDate}</span>
                 </li>
               );

@@ -1,37 +1,50 @@
 import react, { useState } from "react";
 import { DollarSign, Eye, EyeOff, Plus } from "lucide-react";
 import { Chart } from "./chart";
+import { useQuery } from "@tanstack/react-query";
 export const Revenus = () => {
   const [showRevenu, setShowRevenu] = useState(false);
-  const [customers, setCustomers] = useState([
-    {
-      _id: "1",
-      name: "Marie Dubois",
-      orderId: "FS0003",
-      spent: 1249.88,
-      date: "2024-03-15",
-      price: "$ 1700",
-      quantity: 30,
-    },
-    {
-      _id: "2",
-      name: "Jean Martin",
-      orderId: "#FS0007",
-      spent: 689.92,
-      date: "2024-06-20",
-      price: "$ 2700",
-      quantity: 35,
-    },
-    {
-      _id: "3",
-      name: "Sophie Bernard",
-      orderId: "#FS0007",
-      spent: 1899.75,
-      date: "2024-01-10",
-      price: "$ 1600",
-      quantity: 98,
-    },
-  ]);
+
+  const { data: payment = [], isPending } = useQuery({
+    queryKey: ["allPayments"],
+    queryFn: () => api.get("/payment/all").then((res) => res.data.data),
+  });
+  console.log("payment from admin dashboard", payment);
+
+  // revenu
+  const totalRevenu = Array.isArray(payment)
+    ? payment.slice().reduce((acc, item) => acc + item.amount, 0)
+    : 0;
+
+  const currentTransaction = Array.isArray(payment)
+    ? payment.slice().reduce((acc, item) => {
+        const {
+          firstName,
+          lastName,
+          _id,
+          createdAt,
+          amount,
+          cartItems = {},
+        } = item;
+
+        acc[_id] = {
+          fullName: `${firstName} ${lastName}`,
+          createdAt,
+          _id,
+          amount,
+          cartItems,
+        };
+        return acc;
+      }, {})
+    : {};
+
+  const newOrderFilters = Object.values(currentTransaction).sort(
+    (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+  );
+
+  const newTransaction = newOrderFilters.slice(0, 10);
+  console.log("order transaction filterd", newTransaction);
+
   const getRevenu = () => {
     return customers.reduce((acc, item) => acc + item.spent, 0);
   };
@@ -48,7 +61,9 @@ export const Revenus = () => {
           <div className="max-w-xs flex bg-gray-300 py-4 items-center justify-between px-5  rounded shadow-sm">
             <DollarSign />
 
-            <span className="text-3xl font-medium leading-10">{showRevenu ? getRevenu() : "*********"}</span>
+            <span className="text-3xl font-medium leading-10">
+              {showRevenu ? totalRevenu.toLocaleString() : "*********"}
+            </span>
 
             <button onClick={() => setShowRevenu(!showRevenu)}>
               {showRevenu ? <Eye /> : <EyeOff />}
@@ -70,10 +85,10 @@ export const Revenus = () => {
                 QYT
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                Order Id
+                Price
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                Price
+                Order Id
               </th>
 
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
@@ -81,18 +96,31 @@ export const Revenus = () => {
               </th>
             </tr>
           </thead>
-          <tbody className="divide-y">
-            {customers.map((customer) => (
-              <tr key={customer._id} className="hover:bg-gray-50">
-                <td className="px-6 py-4 font-medium text-gray-800">
-                  {customer.name}
-                </td>
-                <td className="px-6 py-4 text-gray-600">{customer.quantity}</td>
-                <td className="px-6 py-4 text-gray-600">{customer.orderId}</td>
-                <td className="px-6 py-4 text-gray-600">{customer.price}</td>
-                <td className="px-6 py-4 text-gray-600">{customer.date}</td>
-              </tr>
-            ))}
+          <tbody className="divide-y divide-gray-200">
+            {newTransaction.map((customer) =>
+              customer.cartItems.map((item, i) => (
+                <tr key={`${customer._id}-${i}`} className="hover:bg-gray-50">
+                  <td className="px-6 py-4 font-medium text-gray-800">
+                    {i === 0 ? customer.fullName : ""}
+                  </td>
+                  <td className="px-6 py-4 text-gray-600">{item.quantity}</td>
+                  <td className="px-6 py-4 text-gray-600">{item.price}</td>
+                  <td className="px-6 py-4 text-gray-600">
+                    {i === 0 ? customer._id : ""}
+                  </td>
+                  <td className="px-6 py-4 text-gray-600">
+                    {i === 0 ? customer.price || "—" : ""}
+                  </td>
+                  <td className="px-6 py-4 text-gray-600">
+                    {i === 0
+                      ? new Intl.DateTimeFormat("en-US").format(
+                          new Date(customer.createdAt)
+                        )
+                      : ""}
+                  </td>
+                </tr>
+              ))
+            )}
           </tbody>
         </table>
       </div>

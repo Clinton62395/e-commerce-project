@@ -46,15 +46,13 @@ export const AdminLogin = () => {
           const { token } = res.data || res.data.data;
 
           localStorage.setItem("token", token);
-          console.log("token from admin sign in==>", token);
           localStorage.setItem("adminData", JSON.stringify(res.data.data));
 
           setIsLoading(false);
           navigate("/admin-dashboard");
         }
 
-        console.log("admin data from login==>", res.data);
-        console.log("Login attempt with:", formData);
+        
       } catch (error) {
         setErrors({ submit: "Failed to login. Please try again." });
       } finally {
