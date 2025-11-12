@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Edit,
   Eye,
@@ -11,87 +11,75 @@ import {
   X,
 } from "lucide-react";
 import { ProductUploadForm } from "./uploadFiles";
+import { useActionData, useOutletContext } from "react-router-dom";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { api } from "../../services/constant";
+import { deleteProduct, getProduct } from "../../api/Product.API";
+import toast from "react-hot-toast";
 
 export const DashboardProducts = () => {
   const [showProductModal, setShowProductModal] = useState(null);
   const [showUploadModal, setShowUploadModal] = useState(false);
   const [editingProduct, setEditingProduct] = useState(null);
 
-  const [selectedImage, setSelectedImage] = useState(null);
-  const [previewUrl, setPreviewUrl] = useState(null);
+  const { toggleSwicht, sidebarOpen } = useOutletContext();
 
-  // Revoke object URL when preview changes to avoid memory leaks
-  React.useEffect(() => {
-    return () => {
-      if (previewUrl) URL.revokeObjectURL(previewUrl);
-    };
-  }, [previewUrl]);
+  const handleUploadModal = () => {
+    if (sidebarOpen) {
+      toggleSwicht();
+      setShowUploadModal(true);
+    }
+  };
+  const handleUploadModalClose = () => {
+    setShowUploadModal(false);
 
-  const [products, setProducts] = useState([
-    {
-      _id: "1",
-      clotheName: "T-shirt Casual",
-      title: "T-shirt en coton bio",
-      description: "T-shirt confortable en coton biologique",
-      category: "men",
-      price: 29.99,
-      stock: 150,
-      status: [],
-      // status: ["In Stock", "Coming Soon", "Out of Stock"],
-      picture:
-        "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=300",
-      newArrival: true,
-      promot: false,
-      size: ["S", "M", "L"],
-      color: ["Blanc", "Noir"],
-      brands: ["Nike"],
-      tags: ["casual", "cotton"],
-      releaseDate: Date.now(),
+    if (!sidebarOpen) {
+      toggleSwicht();
+    }
+  };
+
+  // get all products
+  const queryClient = useQueryClient();
+  const {
+    isPending,
+    error,
+    data: products = [],
+  } = useQuery({
+    queryKey: ["products"],
+    queryFn: getProduct,
+    staleTime: 1000 * 60 * 5,
+  });
+
+  // get single product and delete
+
+  const deleteMutation = useMutation({
+    mutationFn: deleteProduct,
+    staleTime: 1000 * 60 * 5,
+    onSuccess: () => {
+      toast.success("product deleted successful");
+      queryClient.invalidateQueries(["products"]);
     },
-    {
-      _id: "2",
-      clotheName: "Robe Élégante",
-      title: "Robe soirée été",
-      description: "Robe élégante pour occasions spéciales",
-      category: "women",
-      price: 89.99,
-      stock: 150,
-      status: [],
-      picture:
-        "https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=300",
-      newArrival: false,
-      promot: true,
-      size: ["XS", "S", "M"],
-      color: ["Rouge", "Noir"],
-      brands: ["Zara"],
-      tags: ["elegant", "soiree"],
-      releaseDate: Date.now(),
+    onError: () => {
+      toast.error("error when deleting product");
     },
-    {
-      _id: "3",
-      clotheName: "Jean Slim",
-      title: "Jean délavé moderne",
-      description: "Jean slim fit confortable",
-      category: "men",
-      price: 59.99,
-      stock: 0,
-      // status: ["In Stock", "Coming Soon", "Out of Stock"],
-      status: [],
-      picture:
-        "https://images.unsplash.com/photo-1542272604-787c3835535d?w=300",
-      newArrival: true,
-      promot: false,
-      size: ["28", "30", "32", "34"],
-      color: ["Bleu"],
-      brands: ["Levi's"],
-      tags: ["denim", "casual"],
-      releaseDate: Date.now(),
-    },
-  ]);
+  });
+
+  console.log("products backend=== >", products);
+
+  if (isPending) {
+    return (
+      <div className=" relative animate-spin flex h-24 w-24 rounded-full border border-t border-white ">
+        <div className=" w-full bg-slate-800 opacity-10 absolute inset-0"></div>
+      </div>
+    );
+  }
+  if (error) {
+    return <div>error occurd when fetching products : {error}</div>;
+  }
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-center md:justify-between items-center flex-wrap gap-3 max-w-7xl mx-auto">
+      <div className="flex justify-center md:justify-between items-center  min-w-0 flex-wrap gap-3 max-w-7xl mx-auto">
         <div className="relative">
           <input
             type="text"
@@ -104,7 +92,7 @@ export const DashboardProducts = () => {
           />
         </div>
         <button
-          onClick={() => setShowUploadModal(true)}
+          onClick={handleUploadModal}
           className="flex items-center px-4 py-2 duration-300 transition-all bg-black/80 text-white rounded-lg hover:bg-black"
         >
           <Plus size={18} className="mr-2" />
@@ -112,12 +100,12 @@ export const DashboardProducts = () => {
         </button>
 
         {showUploadModal && (
-          <ProductUploadForm onClose={() => setShowUploadModal(false)} />
+          <ProductUploadForm onClose={handleUploadModalClose} />
         )}
       </div>
 
-      <div className="bg-white rounded-lg shadow ">
-        <table className="w-full">
+      <div className="bg-white rounded-lg shadow overflow-x-auto scrollbar-hide">
+        <table className="w-full max-w-full">
           <thead className="bg-gray-50 border-b">
             <tr>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
@@ -140,61 +128,76 @@ export const DashboardProducts = () => {
               </th>
             </tr>
           </thead>
-          <tbody className="divide-y">
+          <tbody className="divide-y text-xs md:text-lg">
             {products.map((product) => (
               <tr key={product._id} className="hover:bg-gray-50">
-                <td className="px-6 py-4">
-                  <div className="flex items-center">
-                    <img
-                      src={product.picture}
-                      alt={product.clotheName}
-                      className="w-12 h-12 object-cover rounded-full border border-black"
-                    />
-                    <div className="ml-3">
-                      <p className="font-medium text-gray-800">
+                <td className="px-2 py-3 md:px-6 md:py-4">
+                  <div className="flex items-center space-x-2 md:space-x-4 overflow-x-auto">
+                    {product.mainImage && (
+                      <div className="flex-shrink-0">
+                        <img
+                          src={product.mainImage}
+                          alt={product._id}
+                          className="w-10 h-10 md:w-16 md:h-16 object-cover rounded-full border border-black"
+                        />
+                      </div>
+                    )}
+                    <div className="min-w-0">
+                      <p className="font-medium text-gray-800 truncate">
                         {product.clotheName}
                       </p>
-                      <p className="text-sm text-gray-500">{product.title}</p>
+                      <p className="text-xs text-gray-500 truncate">
+                        {product.title}
+                      </p>
                     </div>
                   </div>
                 </td>
-                <td className="px-6 py-4">
+                <td className="px-2 py-3 md:px-6 md:py-4">
                   <span className="px-2 py-1 bg-blue-100 text-blue-700 rounded-full text-xs">
                     {product.category}
                   </span>
                 </td>
-                <td className="px-6 py-4 font-medium">€{product.price}</td>
-                <td className="px-6 py-4 font-medium">
+                <td className="px-2 py-3 md:px-6 md:py-4 font-medium">
+                  €{product.price}
+                </td>
+                <td className="px-2 py-3 md:px-6 md:py-4 font-medium">
                   <span
                     className={`${
-                      product.stock < 50 ? "text-red-600" : "text-green-600"
+                      product.quantity < 50 ? "text-red-600" : "text-green-600"
                     }`}
                   >
-                    {product.stock}
+                    {product.quantity}
                   </span>
                 </td>
-                <td className="px-6 py-4">
+                <td className="px-2 py-3 md:px-6 md:py-4">
                   <div className="flex items-center">
                     <span className="text-yellow-500 mr-1">⭐</span>
                     <span>
                       {(() => {
+                        const releaseDate = product.releaseDate
+                          ? new Date(product.releaseDate)
+                          : null;
                         const today = new Date();
 
-                        if (product.stock > 0 && product.releaseDate <= today) {
+                        if (
+                          product.quantity > 0 &&
+                          releaseDate &&
+                          releaseDate <= today
+                        ) {
                           return (
-                            <span className=" font-medium text-[#166A42]">
+                            <span className="font-medium text-[#166A42]">
                               In stock
                             </span>
                           );
-                        } else if (product.releaseDate > today) {
+                        } else if (releaseDate && releaseDate > today) {
                           return (
-                            <span className=" font-medium text-[#5479CB]">
+                            <span className="font-medium text-[#5479CB]">
                               Coming soon
                             </span>
                           );
                         } else {
                           return (
-                            <span className=" font-medium text-[#FF2929]">
+                            <span className="font-medium text-[#FF2929]">
                               Coming soon
                             </span>
                           );
@@ -203,11 +206,11 @@ export const DashboardProducts = () => {
                     </span>
                   </div>
                 </td>
-                <td className="px-6 py-4">
+                <td className="px-2 py-3 md:px-6 md:py-4">
                   <div className="flex space-x-2">
                     <button
                       onClick={() => {
-                        setEditingProduct(product);
+                        setEditingProduct(product._id);
                         setShowProductModal(true);
                       }}
                       className="p-2 text-blue-600 hover:bg-blue-50 rounded"
@@ -222,9 +225,7 @@ export const DashboardProducts = () => {
                         if (
                           confirm("Voulez-vous vraiment supprimer ce produit ?")
                         ) {
-                          setProducts(
-                            products.filter((p) => p._id !== product._id)
-                          );
+                          deleteMutation.mutate(product._id);
                         }
                       }}
                       className="p-2 text-red-600 hover:bg-red-50 rounded"

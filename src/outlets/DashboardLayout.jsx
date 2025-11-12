@@ -11,6 +11,9 @@ export const DashboardLayout = () => {
   const toggleSwicht = () => {
     setSidebarOpen((prev) => !prev);
   };
+  // const sideBarToggle =
+  //   typeof children === "function" ? children(toggleSwicht) : null;
+  // if (sideBarToggle) return sideBarToggle;
 
   return (
     <div className="flex flex-col  bg-gray-50 ">
@@ -35,7 +38,7 @@ export const DashboardLayout = () => {
 
         {/* Page content */}
         <main className="flex-grow p-6 overflow-y-auto z-10">
-          <Outlet />
+          <Outlet context={{ toggleSwicht, sidebarOpen }} />
         </main>
         {modalOpen && (
           <div>
