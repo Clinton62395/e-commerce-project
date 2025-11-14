@@ -230,7 +230,7 @@ export const AdminDashboard = () => {
       {/* Recent Orders */}
       <div className="grid grid-cols-1 md:grid-cols-4 lg:grid-cols-7 gap-4 my-3">
         <div className=" col-span-2  lg:col-span-5 h-full">
-          <div className="overflow-x-auto bg-white rounded-lg shadow-md border border-[#484848] p-6">
+          <div className="overflow-x-auto  scrollbar-hide bg-white rounded-lg shadow-md border border-[#484848] p-6">
             <h2 className="text-lg font-semibold text-gray-800 mb-4">
               Top Selling Products
             </h2>

@@ -11,8 +11,10 @@ import LogoutIcon from "@mui/icons-material/Logout";
 import CurrencyExchangeSharpIcon from "@mui/icons-material/CurrencyExchangeSharp";
 import CategorySharpIcon from "@mui/icons-material/CategorySharp";
 import { Link, useLocation } from "react-router-dom";
+
+
+
 export const Sidebar = ({ isOpen, onClickLogout }) => {
-  const [modalOpen, setModalOpen] = useState(false);
   const location = useLocation();
   const currentPath = location.pathname;
 

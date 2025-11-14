@@ -14,13 +14,21 @@ import { ProductUploadForm } from "./uploadFiles";
 import { useActionData, useOutletContext } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { api } from "../../services/constant";
-import { deleteProduct, getProduct } from "../../api/Product.API";
+import {
+  deleteProduct,
+  getProduct,
+  updateProduct,
+} from "../../api/Product.API";
 import toast from "react-hot-toast";
+import { Modal } from "../modal/Logout";
+import { UpdateProduct } from "./UpdateProduct";
 
 export const DashboardProducts = () => {
-  const [showProductModal, setShowProductModal] = useState(null);
+  const [showProductModal, setShowProductModal] = useState(false);
   const [showUploadModal, setShowUploadModal] = useState(false);
-  const [editingProduct, setEditingProduct] = useState(null);
+  const [productToDelete, setProductToDelete] = useState(null);
+  const [productToUpdate, setProductToUpdate] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const { toggleSwicht, sidebarOpen } = useOutletContext();
 
@@ -30,9 +38,9 @@ export const DashboardProducts = () => {
       setShowUploadModal(true);
     }
   };
+
   const handleUploadModalClose = () => {
     setShowUploadModal(false);
-
     if (!sidebarOpen) {
       toggleSwicht();
     }
@@ -50,8 +58,7 @@ export const DashboardProducts = () => {
     staleTime: 1000 * 60 * 5,
   });
 
-  // get single product and delete
-
+  // delete mutation
   const deleteMutation = useMutation({
     mutationFn: deleteProduct,
     staleTime: 1000 * 60 * 5,
@@ -64,22 +71,78 @@ export const DashboardProducts = () => {
     },
   });
 
-  console.log("products backend=== >", products);
+  // update mutation
+  const updateMutation = useMutation({
+    mutationFn: updateProduct,
+    staleTime: 1000 * 60 * 5,
+    onSuccess: () => {
+      toast.success("product updated successful");
+      queryClient.invalidateQueries(["products"]);
+    },
+    onError: () => {
+      toast.error("error when updating product");
+    },
+  });
+
+  const handleModalOpen = (product) => {
+    setProductToDelete(product);
+    setIsModalOpen(true);
+  };
+
+  const handleCancel = () => {
+    setIsModalOpen(false);
+    setProductToDelete(null);
+  };
+
+  const handleConfirm = () => {
+    if (productToDelete && productToDelete._id) {
+      deleteMutation.mutate(productToDelete._id);
+    }
+    setIsModalOpen(false);
+    setProductToDelete(null);
+  };
+
+  // update product function
+  const handleModaUpdatelOpen = (product) => {
+    setProductToUpdate(product);
+    setShowProductModal(true);
+  };
+
+  const handleCancelUpdatedProduct = () => {
+    setShowProductModal(false);
+    setProductToUpdate(null);
+  };
+
+  const handleConfirmUpdateProduct = (data) => {
+    if (!productToUpdate || !productToUpdate._id) {
+      toast.error("Produit à mettre à jour non défini");
+      return;
+    }
+
+    const file = data.mainImage?.[0];
+    const fullData = {
+      mainImage: file,
+      ...data,
+    };
+
+    updateMutation.mutate({ _id: productToUpdate._id, data: fullData });
+  };
 
   if (isPending) {
     return (
-      <div className=" relative animate-spin flex h-24 w-24 rounded-full border border-t border-white ">
-        <div className=" w-full bg-slate-800 opacity-10 absolute inset-0"></div>
+      <div className="bg-black bg-opacity-45 flex items-center justify-center min-h-screen">
+        <div className="animate-spin rounded-full h-24 w-24 border-b-2 border-gray-900"></div>
       </div>
     );
   }
+
   if (error) {
-    return <div>error occurd when fetching products : {error}</div>;
+    return <div>error occurred when fetching products : {error.message}</div>;
   }
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-center md:justify-between items-center  min-w-0 flex-wrap gap-3 max-w-7xl mx-auto">
+      <div className="flex justify-center md:justify-between items-center min-w-0 flex-wrap gap-3 max-w-7xl mx-auto">
         <div className="relative">
           <input
             type="text"
@@ -109,13 +172,13 @@ export const DashboardProducts = () => {
           <thead className="bg-gray-50 border-b">
             <tr>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                Produit
+                Products
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                Catégorie
+                Category
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                Prix
+                Price
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
                 Stock
@@ -158,7 +221,7 @@ export const DashboardProducts = () => {
                   </span>
                 </td>
                 <td className="px-2 py-3 md:px-6 md:py-4 font-medium">
-                  €{product.price}
+                  NGN{product.price}
                 </td>
                 <td className="px-2 py-3 md:px-6 md:py-4 font-medium">
                   <span
@@ -198,7 +261,7 @@ export const DashboardProducts = () => {
                         } else {
                           return (
                             <span className="font-medium text-[#FF2929]">
-                              Coming soon
+                              Out of stock
                             </span>
                           );
                         }
@@ -209,10 +272,7 @@ export const DashboardProducts = () => {
                 <td className="px-2 py-3 md:px-6 md:py-4">
                   <div className="flex space-x-2">
                     <button
-                      onClick={() => {
-                        setEditingProduct(product._id);
-                        setShowProductModal(true);
-                      }}
+                      onClick={() => handleModaUpdatelOpen(product)}
                       className="p-2 text-blue-600 hover:bg-blue-50 rounded"
                     >
                       <Edit size={18} />
@@ -221,13 +281,7 @@ export const DashboardProducts = () => {
                       <Eye size={18} />
                     </button>
                     <button
-                      onClick={() => {
-                        if (
-                          confirm("Voulez-vous vraiment supprimer ce produit ?")
-                        ) {
-                          deleteMutation.mutate(product._id);
-                        }
-                      }}
+                      onClick={() => handleModalOpen(product)}
                       className="p-2 text-red-600 hover:bg-red-50 rounded"
                     >
                       <Trash2 size={18} />
@@ -240,160 +294,27 @@ export const DashboardProducts = () => {
         </table>
       </div>
 
-      {/* Modal Produit */}
+      {/* Modal de suppression - UN SEUL en dehors de la boucle */}
+      {isModalOpen && (
+        <Modal
+          isOpen={isModalOpen}
+          onclose={handleCancel}
+          onConfirme={handleConfirm}
+          title="Delete this product ?"
+          message={`Do you really want to delete this product "${productToDelete?.title}" ?`}
+          confirmLabel="Delete"
+          cancelLabel="Cancel"
+        />
+      )}
+
+      {/* Modal de mise à jour */}
       {showProductModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-            <div className="p-6 border-b flex justify-between items-center">
-              <h3 className="text-xl font-semibold">
-                {editingProduct ? "Modifier le produit" : "Nouveau produit"}
-              </h3>
-              <button
-                onClick={() => setShowProductModal(false)}
-                className="p-2 hover:bg-gray-100 rounded"
-              >
-                <X size={20} />
-              </button>
-            </div>
-            <div className="p-6 space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium mb-1">
-                    Nom du produit
-                  </label>
-                  <input
-                    type="text"
-                    className="w-full px-3 py-2 border rounded-lg"
-                    defaultValue={editingProduct?.clotheName}
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium mb-1">
-                    Titre
-                  </label>
-                  <input
-                    type="text"
-                    className="w-full px-3 py-2 border rounded-lg"
-                    defaultValue={editingProduct?.title}
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium mb-1">
-                  Description
-                </label>
-                <textarea
-                  className="w-full px-3 py-2 border rounded-lg"
-                  rows="3"
-                  defaultValue={editingProduct?.description}
-                ></textarea>
-              </div>
-
-              <div className="grid grid-cols-3 gap-4">
-                <div>
-                  <label className="block text-sm font-medium mb-1">
-                    Prix (€)
-                  </label>
-                  <input
-                    type="number"
-                    step="0.01"
-                    className="w-full px-3 py-2 border rounded-lg"
-                    defaultValue={editingProduct?.price}
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium mb-1">
-                    Quantité
-                  </label>
-                  <input
-                    type="number"
-                    className="w-full px-3 py-2 border rounded-lg"
-                    defaultValue={editingProduct?.quantity}
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium mb-1">
-                    Catégorie
-                  </label>
-                  <select className="w-full px-3 py-2 border rounded-lg">
-                    <option>men</option>
-                    <option>women</option>
-                    <option>kids</option>
-                  </select>
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium mb-1">
-                  Image du produit
-                </label>
-                <div
-                  className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center cursor-pointer relative"
-                  onDrop={(e) => {
-                    e.preventDefault();
-                    const file = e.dataTransfer.files?.[0];
-                    if (file) {
-                      setSelectedImage(file);
-                      setPreviewUrl(URL.createObjectURL(file));
-                    }
-                  }}
-                  onDragOver={(e) => e.preventDefault()}
-                >
-                  {previewUrl ? (
-                    <img
-                      src={previewUrl}
-                      alt="preview"
-                      className="mx-auto mb-2 max-h-48 object-contain"
-                    />
-                  ) : (
-                    <>
-                      <Upload
-                        className="mx-auto text-gray-400 mb-2"
-                        size={32}
-                      />
-                      <p className="text-sm text-gray-600">
-                        Cliquez pour uploader ou glissez-déposez
-                      </p>
-                    </>
-                  )}
-
-                  <input
-                    type="file"
-                    accept="image/*"
-                    className="absolute inset-0 opacity-0 w-full h-full cursor-pointer"
-                    onChange={(e) => {
-                      const file = e.target.files?.[0];
-                      if (file) {
-                        setSelectedImage(file);
-                        setPreviewUrl(URL.createObjectURL(file));
-                      }
-                    }}
-                  />
-                </div>
-              </div>
-
-              <div className="flex justify-end space-x-3 pt-4">
-                <button
-                  onClick={() => setShowProductModal(false)}
-                  className="px-4 py-2 border rounded-lg hover:bg-gray-50"
-                >
-                  Annuler
-                </button>
-                <button
-                  onClick={() => {
-                    alert("Produit enregistré !");
-                    setShowProductModal(false);
-                  }}
-                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-                >
-                  <Save size={18} className="inline mr-2" />
-                  Enregistrer
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
+        <UpdateProduct
+          editingProduct={productToUpdate}
+          onclose={handleCancelUpdatedProduct}
+          onConfirme={handleConfirmUpdateProduct}
+          onCancel={handleCancelUpdatedProduct}
+        />
       )}
     </div>
   );

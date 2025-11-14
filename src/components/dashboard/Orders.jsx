@@ -33,8 +33,8 @@ export const Orders = () => {
   const { isPending, error, data } = useQuery({
     queryKey: ["allPayments"],
     queryFn: () => api.get("/payment/all").then((res) => res.data.data),
+    staleTime: 1000 * 60 * 10,
   });
-
 
   if (isPending) return "Loading...";
 
@@ -44,7 +44,7 @@ export const Orders = () => {
     if (data) {
       setTransactions(data);
     }
-  },[data]);
+  }, [data]);
 
   useEffect(() => {
     // Charger l'historique
@@ -189,7 +189,7 @@ export const Orders = () => {
         </div>
 
         {/* Tableau des Commandes */}
-        <div className="overflow-x-auto rounded-lg shadow-xl border border-gray-100">
+        <div className="overflow-x-auto  scrollbar-hide rounded-lg shadow-xl border border-gray-100">
           <table className="min-w-full divide-y divide-gray-200 text-sm text-left">
             <thead className="bg-gray-50 text-gray-600 uppercase tracking-wider text-xs">
               <tr>

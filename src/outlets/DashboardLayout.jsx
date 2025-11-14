@@ -40,11 +40,15 @@ export const DashboardLayout = () => {
         <main className="flex-grow p-6 overflow-y-auto z-10">
           <Outlet context={{ toggleSwicht, sidebarOpen }} />
         </main>
+
+
+
         {modalOpen && (
           <div>
-            <UserLogout onClose={() => setMdalOpen(false)} />
+            <UserLogout onclose={() => setMdalOpen(false)} />
           </div>
         )}
+
       </div>
     </div>
   );

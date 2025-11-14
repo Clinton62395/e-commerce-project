@@ -208,6 +208,8 @@ export const ProductUploadForm = ({ onClose }) => {
         mainImage: uploadImages[0],
         picture: uploadImages,
       });
+
+      
       if (productRes.data.data) {
         toast.success("data submitted successful ", { id: toastId });
       }

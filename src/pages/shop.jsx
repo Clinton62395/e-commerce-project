@@ -14,14 +14,29 @@ import Stack from "@mui/material/Stack";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import ScrollTrigger from "gsap/ScrollTrigger";
+
 import gsap from "gsap";
 import { Link } from "react-router-dom";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 
 gsap.registerPlugin(ScrollTrigger);
 
 export const FashionShop = () => {
+  const queryClient = useQueryClient();
+  const {
+    isPending,
+    error,
+    data: product = [],
+  } = useQuery({
+    queryKey: ["products"],
+    staleTime: 1000 * 60 * 5,
+  });
+  console.log("all product fetched in the shop component ", product);
+  console.log("all product fetched in the shop component ", product.length);
+
   const sectionRef = useRef(null);
 
+  if (!sectionRef.current) return;
   useEffect(() => {
     const elements = sectionRef.current.querySelectorAll(".scroll-image");
     gsap.fromTo(
@@ -360,6 +375,18 @@ export const FashionShop = () => {
 
   const clearFilters = () => setActiveFilters({});
 
+  if (isPending) {
+    return (
+      <div className="bg-black bg-opacity-45 flex items-center justify-center min-h-screen">
+        <div className="animate-spin rounded-full h-24 w-24 border-b-2 border-gray-900"></div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return <div>error occurred when fetching products : {error.message}</div>;
+  }
+
   return (
     <div
       ref={sectionRef}
@@ -661,7 +688,7 @@ export const FashionShop = () => {
                         layout === "list" ? "h-48 w-48" : "h-64 w-full"
                       }`}
                     >
-                      <Link to="/product-details">
+                      <Link to="/product-details/:id">
                         <img
                           src={product.src}
                           alt={product.title}
