@@ -11,7 +11,7 @@ import {
   X,
 } from "lucide-react";
 import { ProductUploadForm } from "./uploadFiles";
-import { useActionData, useOutletContext } from "react-router-dom";
+import { Link, useActionData, useOutletContext } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { api } from "../../services/constant";
 import {
@@ -128,16 +128,16 @@ export const DashboardProducts = () => {
     updateMutation.mutate({ _id: productToUpdate._id, data: fullData });
   };
 
+  // if (error) {
+  //   return <div>error occurred when fetching products : {error.message}</div>;
+  // }
+
   if (isPending) {
     return (
-      <div className="bg-black bg-opacity-45 flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-24 w-24 border-b-2 border-gray-900"></div>
+      <div className="bg-black/90 flex items-center justify-center min-h-screen overflow-hidden">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-200"></div>
       </div>
     );
-  }
-
-  if (error) {
-    return <div>error occurred when fetching products : {error.message}</div>;
   }
 
   return (
@@ -163,7 +163,7 @@ export const DashboardProducts = () => {
         </button>
 
         {showUploadModal && (
-          <ProductUploadForm onClose={handleUploadModalClose} />
+          <ProductUploadForm onclose={handleUploadModalClose} />
         )}
       </div>
 
@@ -192,104 +192,121 @@ export const DashboardProducts = () => {
             </tr>
           </thead>
           <tbody className="divide-y text-xs md:text-lg">
-            {products.map((product) => (
-              <tr key={product._id} className="hover:bg-gray-50">
-                <td className="px-2 py-3 md:px-6 md:py-4">
-                  <div className="flex items-center space-x-2 md:space-x-4 overflow-x-auto">
-                    {product.mainImage && (
-                      <div className="flex-shrink-0">
-                        <img
-                          src={product.mainImage}
-                          alt={product._id}
-                          className="w-10 h-10 md:w-16 md:h-16 object-cover rounded-full border border-black"
-                        />
+            {!products || products.length === 0 ? (
+              <div>
+                <div className=" flex items-center justify-center">
+                  <div className="text-center">
+                    <h2 className="text-xl font-semibold text-gray-600">
+                      Product not found
+                    </h2>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              products.map((product) => (
+                <tr key={product._id} className="hover:bg-gray-50">
+                  <td className="px-2 py-3 md:px-6 md:py-4">
+                    <div className="flex items-center space-x-2 md:space-x-4 overflow-x-auto">
+                      {product.mainImage && (
+                        <div className="flex-shrink-0">
+                          <Link to={`/product-details/${product._id}`}>
+                            {" "}
+                            <img
+                              src={product.mainImage.url}
+                              alt={product._id}
+                              className="w-10 h-10 md:w-16 md:h-16 object-cover rounded-full border border-black"
+                            />
+                          </Link>
+                        </div>
+                      )}
+                      <div className="min-w-0">
+                        <p className="font-medium text-gray-800 truncate">
+                          {product.clotheName}
+                        </p>
+                        <p className="text-xs text-gray-500 truncate">
+                          {product.title}
+                        </p>
                       </div>
-                    )}
-                    <div className="min-w-0">
-                      <p className="font-medium text-gray-800 truncate">
-                        {product.clotheName}
-                      </p>
-                      <p className="text-xs text-gray-500 truncate">
-                        {product.title}
-                      </p>
                     </div>
-                  </div>
-                </td>
-                <td className="px-2 py-3 md:px-6 md:py-4">
-                  <span className="px-2 py-1 bg-blue-100 text-blue-700 rounded-full text-xs">
-                    {product.category}
-                  </span>
-                </td>
-                <td className="px-2 py-3 md:px-6 md:py-4 font-medium">
-                  NGN{product.price}
-                </td>
-                <td className="px-2 py-3 md:px-6 md:py-4 font-medium">
-                  <span
-                    className={`${
-                      product.quantity < 50 ? "text-red-600" : "text-green-600"
-                    }`}
-                  >
-                    {product.quantity}
-                  </span>
-                </td>
-                <td className="px-2 py-3 md:px-6 md:py-4">
-                  <div className="flex items-center">
-                    <span className="text-yellow-500 mr-1">⭐</span>
-                    <span>
-                      {(() => {
-                        const releaseDate = product.releaseDate
-                          ? new Date(product.releaseDate)
-                          : null;
-                        const today = new Date();
-
-                        if (
-                          product.quantity > 0 &&
-                          releaseDate &&
-                          releaseDate <= today
-                        ) {
-                          return (
-                            <span className="font-medium text-[#166A42]">
-                              In stock
-                            </span>
-                          );
-                        } else if (releaseDate && releaseDate > today) {
-                          return (
-                            <span className="font-medium text-[#5479CB]">
-                              Coming soon
-                            </span>
-                          );
-                        } else {
-                          return (
-                            <span className="font-medium text-[#FF2929]">
-                              Out of stock
-                            </span>
-                          );
-                        }
-                      })()}
+                  </td>
+                  <td className="px-2 py-3 md:px-6 md:py-4">
+                    <span className="px-2 py-1 bg-blue-100 text-blue-700 rounded-full text-xs">
+                      {product.category}
                     </span>
-                  </div>
-                </td>
-                <td className="px-2 py-3 md:px-6 md:py-4">
-                  <div className="flex space-x-2">
-                    <button
-                      onClick={() => handleModaUpdatelOpen(product)}
-                      className="p-2 text-blue-600 hover:bg-blue-50 rounded"
+                  </td>
+                  <td className="px-2 py-3 md:px-6 md:py-4 font-medium">
+                    NGN{product.price}
+                  </td>
+                  <td className="px-2 py-3 md:px-6 md:py-4 font-medium">
+                    <span
+                      className={`${
+                        product.quantity < 50
+                          ? "text-red-600"
+                          : "text-green-600"
+                      }`}
                     >
-                      <Edit size={18} />
-                    </button>
-                    <button className="p-2 text-gray-600 hover:bg-gray-50 rounded">
-                      <Eye size={18} />
-                    </button>
-                    <button
-                      onClick={() => handleModalOpen(product)}
-                      className="p-2 text-red-600 hover:bg-red-50 rounded"
-                    >
-                      <Trash2 size={18} />
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            ))}
+                      {product.quantity}
+                    </span>
+                  </td>
+                  <td className="px-2 py-3 md:px-6 md:py-4">
+                    <div className="flex items-center">
+                      <span className="text-yellow-500 mr-1">⭐</span>
+                      <span>
+                        {(() => {
+                          const releaseDate = product.releaseDate
+                            ? new Date(product.releaseDate)
+                            : null;
+                          const today = new Date();
+
+                          if (
+                            product.quantity > 0 &&
+                            releaseDate &&
+                            releaseDate <= today
+                          ) {
+                            return (
+                              <span className="font-medium text-[#166A42]">
+                                In stock
+                              </span>
+                            );
+                          } else if (releaseDate && releaseDate > today) {
+                            return (
+                              <span className="font-medium text-[#5479CB]">
+                                Coming soon
+                              </span>
+                            );
+                          } else {
+                            return (
+                              <span className="font-medium text-[#FF2929]">
+                                Out of stock
+                              </span>
+                            );
+                          }
+                        })()}
+                      </span>
+                    </div>
+                  </td>
+                  <td className="px-2 py-3 md:px-6 md:py-4">
+                    <div className="flex space-x-2">
+                      <button
+                        onClick={() => handleModaUpdatelOpen(product)}
+                        className="p-2 text-blue-600 hover:bg-blue-50 rounded"
+                      >
+                        <Edit size={18} />
+                      </button>
+                      <button className="p-2 text-gray-600 hover:bg-gray-50 rounded">
+                        <Eye size={18} />
+                      </button>
+                      <button
+                        onClick={() => handleModalOpen(product)}
+                        className="p-2 text-red-600 hover:bg-red-50 rounded"
+                      >
+                        <Trash2 size={18} />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))
+            )}
           </tbody>
         </table>
       </div>

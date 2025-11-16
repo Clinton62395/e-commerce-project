@@ -18,6 +18,7 @@ import ScrollTrigger from "gsap/ScrollTrigger";
 import gsap from "gsap";
 import { Link } from "react-router-dom";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { getProduct } from "../api/Product.API";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -29,6 +30,7 @@ export const FashionShop = () => {
     data: product = [],
   } = useQuery({
     queryKey: ["products"],
+    queryFn: getProduct,
     staleTime: 1000 * 60 * 5,
   });
   console.log("all product fetched in the shop component ", product);

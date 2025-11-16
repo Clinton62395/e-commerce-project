@@ -13,6 +13,8 @@ import CreatableSelect from "react-select/creatable";
 import { data, useLocation, useOutletContext } from "react-router-dom";
 import axios from "axios";
 import imageCompression from "browser-image-compression";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { onSubmit } from "../../api/Product.API";
 
 const productsSchema = yup.object({
   clotheName: yup.string().required("Clothing name is required"),
@@ -35,8 +37,8 @@ const productsSchema = yup.object({
     .array()
     .of(
       yup.object({
-        value: yup.string().required(),
         label: yup.string().required(),
+        value: yup.string().required(),
       })
     )
     .min(1, "At least one tag is required"),
@@ -44,7 +46,7 @@ const productsSchema = yup.object({
   images: yup
     .array()
     .min(1, "At least one image is required")
-    .max(3, "Maximum 3 images allowed")
+    .max(5, "Maximum 5 images allowed")
     .of(
       yup.object({
         file: yup
@@ -62,8 +64,11 @@ const productsSchema = yup.object({
       })
     ),
 
-  color: yup.string().required("Color is required"),
-  size: yup.string().required("Size is required"),
+  color: yup
+    .array()
+    .of(yup.string())
+    .required("At leat one 1 Color is required"),
+  size: yup.array().of(yup.string()).required("Size is required"),
   quantity: yup
     .number()
     .integer()
@@ -73,13 +78,15 @@ const productsSchema = yup.object({
   description: yup.string().required("Description is required"),
 });
 
-export const ProductUploadForm = ({ onClose }) => {
+export const ProductUploadForm = ({ onclose }) => {
   const { toggleSwicht, sidebarOpen } = useOutletContext();
+  const [toastAc, setToastAc] = useState(false);
+  const queryClient = useQueryClient();
 
   const handleSideOpen = () => {
     if (sidebarOpen) {
       toggleSwicht();
-      onClose();
+      onclose();
     }
   };
 
@@ -93,7 +100,7 @@ export const ProductUploadForm = ({ onClose }) => {
     reset,
     formState: { errors, isSubmitting },
   } = useForm({
-    defaultValues: { tags: [{ value: [""] }], images: [] },
+    defaultValues: { tags: [{ value: [""] }], images: [], size: [], color: [] },
     resolver: yupResolver(productsSchema),
   });
 
@@ -144,19 +151,24 @@ export const ProductUploadForm = ({ onClose }) => {
         at: new Date().toISOString(),
       })
     );
-    toast.success("Draft saved successful");
   };
   // get draft from localstorag
   useEffect(() => {
     try {
+      setToastAc(true);
       const draft = localStorage.getItem("productDraft");
       if (draft) {
         const parsed = JSON.parse(draft);
+        const { images, ...others } = parsed.data;
 
-        Object.keys(parsed.data).forEach((key) => {
-          setValue(key, parsed.data[key]);
+        Object.keys(others).forEach((key) => {
+          setValue(key, others[key]);
         });
-        toast.success("last session data got successful");
+        setToastAc(false);
+        setTimeout(() => {
+          toast.success("last session data got successful");
+          setToastAc(false);
+        }, 1000);
       }
     } catch (err) {
       console.error("error when geting draft from local storage", err);
@@ -164,69 +176,51 @@ export const ProductUploadForm = ({ onClose }) => {
     }
   }, []);
 
-  const onSubmit = async (data) => {
-    try {
-      // 1️⃣ Récupérer la signature depuis ton backend
-      const toastId = toast.loading("data submitting...");
-      const signatureRes = await api.get("/auth/signature");
-      console.log("Signature =>", signatureRes.data);
+  // function form multiple selection
 
-      if (!signatureRes.data) return;
+  const selectedSize = watch("size") || [];
+  const selectedColor = watch("color") || [];
 
-      const { signature, timestamp, cloud_key, cloud_name } = signatureRes.data;
+  const handleSelectSize = (size) => {
+    const current = getValues("size");
+    const updatedSize = current.includes(size)
+      ? current.filter((s) => s !== size)
+      : [...current, size];
+    setValue("size", updatedSize, { shouldValidate: true });
+  };
+  const handleSelectColor = (color) => {
+    const current = getValues("color");
+    const updatedColor = current.includes(color)
+      ? current.filter((c) => c !== color)
+      : [...current, color];
+    setValue("color", updatedColor, { shouldValidate: true });
+  };
 
-      // 2️⃣ Créer le FormData pour l’upload Cloudinary
+  const useonSubmit = useMutation({
+    mutationKey: "products",
+    mutationFn: onSubmit,
 
-      const uploadImages = [];
-
-      for (const imagObj of data.images) {
-        const formData = new FormData();
-        formData.append("file", imagObj.file);
-        console.log("imagefile==>", imagObj);
-        formData.append("timestamp", timestamp);
-        formData.append("signature", signature);
-        formData.append("api_key", cloud_key);
-        // 3️⃣ Upload vers Cloudinary
-        const imageRes = await axios.post(
-          `https://api.cloudinary.com/v1_1/${cloud_name}/image/upload`,
-          formData
-        );
-
-        if (!imageRes.data?.secure_url) return;
-        const { secure_url } = imageRes.data;
-
-        uploadImages.push(secure_url);
-
-        console.log("Cloudinary response links:", uploadImages);
-      }
-
-      // 4️⃣ Poster ton produit ensuite
-      const productRes = await api.post("/products/create", {
-        ...data,
-        tags: data.tags.map((tag) => tag.value),
-        brands: data.brands.value,
-        mainImage: uploadImages[0],
-        picture: uploadImages,
-      });
-
-      
-      if (productRes.data.data) {
-        toast.success("data submitted successful ", { id: toastId });
-      }
+    staleTime: 1000 * 60 * 5,
+    onSuccess: () => {
+      queryClient.invalidateQueries(["products"]);
       reset();
-
-      console.log("Product created:", productRes.data);
-    } catch (err) {
-      console.error("❌ Erreur lors de l'upload :", err);
-
-      if (err.response) {
-        toast.error(
-          err.response.data ||
-            err.response.data?.message ||
-            "error occured when sending data"
-        );
+      onclose?.();
+    },
+    onError: (error) => {
+      if (error.response?.status === 401) {
+        toast.error("Session expirée. Veuillez vous reconnecter.");
+        // Rediriger vers login ou rafraîchir le token
+      } else {
+        toast.error("Erreur lors de l’envoi du produit");
       }
-    }
+    },
+    onSettled: () => {
+      console.log("mutation done");
+    },
+  });
+  const handleSubmittedData = (formData) => {
+    console.log("Form data to submit:", formData);
+    useonSubmit.mutate(formData);
   };
 
   const productColors = [
@@ -294,19 +288,11 @@ export const ProductUploadForm = ({ onClose }) => {
   const productSize = ["M", "L", "X", "XL", "XX,", "XXL"];
 
   // react hook form watch to know the selected color
-  const selectedColor = watch("color");
-  const selectedSize = watch("size");
 
   const images = watch("images");
-  console.log("les contenus de image", images);
 
   return (
-    <div
-      className="fixed inset-0 top-24 min-w-0  flex items-center justify-center bg-black/70 backdrop-blur-sm p-4 transition-all duration-300 w-full"
-      onMouseDown={(e) => {
-        if (e.target === e.currentTarget) onClose?.();
-      }}
-    >
+    <div className="fixed inset-0 top-24 min-w-0  flex items-center justify-center bg-black/70 backdrop-blur-sm p-4 transition-all duration-300 w-full">
       <div
         role="dialog"
         aria-modal="true"
@@ -329,16 +315,16 @@ export const ProductUploadForm = ({ onClose }) => {
               </h2>
             </div>
           </div>
-          {/* <button
-            onClick={handleSideOpen}
+          <button
+            onClick={onclose}
             aria-label="close"
             className="p-2 rounded-lg hover:bg-gray-100 transition-all duration-200 group"
           >
             <X size={20} className="text-gray-500 group-hover:text-gray-700" />
-          </button> */}
+          </button>
         </div>
 
-        <form onSubmit={handleSubmit(onSubmit)}>
+        <form onSubmit={handleSubmit(handleSubmittedData)}>
           <div className="p-8">
             {/* Section Images améliorée */}
             <div className="mb-8">
@@ -352,7 +338,7 @@ export const ProductUploadForm = ({ onClose }) => {
                   </span>
                 </div>
               ) : (
-                <div className="flex min-w-0 justify-center items-center flex-wrap gap-4  md:gap-10 mb-4">
+                <div className="grid grid-cols-2 lg:grid-cols-5 min-w-0 justify-center items-center flex-wrap gap-4  md:gap-2 mb-4">
                   {imageFields
                     .filter((img) => img.preview)
                     .map((src, i) => (
@@ -379,9 +365,9 @@ export const ProductUploadForm = ({ onClose }) => {
                             </button>
                           </div>
 
-                          {isSubmitting && (
+                          {useonSubmit.isPending && (
                             <div className="absolute inset-0 bg-black/50 flex items-center justify-center rounded-xl backdrop-blur-sm">
-                              <div className="w-8 h-8 border-3 border-white border-t-transparent rounded-full animate-spin"></div>
+                              <div className="w-8 h-8 border-3 border-white border-t rounded-full animate-spin"></div>
                             </div>
                           )}
                         </div>
@@ -391,38 +377,42 @@ export const ProductUploadForm = ({ onClose }) => {
               )}
 
               {/* Input Upload amélioré */}
-              <div
-                className="flex items-center justify-center my-6"
-              >
-                <label className="w-32 h-28 md:w-32 md:h-44 border-2 border-dashed border-gray-300 rounded-xl flex flex-col items-center justify-center cursor-pointer hover:border-blue-400 hover:bg-blue-50/30 transition-all duration-300 group">
-                  <Upload
-                    className="text-gray-400 group-hover:text-blue-400 mb-2 transition-colors"
-                    size={32}
-                  />
-                  <span className="text-xs text-gray-500 group-hover:text-blue-600 transition-colors">
-                    Upload Image
-                  </span>
-                  <input
-                    hidden={isSubmitting}
-                    type="file"
-                    name="picture"
-                    multiple
-                    onChange={(e) => {
-                      const files = Array.from(e.target.files);
-                      files.forEach((file) => {
-                        addImage({ file, preview: URL.createObjectURL(file) });
-                      });
-                      e.target.value = null;
-                    }}
-                    className="hidden"
-                    accept="image/*"
-                  />
-                </label>
-              </div>
-              {errors.images?.message && (
-                <p className="text-center font-medium text-sm text-red-500 bg-red-50 py-2 px-4 rounded-lg">
-                  {errors.images.message}
-                </p>
+
+              {images.length < 5 && (
+                <div className="flex items-center justify-center my-6">
+                  <label className="w-32 h-28 md:w-32 md:h-44 border-2 border-dashed border-gray-300 rounded-xl flex flex-col items-center justify-center cursor-pointer hover:border-blue-400 hover:bg-blue-50/30 transition-all duration-300 group">
+                    <Upload
+                      className="text-gray-400 group-hover:text-blue-400 mb-2 transition-colors"
+                      size={32}
+                    />
+                    <span className="flex gap-3 items-center text-xs text-gray-500 group-hover:text-blue-600 transition-colors">
+                      Upload Image {5 - images.length}
+                    </span>
+                    <input
+                      hidden={isSubmitting}
+                      type="file"
+                      name="picture"
+                      multiple
+                      onChange={(e) => {
+                        const files = Array.from(e.target.files);
+                        files.forEach((file) => {
+                          addImage({
+                            file,
+                            preview: URL.createObjectURL(file),
+                          });
+                        });
+                        e.target.value = null;
+                      }}
+                      className="hidden"
+                      accept="image/*"
+                    />
+                    {errors.images?.message && (
+                      <p className="text-center font-medium text-sm text-red-500 bg-red-50 py-2 px-4 rounded-lg">
+                        {errors.images.message}
+                      </p>
+                    )}
+                  </label>
+                </div>
               )}
             </div>
 
@@ -491,18 +481,17 @@ export const ProductUploadForm = ({ onClose }) => {
                   <div className="grid grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-3">
                     {productColors.map((color) => (
                       <button
+                        key={color.label}
                         type="button"
-                        onClick={() => setValue("color", color.value)}
-                        key={color.value}
-                        className="flex flex-col items-center gap-2 cursor-pointer group/color"
+                        onClick={() => handleSelectColor(color.value)}
+                        className={`flex flex-col items-center gap-2 cursor-pointer group/color    `}
                       >
                         <div
-                          className={`h-8 w-8 rounded-full ${
-                            color.color
-                          } transform transition-all duration-200 shadow-sm ring-1  ${
-                            selectedColor === color.value
+                          style={{ backgroundColor: color.value }}
+                          className={`h-8 w-8  rounded-full transform transition-all duration-200 shadow-sm ring-1 ${
+                            selectedColor.includes(color.value)
                               ? "ring-2 ring-offset-2 border border-gradient-to-r from-blue-600 to-purple-600 scale-110 shadow-lg"
-                              : "hover:scale-105 hover:shadow-md group-hover/color:scale-105"
+                              : "hover:scale-105 hover:shadow-md group-hover:color:scale-105"
                           }`}
                         />
                         <span className="text-xs font-medium text-gray-600">
@@ -587,13 +576,13 @@ export const ProductUploadForm = ({ onClose }) => {
                     {productSize.map((size, i) => (
                       <button
                         key={i}
-                        onClick={() => setValue("size", size)}
+                        onClick={() => handleSelectSize(size)}
                         type="button"
                         className="transform transition-all duration-200 hover:scale-105"
                       >
                         <span
                           className={`min-w-12 px-4 py-2.5 rounded-lg font-medium text-sm ${
-                            selectedSize === size
+                            selectedSize.includes(size)
                               ? "bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg"
                               : "bg-gray-100 text-gray-700 hover:bg-gray-200 shadow-sm"
                           } transition-all duration-200`}
@@ -709,30 +698,28 @@ export const ProductUploadForm = ({ onClose }) => {
             {/* Action Buttons améliorés */}
             <div className="flex flex-wrap justify-center gap-6 mt-16 pt-8 border-t border-gray-100">
               <button
-                disabled={data.length === 0 && files.length === 0}
+                type="button"
                 onClick={handleSaveDraft}
-                className={`flex items-center gap-3 px-2 md:px-10 py-3.5 rounded-xl font-semibold transition-all duration-300 ${
-                  data.length === 0 && files.length === 0
-                    ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                    : "bg-gradient-to-r from-gray-700 to-gray-900 text-white hover:shadow-lg transform hover:scale-105"
-                }`}
+                className="flex items-center gap-3 px-2 md:px-10 py-3.5 rounded-xl font-semibold transition-all duration-300  bg-gray-300 cursor-not-allowed
+                    bg-gradient-to-r from-gray-700 to-gray-900 text-white hover:shadow-lg transform hover:scale-105 "
               >
                 <LocalPrintshopIcon />
                 Save Draft
               </button>
               <button
-                disabled={isSubmitting}
+                type="submit"
+                disabled={useonSubmit.isPending}
                 onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
                 className={`flex items-center gap-3 px-2 md:px-10 py-3.5 rounded-xl font-semibold transition-all duration-300 ${
-                  isSubmitting
+                  useonSubmit.isPending
                     ? "bg-gray-400 cursor-not-allowed text-white"
                     : "bg-gradient-to-r from-blue-600 to-purple-600 text-white hover:shadow-lg transform hover:scale-105"
                 }`}
               >
                 <CloudUploadIcon
-                  className={isSubmitting ? "animate-spin" : ""}
+                  className={useonSubmit.isPending ? "animate-spin" : ""}
                 />
-                {isSubmitting ? "Uploading..." : "Upload Product"}
+                {useonSubmit.isPending ? "Uploading..." : "Upload Product"}
               </button>
             </div>
           </div>

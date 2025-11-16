@@ -125,7 +125,7 @@ export const SlidePagination = ({
 }
 
 export const CountdownTimer = ({ children }) => {
-  const endDate = new Date("2025-10-31T23:59:59").getTime();
+  const endDate = new Date("2026-01-31T23:59:59").getTime();
 
   const SegmentDigit = ({ digit }) => {
     // Configuration des segments pour chaque chiffre (0-9)

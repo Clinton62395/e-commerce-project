@@ -1,6 +1,73 @@
 import toast from "react-hot-toast";
 import { api } from "../services/constant";
 import axios from "axios";
+
+// form of upload images and images data to cloudinary and meta data to backend
+
+export const onSubmit = async (data) => {
+  try {
+    // 1️⃣ Récupérer la signature depuis ton backend
+    const signatureRes = await api.get("/auth/signature");
+    console.log("Signature =>", signatureRes.data);
+
+    if (!signatureRes.data) return;
+
+    const { signature, timestamp, cloud_key, cloud_name } = signatureRes.data;
+
+    // 2️⃣ Créer le FormData pour l’upload Cloudinary
+
+    const uploadImages = [];
+
+    for (const imagObj of data.images) {
+      const formData = new FormData();
+      formData.append("file", imagObj.file);
+      console.log("imagefile==>", imagObj);
+      formData.append("timestamp", timestamp);
+      formData.append("signature", signature);
+      formData.append("api_key", cloud_key);
+      // 3️⃣ Upload vers Cloudinary
+      const imageRes = await axios.post(
+        `https://api.cloudinary.com/v1_1/${cloud_name}/image/upload`,
+        formData
+      );
+
+      if (!imageRes?.data) return;
+      const { url: secure_url, public_id } = imageRes.data;
+
+      uploadImages.push({ url: secure_url, public_id });
+
+      console.log("Cloudinary response links:", uploadImages);
+    }
+
+    const payLoad = {
+      ...data,
+      tags: data.tags.map((tag) => tag.value),
+      brands: data.brands.value,
+      mainImage: uploadImages[0],
+      picture: uploadImages,
+    };
+
+    // 4 Poster ton produit ensuite
+    const productRes = await api.post("/products/create", payLoad);
+
+    if (productRes.data.data) {
+      toast.success(productRes.data.message || "data submitted successful ");
+    }
+    console.log("Product created:", productRes.data.data);
+    return productRes.data.data;
+  } catch (err) {
+    console.error("❌ Erreur lors de l'upload :", err);
+
+    if (err.response) {
+      toast.error(
+        err.response.data ||
+          err.response.data?.message ||
+          "error occured when sending data"
+      );
+    }
+  }
+};
+
 export const getProduct = async () => {
   try {
     const res = await api.get("/products/getAll");
@@ -10,18 +77,24 @@ export const getProduct = async () => {
   }
 };
 
-export const getSingleProduct = async (id) => {
+export const getProductById = async (id) => {
   try {
+    if (!id) {
+      toast.error("product id not found");
+      return;
+    }
     const res = await api.get(`products/getOne/${id}`);
-    return res.data.data;
+    console.log("id du product ==>", res.data.data || res.data);
+
+    return res.data.data || res.data;
   } catch (err) {
     console.log("error when getting products  2==>", err);
   }
 };
 
-export const deleteProduct = async (_id) => {
+export const deleteProduct = async (id) => {
   try {
-    const res = await api.delete(`/products/delete/${_id}`);
+    const res = await api.delete(`/products/delete/${id}`);
     if (!res.data.status) {
       throw new Error(
         res.data.message || "error occured when deleting product"
@@ -113,7 +186,8 @@ export const updateProduct = async ({ _id, data }) => {
           return;
         }
 
-        imageUrl = imageRes.data.secure_url;
+        const { secure_url, public_id } = imageRes.data;
+        // imageUrl = imageRes.data.secure_url;
         console.log("Main image URL:", imageUrl);
       } catch (uploadError) {
         console.error("Cloudinary upload error:", uploadError);
@@ -130,7 +204,8 @@ export const updateProduct = async ({ _id, data }) => {
 
     const updateData = {
       ...data,
-      mainImage: imageUrl, // Envoyer l'URL string, pas le File
+      url: mainImage.secure_url, // Envoyer l'URL string, pas le File
+      public_id: mainImage.public_id, // Envoyer l'URL string, pas le File
     };
 
     // Nettoyer les données
