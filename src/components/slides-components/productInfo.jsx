@@ -91,9 +91,9 @@ export const ProductDetails = () => {
     const images = [];
 
     // Ajouter l'image principale si elle existe
-    if (product.mainImage && product.mainImage.url) {
-      images.push(product.mainImage.url);
-    }
+    // if (product.mainImage && product.mainImage.url) {
+    //   images.push(product.mainImage.url);
+    // }
 
     // Ajouter les images secondaires (pictures)
     if (product.picture && Array.isArray(product.picture)) {

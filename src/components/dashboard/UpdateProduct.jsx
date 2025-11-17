@@ -1,14 +1,9 @@
 import React, { useState } from "react";
-import { CloudUploadIcon, Save, Upload, X } from "lucide-react";
+import { CloudUploadIcon, Upload, X } from "lucide-react";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { useForm, useFieldArray, Controller } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import * as yup from "yup";
-import toast from "react-hot-toast";
-import { Eye, EyeOff } from "lucide-react";
-import { api } from "../../services/constant";
-import CreatableSelect from "react-select/creatable";
-import { updateProduct } from "../../api/Product.API";
-import { data } from "react-router-dom";
+
 
 const MAX_FILE_SIZE = 5242880; // 5MB
 const SUPPORTED_FORMATS = ["image/jpg", "image/jpeg", "image/gif", "image/png"];
@@ -46,6 +41,7 @@ export const UpdateProduct = ({
   onclose,
   onConfirme,
   ShowMadal,
+  loading,
   onCancel,
   editingProduct,
 }) => {
@@ -251,18 +247,16 @@ export const UpdateProduct = ({
                 Cancel
               </button>
               <button
-                disabled={isSubmitting}
+                disabled={loading}
                 type="submit"
                 className={`flex items-center gap-3 px-2 md:px-10 py-3.5 rounded-xl font-semibold transition-all duration-300 ${
-                  isSubmitting
+                  loading
                     ? "bg-gray-400 cursor-not-allowed text-white"
                     : "bg-gradient-to-r from-blue-600 to-purple-600 text-white hover:shadow-lg transform hover:scale-105"
                 }`}
               >
-                <CloudUploadIcon
-                  className={isSubmitting ? "animate-spin" : ""}
-                />
-                {isSubmitting ? "Uploading..." : "Upload Product"}
+                <CloudUploadIcon className={loading ? "animate-spin" : ""} />
+                {loading ? "Uploading..." : "Upload Product"}
               </button>
             </div>
           </form>

@@ -1,11 +1,9 @@
 import React, { useState } from "react";
-import {
-  DiscountDeals,
-  MenAccessories,
-  MenFashion,
-  WomenAccessories,
-  WomenFashion,
-} from "../components/slides-components/productsFilters";
+import { MenFashion } from "../components/FashionProduct/FashionMen";
+import { WomenFashion } from "../components/FashionProduct/FashionWomen";
+import { MenAccessories } from "../components/FashionProduct/FashionAccessoriesMen";
+import { WomenAccessories } from "../components/FashionProduct/FashionAccessoriesWomen";
+import { DiscountDeals } from "../components/FashionProduct/DiscountSection";
 
 export const NewProduct = () => {
   const [isActive, setIsActive] = useState("WomenFashion");

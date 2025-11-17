@@ -113,25 +113,24 @@ export const DashboardProducts = () => {
     setProductToUpdate(null);
   };
 
-  const handleConfirmUpdateProduct = (data) => {
+  const handleConfirmUpdateProduct = (formData) => {
     if (!productToUpdate || !productToUpdate._id) {
       toast.error("Produit à mettre à jour non défini");
       return;
     }
+    console.log("formdata to update==>", Object.keys(formData));
 
-    const file = data.mainImage?.[0];
     const fullData = {
-      mainImage: file,
-      ...data,
+      ...formData, // D'abord étendre formData
+
+      // ✅ Si pas de nouvelle image dans formData, utiliser l'image existante
+      mainImage: formData.mainImage || productToUpdate.mainImage,
     };
 
-    updateMutation.mutate({ _id: productToUpdate._id, data: fullData });
+    updateMutation.mutate({ id: productToUpdate._id, data: fullData });
   };
 
-  // if (error) {
-  //   return <div>error occurred when fetching products : {error.message}</div>;
-  // }
-
+  
   if (isPending) {
     return (
       <div className="bg-black/90 flex items-center justify-center min-h-screen overflow-hidden">
@@ -139,7 +138,10 @@ export const DashboardProducts = () => {
       </div>
     );
   }
-
+  
+  // if (error) {
+  //   return <div>error occurred when fetching products : {error.message}</div>;
+  // }
   return (
     <div className="space-y-6">
       <div className="flex justify-center md:justify-between items-center min-w-0 flex-wrap gap-3 max-w-7xl mx-auto">
@@ -331,6 +333,7 @@ export const DashboardProducts = () => {
           onclose={handleCancelUpdatedProduct}
           onConfirme={handleConfirmUpdateProduct}
           onCancel={handleCancelUpdatedProduct}
+          loading={updateMutation.isPending}
         />
       )}
     </div>

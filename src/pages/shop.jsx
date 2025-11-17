@@ -17,36 +17,45 @@ import ScrollTrigger from "gsap/ScrollTrigger";
 
 import gsap from "gsap";
 import { Link } from "react-router-dom";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { getProduct } from "../api/Product.API";
-
 gsap.registerPlugin(ScrollTrigger);
 
 export const FashionShop = () => {
-  const queryClient = useQueryClient();
   const {
-    isPending,
-    error,
-    data: product = [],
+    isLoading,
+    isError,
+    data = [],
   } = useQuery({
     queryKey: ["products"],
     queryFn: getProduct,
     staleTime: 1000 * 60 * 5,
   });
-  console.log("all product fetched in the shop component ", product);
-  console.log("all product fetched in the shop component ", product.length);
 
+  const colors = [...new Set(data.flatMap((item) => item.colors || []))];
+  const tags = [...new Set(data.flatMap((item) => item.tags || []))];
+  const brands = [...new Set(data.flatMap((item) => item.brands || []))];
+  const sizes = [...new Set(data.flatMap((item) => item.size || []))];
+  const prices = [...new Set(data.flatMap((item) => item.price || []))];
+  const collections = [...new Set(data.flatMap((item) => item.category || []))];
+
+  console.log("les valeur extraites de data colors", colors);
+  console.log("les valeur extraites de data tags", tags);
+  console.log("les valeur extraites de data brands", brands);
+  console.log("les valeur extraites de data sizes", sizes);
+  console.log("les valeur extraites de data prices", prices);
+  console.log("les valeur extraites de data category", collections);
+
+  console.log("product from shop==>>", data);
   const sectionRef = useRef(null);
-
-  if (!sectionRef.current) return;
   useEffect(() => {
-    const elements = sectionRef.current.querySelectorAll(".scroll-image");
+    const elements =
+      sectionRef.current?.querySelectorAll(".scroll-image") || [];
+    if (elements.length === 0) return;
+
     gsap.fromTo(
       elements,
-      {
-        opacity: 0,
-        y: 50,
-      },
+      { opacity: 0, y: 50 },
       {
         opacity: 1,
         y: 0,
@@ -55,13 +64,10 @@ export const FashionShop = () => {
         ease: "power2.out",
         clearProps: "all",
         scrollTrigger: {
-          trigger: elements,
+          trigger: sectionRef.current,
           start: "top 90%",
-          bottom: "bottom 10%",
-          toggleActions: "play reverse play reverse",
-
+          end: "bottom 10%",
           scrub: 1,
-          // toggleActions: "play reverse play reverse",
         },
       }
     );
@@ -84,277 +90,33 @@ export const FashionShop = () => {
   const [page, setPage] = useState(1);
   const [activeFilters, setActiveFilters] = useState({});
 
-  const sizes = ["XS", "S", "M", "L", "XL", "XXL"];
-  const colors = [
-    "bg-black",
-    "bg-white border-2",
-    "bg-red-500",
-    "bg-blue-500",
-    "bg-yellow-400",
-    "bg-green-500",
-    "bg-purple-500",
-    "bg-pink-500",
-    "bg-[tomato]",
-    "bg-orange-500",
-    "bg-teal-500",
-    "bg-sky-500",
-    "bg-lime-500",
-    "bg-indigo-500",
-  ];
-  const prices = ["$0 - $50", "$50 - $100", "$100 - $200", "$200+"];
-  const brands = ["Nike", "Adidas", "Puma", "Gucci", "Zara"];
-  const collections = ["Summer", "Winter", "Spring", "Fall"];
-  const tags = ["New", "Sale", "Trending", "Premium"];
+  // const sizes = ["XS", "S", "M", "L", "XL", "XXL"];
+  // const colors = [
+  //   "bg-black",
+  //   "bg-white border-2",
+  //   "bg-red-500",
+  //   "bg-blue-500",
+  //   "bg-yellow-400",
+  //   "bg-green-500",
+  //   "bg-purple-500",
+  //   "bg-pink-500",
+  //   "bg-[tomato]",
+  //   "bg-orange-500",
+  //   "bg-teal-500",
+  //   "bg-sky-500",
+  //   "bg-lime-500",
+  //   "bg-indigo-500",
+  // ];
 
-  const products = [
-    {
-      id: 1,
-      title: "Classic Tee",
-      price: "₦72,000",
-      reducePrice: "₦142,400",
-      src: "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=400&h=400&fit=crop",
-      color1: "bg-black",
-      color2: "bg-white border",
-      color3: "bg-gray-500",
-    },
-    {
-      id: 2,
-      title: "Denim Jacket",
-      price: "₦192,000",
-      reducePrice: "₦302,400",
-      src: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTCGygbQbjP3gy-qPSu9lG8jygABHoeMQsXZg&s",
-      color1: "bg-blue-900",
-      color2: "bg-blue-700",
-    },
-    {
-      id: 3,
-      title: "Summer Dress",
-      price: "₦104,000",
-      reducePrice: "₦206,400",
-      src: "https://st4.depositphotos.com/4678277/20866/i/450/depositphotos_208662024-stock-photo-black-friday-happy-model-girl.jpg",
-      color1: "bg-pink-300",
-      color2: "bg-red-400",
-    },
-    {
-      id: 4,
-      title: "Casual Pants",
-      price: "₦88,000",
-      reducePrice: "₦158,400",
-      src: "https://st2.depositphotos.com/1177973/5621/i/450/depositphotos_56213817-stock-photo-shopping-concept-beautiful-young-woman.jpg",
-      color1: "bg-gray-700",
-      color2: "bg-black",
-    },
-    {
-      id: 5,
-      title: "Sneakers",
-      price: "₦136,000",
-      reducePrice: "₦254,400",
-      src: "https://www.bubblestranslation.com/wp-content/uploads/Top-5-International-Fashion-E-Commerce-Websites-Featured.jpg",
-      color1: "bg-white border",
-      color2: "bg-gray-300",
-    },
-    {
-      id: 6,
-      title: "Leather Belt",
-      price: "₦56,000",
-      reducePrice: "₦110,400",
-      src: "https://img.freepik.com/free-photo/portrait-curly-girl-with-red-lipstick-taking-notes-tablet-pink-background-with-dressees_197531-17620.jpg",
-      color1: "bg-amber-900",
-      color2: "bg-black",
-    },
-    {
-      id: 7,
-      title: "Leather Belt",
-      price: "₦56,000",
-      reducePrice: "₦110,400",
-      src: "/paginationImage1.png",
-      color1: "bg-amber-900",
-      color2: "bg-black",
-    },
-    {
-      id: 8,
-      title: "Leather Belt",
-      price: "₦56,000",
-      reducePrice: "₦110,400",
-      src: "/paginationImage2.png",
-      color1: "bg-amber-900",
-      color2: "bg-black",
-    },
-    {
-      id: 9,
-      title: "Leather Belt",
-      price: "₦56,000",
-      reducePrice: "₦110,400",
-      src: "/paginationImage3.png",
-      color1: "bg-amber-900",
-      color2: "bg-black",
-    },
-    {
-      id: 10,
-      title: "Leather Belt",
-      price: "₦56,000",
-      reducePrice: "₦110,400",
-      src: "/paginationImage4.png",
-      color1: "bg-amber-900",
-      color2: "bg-black",
-    },
-    {
-      id: 11,
-      title: "Leather Belt",
-      price: "₦56,000",
-      reducePrice: "₦110,400",
-      src: "/paginationImage5.png",
-      color1: "bg-amber-900",
-      color2: "bg-black",
-    },
-    {
-      id: 12,
-      title: "Leather Belt",
-      price: "₦56,000",
-      reducePrice: "₦110,400",
-      src: "/paginationImage6.png",
-      color1: "bg-amber-900",
-      color2: "bg-black",
-    },
-    {
-      id: 13,
-      title: "Leather Belt",
-      price: "₦56,000",
-      reducePrice: "₦110,400",
-      src: "/paginationImage7.png",
-      color1: "bg-amber-900",
-      color2: "bg-black",
-    },
-    {
-      id: 14,
-      title: "Leather Belt",
-      price: "₦56,000",
-      reducePrice: "₦110,400",
-      src: "/paginationImage8.png",
-      color1: "bg-amber-900",
-      color2: "bg-black",
-    },
-    {
-      id: 15,
-      title: "Leather Belt",
-      price: "₦56,000",
-      reducePrice: "₦110,400",
-      src: "/paginationImage9.png",
-      color1: "bg-amber-900",
-      color2: "bg-black",
-    },
-    {
-      id: 16,
-      src: "https://images.pexels.com/photos/6311391/pexels-photo-6311391.jpeg",
-      title: "Casual Hoodie",
-      price: "₦44,800",
-      reducePrice: "₦56,000",
-      color1: "h-8 w-8 rounded-full p-2 bg-[#2ECC71]",
-      color2: "h-8 w-8 rounded-full p-2 bg-[#117A65]",
-    },
-    {
-      id: 17,
-      src: "https://images.pexels.com/photos/1701207/pexels-photo-1701207.jpeg",
-      title: "Denim Skirt",
-      price: "₦60,800",
-      reducePrice: "₦72,000",
-      color1: "h-8 w-8 rounded-full p-2 bg-[#5DADE2]",
-      color2: "h-8 w-8 rounded-full p-2 bg-[#2874A6]",
-    },
-    {
-      id: 18,
-      src: "https://images.pexels.com/photos/842811/pexels-photo-842811.jpeg",
-      title: "Classic Trench Coat",
-      price: "₦152,000",
-      reducePrice: "₦176,000",
-      color1: "h-8 w-8 rounded-full p-2 bg-[#D2B48C]",
-      color2: "h-8 w-8 rounded-full p-2 bg-[#BCA77E]",
-    },
-    {
-      id: 19,
-      src: "https://images.pexels.com/photos/1926769/pexels-photo-1926769.jpeg",
-      title: "Sport Tracksuit",
-      price: "₦112,000",
-      reducePrice: "₦136,000",
-      color1: "h-8 w-8 rounded-full p-2 bg-[#1B2631]",
-      color2: "h-8 w-8 rounded-full p-2 bg-[#566573]",
-    },
-    {
-      id: 20,
-      src: "https://images.pexels.com/photos/6311608/pexels-photo-6311608.jpeg",
-      title: "Cargo Pants",
-      price: "₦72,000",
-      reducePrice: "₦88,000",
-      color1: "h-8 w-8 rounded-full p-2 bg-[#5D6D7E]",
-      color2: "h-8 w-8 rounded-full p-2 bg-[#85929E]",
-    },
-    {
-      id: 21,
-      src: "https://images.pexels.com/photos/7679465/pexels-photo-7679465.jpeg",
-      title: "Knitted Cardigan",
-      price: "₦67,200",
-      reducePrice: "₦80,000",
-      color1: "h-8 w-8 rounded-full p-2 bg-[#E59866]",
-      color2: "h-8 w-8 rounded-full p-2 bg-[#D35400]",
-    },
-    {
-      id: 22,
-      src: "https://images.pexels.com/photos/6311607/pexels-photo-6311607.jpeg",
-      title: "Casual Shorts",
-      price: "₦32,000",
-      reducePrice: "₦40,000",
-      color1: "h-8 w-8 rounded-full p-2 bg-[#F4D03F]",
-      color2: "h-8 w-8 rounded-full p-2 bg-[#D68910]",
-    },
-    {
-      id: 23,
-      src: "https://images.pexels.com/photos/2983463/pexels-photo-2983463.jpeg",
-      title: "Women’s Blouse",
-      price: "₦56,000",
-      reducePrice: "₦64,000",
-      color1: "h-8 w-8 rounded-full p-2 bg-[#F5B7B1]",
-      color2: "h-8 w-8 rounded-full p-2 bg-[#E6B0AA]",
-    },
-    {
-      id: 24,
-      src: "https://images.pexels.com/photos/2983462/pexels-photo-2983462.jpeg",
-      title: "Beach Sandals",
-      price: "₦28,800",
-      reducePrice: "₦35,200",
-      color1: "h-8 w-8 rounded-full p-2 bg-[#FAD7A0]",
-      color2: "h-8 w-8 rounded-full p-2 bg-[#EDBB99]",
-    },
-    {
-      id: 25,
-      src: "https://i5.walmartimages.com/seo/Men-s-Stretch-Skinny-Ripped-Jeans-Super-Comfy-Distressed-Denim-Pants-with-Destroyed-Holes_e3498edd-0cc4-4171-975a-7ef6c65c9e51.81c654a015b81b927a575fbf38d10f0a.jpeg",
-      title: "Beach Sandals",
-      price: "₦28,800",
-      reducePrice: "₦35,200",
-      color1: "h-8 w-8 rounded-full p-2 bg-[#FAD7A0]",
-      color2: "h-8 w-8 rounded-full p-2 bg-[#EDBB99]",
-    },
-    {
-      id: 26,
-      src: "/sara.jpg",
-      title: "Beach Sandals",
-      price: "₦28,800",
-      reducePrice: "₦35,200",
-      color1: "h-8 w-8 rounded-full p-2 bg-[#FAD7A0]",
-      color2: "h-8 w-8 rounded-full p-2 bg-[#EDBB99]",
-    },
-    {
-      id: 27,
-      src: "/sar.jpg",
-      title: "Beach Sandals",
-      price: "₦28,800",
-      reducePrice: "₦35,200",
-      color1: "h-8 w-8 rounded-full p-2 bg-[#FAD7A0]",
-      color2: "h-8 w-8 rounded-full p-2 bg-[#EDBB99]",
-    },
-  ];
+  // const prices = ["$0 - $50", "$50 - $100", "$100 - $200", "$200+"];
+  // const brands = ["Nike", "Adidas", "Puma", "Gucci", "Zara"];
+  // const collections = ["Summer", "Winter", "Spring", "Fall"];
+  // const tags = ["New", "Sale", "Trending", "Premium"];
+
+  const products = data || [];
 
   const itemsPerPage = 9;
-  const totalPages = Math.ceil(products.length / itemsPerPage);
+  const totalPages = Math.max(1, Math.ceil(products.length / itemsPerPage));
   const currentIndex = products.slice(
     (page - 1) * itemsPerPage,
     page * itemsPerPage
@@ -377,22 +139,26 @@ export const FashionShop = () => {
 
   const clearFilters = () => setActiveFilters({});
 
-  if (isPending) {
+  if (isLoading) {
     return (
-      <div className="bg-black bg-opacity-45 flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-24 w-24 border-b-2 border-gray-900"></div>
+      <div className="bg-black/90 flex items-center justify-center min-h-screen  overflow-hidden">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-200"></div>
       </div>
     );
   }
 
-  if (error) {
-    return <div>error occurred when fetching products : {error.message}</div>;
+  if (isError) {
+    return (
+      <div className="text-center flex items-center justify-center font-extrabold bg-red-100 shadow-md py-3 px-4">
+        Error occurred when fetching products: {isError.message}
+      </div>
+    );
   }
 
   return (
     <div
       ref={sectionRef}
-      className="min-h-screen bg-gradient-to-r from-gray-50 to-gray-100   "
+      className="min-h-screen bg-gradient-to-r from-gray-50 to-gray-100"
     >
       {/* Header */}
       <div className="bg-white border-b border-gray-100 sticky top-0 z-30 shadow-sm">
@@ -414,10 +180,10 @@ export const FashionShop = () => {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8 ">
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
           {/* Sidebar Filters */}
           <div className="lg:col-span-1 w-full min-h-screen py-8 lg:pt-0">
-            <div className=" sticky top-0 min-h-screen ">
+            <div className="sticky top-0 min-h-screen">
               {/* Clear Filters */}
               {hasActiveFilters && (
                 <button
@@ -625,8 +391,8 @@ export const FashionShop = () => {
           {/* Main Content */}
           <div className="lg:col-span-3">
             {/* Controls */}
-            <div className="flex  items-center gap-2 justify-between mb-6 w-full">
-              <div className="flex items-center gap-3 w-full text-sm font-bold text-gray-700 ">
+            <div className="flex items-center gap-2 justify-between mb-6 w-full">
+              <div className="flex items-center gap-3 w-full text-sm font-bold text-gray-700">
                 {show.BestSelling ? (
                   "Best selling"
                 ) : (
@@ -634,7 +400,7 @@ export const FashionShop = () => {
                 )}
                 <button
                   onClick={() => toggleSwitch("BestSelling")}
-                  className=" flex items-center justify-between p-4 hover:bg-gray-50 transition-colors"
+                  className="flex items-center justify-between p-4 hover:bg-gray-50 transition-colors"
                 >
                   {show.BestSelling ? (
                     <ChevronUp size={18} />
@@ -667,7 +433,7 @@ export const FashionShop = () => {
               </div>
             </div>
 
-            {/* Products */}
+            {/* Products - ADAPTÉ POUR LES DONNÉES API */}
             <div
               className={
                 layout === "grid"
@@ -677,7 +443,7 @@ export const FashionShop = () => {
             >
               {currentIndex.map((product) => (
                 <div
-                  key={product.id}
+                  key={product._id}
                   className={`group bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-lg transition-all ${
                     layout === "list" ? "flex gap-6 p-4" : ""
                   }`}
@@ -690,10 +456,14 @@ export const FashionShop = () => {
                         layout === "list" ? "h-48 w-48" : "h-64 w-full"
                       }`}
                     >
-                      <Link to="/product-details/:id">
+                      <Link to={`/product-details/${product._id}`}>
+                        {" "}
+                        {/* ✅ Lien dynamique */}
                         <img
-                          src={product.src}
-                          alt={product.title}
+                          src={
+                            product.picture?.[0]?.url || product.mainImage?.url
+                          }
+                          alt={product.clotheName || product.title}
                           className="scroll-image w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                         />
                       </Link>
@@ -707,35 +477,64 @@ export const FashionShop = () => {
                     }
                   >
                     <h3 className="font-semibold text-gray-900 mb-2">
-                      {product.title}
+                      {product.clotheName || product.title}{" "}
+                      {/* ✅ Utiliser clotheName */}
                     </h3>
                     <div className="flex items-center gap-3 mb-3">
                       <span className="text-lg font-bold text-gray-900">
-                        {product.price} NGN
+                        {product.discountPrice
+                          ? product.discountPrice.toLocaleString()
+                          : product.price?.toLocaleString()}{" "}
+                        NGN {/* ✅ Prix dynamique */}
                       </span>
-                      {product.reducePrice && (
+                      {product.discountPrice && product.price && (
                         <span className="text-sm text-gray-500 line-through">
-                          {product.reducePrice}NGN
+                          {product.price.toLocaleString()} NGN
                         </span>
                       )}
                     </div>
+
+                    {/* ✅ Couleurs dynamiques depuis l'API */}
                     <div className="flex gap-2">
-                      {product.color1 && (
+                      {product.color && Array.isArray(product.color) ? (
+                        product.color.map((color, index) => (
+                          <div
+                            key={index}
+                            className="w-6 h-6 rounded-full border border-gray-300"
+                            style={{ backgroundColor: color }}
+                          />
+                        ))
+                      ) : product.color ? (
                         <div
-                          className={`w-6 h-6 rounded-full ${product.color1} border border-gray-300`}
+                          className="w-6 h-6 rounded-full border border-gray-300"
+                          style={{ backgroundColor: product.color }}
                         />
-                      )}
-                      {product.color2 && (
-                        <div
-                          className={`w-6 h-6 rounded-full ${product.color2} border border-gray-300`}
-                        />
-                      )}
-                      {product.color3 && (
-                        <div
-                          className={`w-6 h-6 rounded-full ${product.color3} border border-gray-300`}
-                        />
+                      ) : (
+                        // Fallback si pas de couleurs
+                        <div className="w-6 h-6 rounded-full bg-gray-300 border border-gray-300" />
                       )}
                     </div>
+
+                    {product.description && (
+                      <p className="text-sm text-gray-600 mt-2 line-clamp-2">
+                        {product.description}
+                      </p>
+                    )}
+
+                    {/* ✅ Rating si disponible */}
+                    {product.rate && (
+                      <div className="flex items-center gap-1 mt-2">
+                        <span className="text-sm text-yellow-500">
+                          {"★".repeat(Math.floor(product.rate))}
+                        </span>
+                        <span className="text-sm text-gray-400">
+                          {"★".repeat(5 - Math.floor(product.rate))}
+                        </span>
+                        <span className="text-xs text-gray-500 ml-1">
+                          ({product.rate})
+                        </span>
+                      </div>
+                    )}
                   </div>
                 </div>
               ))}

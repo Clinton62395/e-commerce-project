@@ -220,6 +220,7 @@ export const ProductUploadForm = ({ onclose }) => {
   });
   const handleSubmittedData = (formData) => {
     console.log("Form data to submit:", formData);
+
     useonSubmit.mutate(formData);
   };
 
@@ -516,13 +517,13 @@ export const ProductUploadForm = ({ onclose }) => {
                     {...register("category")}
                     className="w-full px-0 py-3 border-0 border-b-2 border-gray-200 focus:border-blue-500 focus:ring-0 text-sm text-gray-600 hover:text-gray-900 transition-all duration-300 appearance-none bg-transparent"
                   >
-                    <option value="">SEARCH CATEGORY</option>
+                    <option value="" disabled>SEARCH CATEGORY</option>
                     <option value="men">Men</option>
                     <option value="women">Women</option>
                     <option value="menAccessories">Men Accessories</option>
                     <option value="womenAccessories">Women Accessories</option>
                   </select>
-                  {errors.category && (
+                  {errors.category?.message && (
                     <p className="font-medium text-sm text-red-500 mt-2 bg-red-50 py-1 px-3 rounded-lg">
                       {errors.category.message}
                     </p>
