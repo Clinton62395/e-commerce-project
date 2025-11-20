@@ -102,34 +102,73 @@ export const FashionShop = () => {
   const [page, setPage] = useState(1);
   const [activeFilters, setActiveFilters] = useState({});
 
-  // const sizes = ["XS", "S", "M", "L", "XL", "XXL"];
-  // const colors = [
-  //   "bg-black",
-  //   "bg-white border-2",
-  //   "bg-red-500",
-  //   "bg-blue-500",
-  //   "bg-yellow-400",
-  //   "bg-green-500",
-  //   "bg-purple-500",
-  //   "bg-pink-500",
-  //   "bg-[tomato]",
-  //   "bg-orange-500",
-  //   "bg-teal-500",
-  //   "bg-sky-500",
-  //   "bg-lime-500",
-  //   "bg-indigo-500",
-  // ];
-
-  // const prices = ["$0 - $50", "$50 - $100", "$100 - $200", "$200+"];
-  // const brands = ["Nike", "Adidas", "Puma", "Gucci", "Zara"];
-  // const collections = ["Summer", "Winter", "Spring", "Fall"];
-  // const tags = ["New", "Sale", "Trending", "Premium"];
+  const hasActiveFilters = Object.values(activeFilters).some(
+    (v) => v !== null && v !== undefined
+  );
 
   const products = data || [];
 
+  // Apply active filters to products before pagination
+  const filteredProducts = products.filter((p) => {
+    // if no active filters, keep all
+    if (!hasActiveFilters) return true;
+
+    let ok = true;
+
+    // size: accept if p.size contains the selected size (or equals)
+    if (activeFilters.size) {
+      const sizes = Array.isArray(p.size) ? p.size : [p.size].filter(Boolean);
+      ok = ok && sizes.includes(activeFilters.size);
+    }
+
+    // color: p.color can be array or string; compare values
+    if (activeFilters.color) {
+      const colors = Array.isArray(p.color)
+        ? p.color
+        : [p.color].filter(Boolean);
+      ok = ok && colors.includes(activeFilters.color);
+    }
+
+    // price: compare numeric equality (or you can map ranges)
+    if (activeFilters.price !== undefined && activeFilters.price !== null) {
+      // if the filter value is a string range (e.g. "$0 - $50"), adapt accordingly.
+      // Here we support direct numeric match.
+      ok =
+        ok &&
+        (p.price === activeFilters.price ||
+          p.price?.toString() === activeFilters.price?.toString());
+    }
+
+    if (activeFilters.brand) {
+      const brands = Array.isArray(p.brands)
+        ? p.brands
+        : [p.brands].filter(Boolean);
+      ok = ok && brands.includes(activeFilters.brand);
+    }
+
+    if (activeFilters.collection) {
+      const cats = Array.isArray(p.category)
+        ? p.category
+        : [p.category].filter(Boolean);
+      ok = ok && cats.includes(activeFilters.collection);
+    }
+
+    if (activeFilters.tag) {
+      const tagsLocal = Array.isArray(p.tags)
+        ? p.tags
+        : [p.tags].filter(Boolean);
+      ok = ok && tagsLocal.includes(activeFilters.tag);
+    }
+
+    return ok;
+  });
+
   const itemsPerPage = 9;
-  const totalPages = Math.max(1, Math.ceil(products.length / itemsPerPage));
-  const currentIndex = products.slice(
+  const totalPages = Math.max(
+    1,
+    Math.ceil(filteredProducts.length / itemsPerPage)
+  );
+  const currentIndex = filteredProducts.slice(
     (page - 1) * itemsPerPage,
     page * itemsPerPage
   );
@@ -143,13 +182,14 @@ export const FashionShop = () => {
       ...prev,
       [category]: prev[category] === value ? null : value,
     }));
+    // Reset to first page whenever filters change
+    setPage(1);
   };
 
-  const hasActiveFilters = Object.values(activeFilters).some(
-    (v) => v !== null && v !== undefined
-  );
-
-  const clearFilters = () => setActiveFilters({});
+  const clearFilters = () => {
+    setActiveFilters({});
+    setPage(1);
+  };
 
   if (isLoading) {
     return (
@@ -262,10 +302,10 @@ export const FashionShop = () => {
                         [...colors].map((color, i) => (
                           <button
                             style={{ backgroundColor: color }}
-                            key={i}
-                            onClick={() => toggleFilter("color", i)}
+                            key={`${color}-${i}`}
+                            onClick={() => toggleFilter("color", color)}
                             className={`w-7 h-7 rounded-full transition-all flex gap-2 items-center flex-wrap ${
-                              activeFilters.color === i
+                              activeFilters.color === color
                                 ? "ring-2 ring-offset-2 ring-gray-900"
                                 : "hover:ring-2 hover:ring-offset-1 hover:ring-gray-400"
                             }`}
@@ -464,133 +504,154 @@ export const FashionShop = () => {
             </div>
 
             {/* Products - ADAPTÉ POUR LES DONNÉES API */}
-            <div
-              className={
-                layout === "grid"
-                  ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
-                  : "space-y-4"
-              }
-            >
-              {currentIndex.map((product) => (
+            {filteredProducts.length === 0 ? (
+              <div className="py-12 col-span-3 text-center">
+                <p className="text-lg font-semibold text-gray-700">
+                  No product match your filters.
+                </p>
+                {hasActiveFilters && (
+                  <div className="mt-4">
+                    <button
+                      onClick={clearFilters}
+                      className="px-4 py-2 bg-gray-900 text-white rounded-md hover:bg-gray-800 transition-colors"
+                    >
+                      Delete all filters
+                    </button>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <>
                 <div
-                  key={product._id}
-                  className={`group bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-lg transition-all ${
-                    layout === "list" ? "flex gap-6 p-4" : ""
-                  }`}
+                  className={
+                    layout === "grid"
+                      ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
+                      : "space-y-4"
+                  }
                 >
-                  <div
-                    className={layout === "list" ? "flex-shrink-0 w-48" : ""}
-                  >
+                  {currentIndex.map((product) => (
                     <div
-                      className={`scroll-image relative overflow-hidden bg-gray-100 ${
-                        layout === "list" ? "h-48 w-48" : "h-64 w-full"
+                      key={product._id}
+                      className={`group bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-lg transition-all ${
+                        layout === "list" ? "flex gap-6 p-4" : ""
                       }`}
                     >
-                      <Link to={`/product-details/${product._id}`}>
-                        {" "}
-                        {/* ✅ Lien dynamique */}
-                        <img
-                          src={
-                            product.picture?.[0]?.url || product.mainImage?.url
-                          }
-                          alt={product.clotheName || product.title}
-                          className="scroll-image w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                        />
-                      </Link>
-                    </div>
-                  </div>
-                  <div
-                    className={
-                      layout === "list"
-                        ? "flex-grow flex flex-col justify-center"
-                        : "p-4"
-                    }
-                  >
-                    <h3 className="font-semibold text-gray-900 mb-2">
-                      {product.clotheName || product.title}{" "}
-                      {/* ✅ Utiliser clotheName */}
-                    </h3>
-                    <div className="flex items-center gap-3 mb-3">
-                      <span className="text-lg font-bold text-gray-900">
-                        {product.discountPrice
-                          ? product.discountPrice.toLocaleString()
-                          : product.price?.toLocaleString()}{" "}
-                        NGN {/* ✅ Prix dynamique */}
-                      </span>
-                      {product.discountPrice && product.price && (
-                        <span className="text-sm text-gray-500 line-through">
-                          {product.price.toLocaleString()} NGN
-                        </span>
-                      )}
-                    </div>
-
-                    {/* ✅ Couleurs dynamiques depuis l'API */}
-                    <div className="flex  justify-between w-full flex-wrap  items-center">
-                      <div className="text-gray-800 text-sm  font-medium">
-                        {" "}
-                        qty: {product.quantity || 0} pcs
-                      </div>
-                      <div className="flex items-center gap-2">
-                        {product.color?.map((color, index) => (
-                          <div className="flex items-center gap-2">
-                            <div
-                              key={index}
-                              className={`w-6 h-6  rounded-full border border-gray-300`}
-                              style={{ backgroundColor: color }}
+                      <div
+                        className={
+                          layout === "list" ? "flex-shrink-0 w-48" : ""
+                        }
+                      >
+                        <div
+                          className={`scroll-image relative overflow-hidden bg-gray-100 ${
+                            layout === "list" ? "h-48 w-48" : "h-64 w-full"
+                          }`}
+                        >
+                          <Link to={`/product-details/${product._id}`}>
+                            {" "}
+                            <img
+                              src={
+                                product.picture?.[0]?.url ||
+                                product.mainImage?.url
+                              }
+                              alt={product.clotheName || product.title}
+                              className="scroll-image w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                             />
+                          </Link>
+                        </div>
+                      </div>
+                      <div
+                        className={
+                          layout === "list"
+                            ? "flex-grow flex flex-col justify-center"
+                            : "p-4"
+                        }
+                      >
+                        <h3 className="font-semibold text-gray-900 mb-2">
+                          {product.clotheName || product.title}
+                        </h3>
+                        <div className="flex items-center gap-3 mb-3">
+                          <span className="text-lg font-bold text-gray-900">
+                            {product.discountPrice
+                              ? product.discountPrice.toLocaleString()
+                              : product.price?.toLocaleString()}{" "}
+                            NGN
+                          </span>
+                          {product.discountPrice && product.price && (
+                            <span className="text-sm text-gray-500 line-through">
+                              {product.price.toLocaleString()} NGN
+                            </span>
+                          )}
+                        </div>
+
+                        <div className="flex  justify-between w-full flex-wrap  items-center">
+                          <div className="text-gray-800 text-sm  font-medium">
+                            {" "}
+                            qty: {product.quantity || 0} pcs
                           </div>
-                        ))}
+                          <div className="flex items-center gap-2">
+                            {product.color?.map((color, index) => (
+                              <div
+                                className="flex items-center gap-2"
+                                key={index}
+                              >
+                                <div
+                                  className={`w-6 h-6  rounded-full border border-gray-300`}
+                                  style={{ backgroundColor: color }}
+                                />
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+
+                        {product.description && (
+                          <p className="text-sm text-gray-600 mt-2 line-clamp-2">
+                            {product.description}
+                          </p>
+                        )}
+
+                        {product.rate && (
+                          <div className="flex items-center gap-1 mt-2">
+                            <span className="text-sm text-yellow-500">
+                              {"★".repeat(Math.floor(product.rate))}
+                            </span>
+                            <span className="text-sm text-gray-400">
+                              {"★".repeat(5 - Math.floor(product.rate))}
+                            </span>
+                            <span className="text-xs text-gray-500 ml-1">
+                              ({product.rate})
+                            </span>
+                          </div>
+                        )}
                       </div>
                     </div>
-
-                    {product.description && (
-                      <p className="text-sm text-gray-600 mt-2 line-clamp-2">
-                        {product.description}
-                      </p>
-                    )}
-
-                    {/* ✅ Rating si disponible */}
-                    {product.rate && (
-                      <div className="flex items-center gap-1 mt-2">
-                        <span className="text-sm text-yellow-500">
-                          {"★".repeat(Math.floor(product.rate))}
-                        </span>
-                        <span className="text-sm text-gray-400">
-                          {"★".repeat(5 - Math.floor(product.rate))}
-                        </span>
-                        <span className="text-xs text-gray-500 ml-1">
-                          ({product.rate})
-                        </span>
-                      </div>
-                    )}
-                  </div>
+                  ))}
                 </div>
-              ))}
-            </div>
 
-            {/* Pagination */}
-            <div className="flex items-center justify-center gap-2 mt-12">
-              <Stack spacing={2}>
-                <Pagination
-                  count={totalPages}
-                  page={page}
-                  onChange={(e, value) => setPage(value)}
-                  renderItem={(item) => (
-                    <PaginationItem
-                      slots={{
-                        previous: ArrowBackIcon,
-                        next: ArrowForwardIcon,
-                      }}
-                      {...item}
-                      size="large"
-                      showFirstButton
-                      showLastButton
-                      color="primary"
+                {/* Pagination */}
+                <div className="flex items-center justify-center gap-2 mt-12">
+                  <Stack spacing={2}>
+                    <Pagination
+                      count={totalPages}
+                      page={page}
+                      onChange={(e, value) => setPage(value)}
+                      renderItem={(item) => (
+                        <PaginationItem
+                          slots={{
+                            previous: ArrowBackIcon,
+                            next: ArrowForwardIcon,
+                          }}
+                          {...item}
+                          size="large"
+                          showFirstButton
+                          showLastButton
+                          color="primary"
+                        />
+                      )}
                     />
-                  )}
-                />
-              </Stack>
-            </div>
+                  </Stack>
+                </div>
+              </>
+            )}
           </div>
         </div>
       </div>

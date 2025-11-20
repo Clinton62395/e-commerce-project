@@ -8,7 +8,7 @@ import { PropagateLoader } from "react-spinners";
 import { getAuth, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 import { api } from "../services/constant";
 import app from "../services/firabase";
-import { Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff, User, Mail, Lock } from "lucide-react";
 
 const schema = yup.object({
   firstName: yup.string().min(3).max(15).required("first Name is required"),
@@ -95,7 +95,7 @@ export const Register = () => {
           error: (err) => err.response.data?.message || error.response?.data,
         }
       );
-      const {  data: userData } = res.data;
+      const { data: userData } = res.data;
       localStorage.setItem("token", res.data.token);
       localStorage.setItem("refreshToken", res.data.refreshToken);
 
@@ -111,21 +111,27 @@ export const Register = () => {
     }
   };
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center py-10 px-4">
-      <div className="max-w-5xl w-full bg-white rounded-2xl shadow-lg overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-gray-100 to-gray-200 py-10 px-4">
+      <div className="max-w-5xl w-full bg-white rounded-2xl shadow-xl overflow-hidden mx-auto">
         <div className="grid grid-cols-1 md:grid-cols-2">
           {/* Left: image (kept as-is) */}
-          <div className="flex items-center justify-center p-6">
+          <div className="relative hidden md:block">
             <img
               src="Rectangle 19280 (1).png"
               alt="FASCO sign up"
-              className="group-hover:shadow-md hover:rounded-md duration-200 transition-all hover:scale-105 max-h-96 w-auto"
+              className="h-full w-full object-cover rounded-l-2xl"
             />
+            <div className="absolute inset-0 bg-black/40 flex items-center justify-center rounded-l-2xl">
+              <div className="text-white text-center p-6">
+                <h2 className="text-3xl font-bold">FASCO</h2>
+                <p className="text-sm">Create your account</p>
+              </div>
+            </div>
           </div>
 
           {/* Right: form */}
           <div className="p-8 md:p-12 flex items-center">
-            <div className="w-full">
+            <div className="w-full max-w-md mx-auto">
               <h2 className="text-3xl font-bold text-gray-900 mb-1">
                 Create an account
               </h2>
@@ -152,6 +158,7 @@ export const Register = () => {
                 <span className="text-xs text-gray-400">or</span>
                 <hr className="flex-1 border-t border-gray-200" />
               </div>
+
               <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                   <div>

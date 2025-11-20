@@ -9,20 +9,44 @@ import * as yup from "yup";
 import { api } from "../services/constant";
 import toast from "react-hot-toast";
 import app from "../services/firabase";
-import { Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff, Mail, Lock } from "lucide-react";
+
 const schema = yup.object({
   email: yup.string().email("Invalid email").required("Email is required"),
-  password: yup.string().required(),
+  password: yup.string().required("Password is required"),
 });
 
 export const Login = () => {
-  const [error, setError] = useState({});
+  const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
 
-  const toggleShoPassword = () => setShowPassword((prev) => !prev);
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors, isSubmitting },
+  } = useForm({ resolver: yupResolver(schema) });
+
+  const toggleShowPassword = () => setShowPassword((s) => !s);
 
   const auth = getAuth(app);
   const provider = new GoogleAuthProvider();
+
+  const sendTokenToBackend = async (token) => {
+    try {
+      const res = await toast.promise(api.post("/auth/google", { token }), {
+        loading: "Signing in...",
+        success: "User signed in",
+        error: (err) => err?.response?.data?.message || "Failed to sign in",
+      });
+      localStorage.setItem("token", res.data.token);
+      localStorage.setItem("refreshToken", res.data.refreshToken);
+      navigate("/shop");
+    } catch (err) {
+      console.error("Error sending token to backend:", err);
+      toast.error("Google sign-in failed");
+    }
+  };
 
   const signInWithGoogle = async () => {
     try {
@@ -30,184 +54,193 @@ export const Login = () => {
       if (res) {
         const user = res.user;
         const token = await user.getIdToken();
-
-        sendTokenToBackend(token);
+        await sendTokenToBackend(token);
       }
     } catch (err) {
-      console.log("error occured when google signing", err);
+      console.error("Google sign-in error:", err);
+      toast.error("Google sign-in failed");
     }
   };
-
-  const sendTokenToBackend = async (token) => {
-    try {
-      const res = await toast.promise(
-        api.post("/auth/google", { token }),
-
-        {
-          loading: " login...",
-          success: "user login successfully",
-          error: (err) => err.response.data?.message || error.response?.data,
-        }
-      );
-      console.log("backend response:", res.data);
-      navigate("/shop");
-    } catch (error) {
-      console.error("error sending token:", error);
-    }
-  };
-
-  const {
-    register,
-    handleSubmit,
-    reset,
-    formState: { errors, isSubmitting },
-  } = useForm({
-    resolver: yupResolver(schema),
-  });
-
-  const navigate = useNavigate();
 
   const onLogin = async (data) => {
-    console.log("Login data submitted:", data);
-
     try {
       const res = await toast.promise(api.post("/auth/login", data), {
-        loading: "user login...",
-        success: "user logged successfully",
-        error: (err) => err.response.data?.message || err.response?.data,
+        loading: "Logging in...",
+        success: "Logged in",
+        error: (err) => err?.response?.data?.message || "Login failed",
       });
 
-      const {  data: userData } = res.data;
-      localStorage.setItem("token", res.data.token);
-      localStorage.setItem("refreshToken", res.data.refreshToken);
+      if (res?.data) {
+        localStorage.setItem("token", res.data.token);
+        localStorage.setItem("refreshToken", res.data.refreshToken);
+      }
 
-
-      
-      navigate("/shop");
       reset();
-      console.log("Response from backend:", userData);
+      navigate("/shop");
     } catch (err) {
       console.error("Login error:", err);
     }
   };
 
   return (
-    <>
-      {" "}
-      <main className=" bg-gray-50 p-5 md:p-10  gap-4 h-screen ">
-        <div className="flex flex-col md:flex-row p-5 rounded-lg shadow-lg border border-gray-200 justify-center items-center ">
-          <div className=" group flex justify-center items-center p-4 md:p-10 w-full md:w-1/3">
+    <div className="min-h-screen bg-gradient-to-br from-gray-100 to-gray-200 py-8 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-5xl mx-auto bg-white rounded-2xl shadow-xl overflow-hidden">
+        <div className="grid grid-cols-1 md:grid-cols-2">
+          {/* Image Section - kept as-is */}
+          <div className="relative hidden md:block">
             <img
               src="Rectangle 19280.png"
-              alt="logo"
-              className="group-hover:shadow-md transition-all duration-200 hover:scale-105 hover:rounded-md"
+              alt="FASCO"
+              className="h-full w-full object-cover rounded-l-2xl"
             />
-          </div>
-          <div className=" text-center w-full md:w-1/2">
-            <h2 className="text-3xl font-bold mb-6">FASCO</h2>
-            <p className="text-gray-500 my-2 lowercase  tracking-wide ">
-              Sign In To FASCO
-            </p>
-            <button
-              onClick={signInWithGoogle}
-              className="relative outline-none border border-[#5B86E5] rounded-md py-2 w-full md:w-1/2  hover:bg-gray-400 duration-150 transition-all"
-            >
-              <span>
-                <img
-                  src="google-logo.png"
-                  alt="google"
-                  className="absolute  left-2 top-0 h-10 "
-                />
-              </span>
-              Sign In with Google
-            </button>
-
-            <div className="flex items-center justify-center my-6">
-              <hr className="w-24  border-t border-[#838383]" />
-              <span className="mx-2 text-gray-500 lowercase  tracking-widest">
-                or
-              </span>
-              <hr className="w-24 border-t border-[#838383]" />
+            <div className="absolute inset-0 bg-black/40 flex items-center justify-center rounded-l-2xl">
+              <div className="text-center text-white p-6">
+                <h2 className="text-3xl font-bold mb-2">FASCO</h2>
+                <p className="text-lg">Welcome back — Sign in to continue</p>
+              </div>
             </div>
-            <form
-              className=" flex flex-col gap-4"
-              onSubmit={handleSubmit(onLogin)}
-            >
-              <label htmlFor="email">
-                <input
-                  type="email"
-                  {...register("email")}
-                  className=" outline-none w-full border-b-2 border-gray-[#9D9D9D] py-2 px-2 md:px-4"
-                  placeholder="email"
-                />
-                <p className="text-xs text-red-500">{errors.email?.message}</p>
-              </label>
+          </div>
 
-              <label htmlFor="password" className="relative">
-                <input
-                  type={showPassword ? "text" : "password"}
-                  {...register("password")}
-                  className=" outline-none w-full border-b-2 border-gray-[#9D9D9D] py-2 px-2 md:px-4 "
-                  placeholder="password"
-                />
-                <p className="text-xs text-red-500">
-                  {errors.password?.message}
-                </p>
-                <button
-                  type="button"
-                  onClick={toggleShoPassword}
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500"
-                  aria-label={showPassword ? "Hide password" : "Show password"}
-                >
-                  {showPassword ? (
-                    <EyeOff className="h-5 w-5" />
-                  ) : (
-                    <Eye className="h-5 w-5" />
-                  )}
-                </button>
-              </label>
-
-              <div className="flex flex-col space-y-4 w-full max-w-sm mx-auto">
-                <button
-                  type="submit"
-                  disabled={isSubmitting}
-                  className={`flex items-center justify-center gap-2 bg-black text-white py-3 rounded-lg font-semibold transition-all duration-200 ${
-                    isSubmitting
-                      ? "opacity-70 cursor-not-allowed"
-                      : "hover:bg-gray-900"
-                  }`}
-                >
-                  {isSubmitting ? (
-                    <span className="flex items-center gap-2">
-                      <PropagateLoader size={10} color="#FF6347" />
-                      <span className="text-sm">Signing in...</span>
-                    </span>
-                  ) : (
-                    <span className="text-sm">Sign In</span>
-                  )}
-                </button>
-
-                <Link
-                  to="/register"
-                  className="text-center py-3 rounded-lg bg-gray-100 text-blue-500 font-medium hover:bg-blue-600 hover:text-white transition-all duration-200"
-                >
-                  Register Now
-                </Link>
+          {/* Form Section */}
+          <div className="p-8 lg:p-10">
+            <div className="w-full max-w-md mx-auto">
+              <div className="text-center mb-6">
+                <h1 className="text-4xl font-bold text-gray-900 mb-2">FASCO</h1>
+                <p className="text-gray-600">Sign in to your account</p>
               </div>
 
-              <Link
-                className="text-[#5B86E5] hover:underline text-end"
-                to="/forget-password"
+              <button
+                onClick={signInWithGoogle}
+                type="button"
+                className={`w-full flex items-center justify-center gap-3 rounded-md py-2 px-4 mb-5 transition-colors border ${
+                  isSubmitting
+                    ? "bg-gray-200 text-gray-500 cursor-not-allowed"
+                    : "border-[#5B86E5] text-[#0f172a]"
+                }`}
+                aria-label="Sign in with Google"
               >
-                Forget Password?
-              </Link>
-            </form>
-            <p className="text-xs text-gray-500 mt-4 text-end w-3/4 md:mt-24 flex justify-end">
-              <a href="#">FASCO Terms & Codnitions</a>
-            </p>
+                <img src="google-logo.png" alt="google" className="h-5" />
+                <span className="font-medium">Sign in with Google</span>
+              </button>
+
+              <div className="flex items-center gap-3 my-4">
+                <hr className="flex-1 border-t border-gray-200" />
+                <span className="text-xs text-gray-400">or</span>
+                <hr className="flex-1 border-t border-gray-200" />
+              </div>
+
+              <form onSubmit={handleSubmit(onLogin)} className="space-y-4">
+                <div>
+                  <label
+                    htmlFor="email"
+                    className="block text-sm font-medium text-gray-700 mb-1"
+                  >
+                    Email address
+                  </label>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                      <Mail className="h-5 w-5 text-gray-400" />
+                    </div>
+                    <input
+                      id="email"
+                      type="email"
+                      {...register("email")}
+                      className="block w-full pl-10 pr-3 py-2.5 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      placeholder="you@example.com"
+                      aria-invalid={errors.email ? "true" : "false"}
+                    />
+                  </div>
+                  <p className="text-xs text-red-500 mt-1">
+                    {errors.email?.message}
+                  </p>
+                </div>
+
+                <div>
+                  <label
+                    htmlFor="password"
+                    className="block text-sm font-medium text-gray-700 mb-1"
+                  >
+                    Password
+                  </label>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                      <Lock className="h-5 w-5 text-gray-400" />
+                    </div>
+                    <input
+                      id="password"
+                      type={showPassword ? "text" : "password"}
+                      {...register("password")}
+                      className="block w-full pl-10 pr-10 py-2.5 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      placeholder="Your password"
+                      aria-invalid={errors.password ? "true" : "false"}
+                    />
+                    <button
+                      type="button"
+                      onClick={toggleShowPassword}
+                      className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                      aria-label={
+                        showPassword ? "Hide password" : "Show password"
+                      }
+                    >
+                      {showPassword ? (
+                        <EyeOff className="h-5 w-5 text-gray-400" />
+                      ) : (
+                        <Eye className="h-5 w-5 text-gray-400" />
+                      )}
+                    </button>
+                  </div>
+                  <p className="text-xs text-red-500 mt-1">
+                    {errors.password?.message}
+                  </p>
+                </div>
+
+                <div>
+                  <button
+                    type="submit"
+                    disabled={isSubmitting}
+                    className={`w-full flex items-center justify-center gap-2 py-3 rounded-md text-white bg-black hover:bg-gray-800 transition-colors ${
+                      isSubmitting ? "opacity-70 cursor-not-allowed" : ""
+                    }`}
+                  >
+                    {isSubmitting ? (
+                      <span className="flex items-center gap-2">
+                        <PropagateLoader size={10} color="#fff" />
+                        <span className="text-sm">Signing in...</span>
+                      </span>
+                    ) : (
+                      <span className="text-sm font-medium">Sign In</span>
+                    )}
+                  </button>
+                </div>
+
+                <p className="text-center text-sm text-gray-600">
+                  Don't have an account?{" "}
+                  <Link
+                    to="/register"
+                    className="text-[#5B86E5] hover:underline"
+                  >
+                    Create one
+                  </Link>
+                </p>
+
+                <div className="text-right">
+                  <Link
+                    to="/forget-password"
+                    className="text-[#5B86E5] hover:underline text-sm"
+                  >
+                    Forget Password?
+                  </Link>
+                </div>
+              </form>
+
+              <p className="text-xs text-gray-500 mt-6 text-center">
+                {" "}
+                <a href="#">FASCO Terms & Conditions</a>
+              </p>
+            </div>
           </div>
         </div>
-      </main>
-    </>
+      </div>
+    </div>
   );
 };
