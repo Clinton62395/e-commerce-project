@@ -10,6 +10,7 @@ export const Modal = ({
   isLoading,
   confirmLabel = "Confirm",
   cancelLabel = "Cancel",
+  isDeleting,
 }) => {
   if (!onclose) return null;
 

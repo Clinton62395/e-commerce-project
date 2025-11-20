@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {
   Edit,
   Eye,
@@ -11,9 +11,8 @@ import {
   X,
 } from "lucide-react";
 import { ProductUploadForm } from "./uploadFiles";
-import { Link, useActionData, useOutletContext } from "react-router-dom";
+import { Link, useOutletContext } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { api } from "../../services/constant";
 import {
   deleteProduct,
   getProduct,
@@ -23,12 +22,16 @@ import toast from "react-hot-toast";
 import { Modal } from "../modal/Logout";
 import { UpdateProduct } from "./UpdateProduct";
 
-export const DashboardProducts = () => {
+export const DashboardProducts = ({ onclose }) => {
   const [showProductModal, setShowProductModal] = useState(false);
   const [showUploadModal, setShowUploadModal] = useState(false);
   const [productToDelete, setProductToDelete] = useState(null);
   const [productToUpdate, setProductToUpdate] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [showPicture, setShowPicture] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState(null);
+
+  const [deleteSpinner, setDeleteSpinner] = useState(null);
 
   const { toggleSwicht, sidebarOpen } = useOutletContext();
 
@@ -96,7 +99,13 @@ export const DashboardProducts = () => {
 
   const handleConfirm = () => {
     if (productToDelete && productToDelete._id) {
-      deleteMutation.mutate(productToDelete._id);
+      setDeleteSpinner(productToDelete._id);
+
+      deleteMutation.mutate(productToDelete._id, {
+        onSettled: () => {
+          setDeleteSpinner(null);
+        },
+      });
     }
     setIsModalOpen(false);
     setProductToDelete(null);
@@ -123,14 +132,19 @@ export const DashboardProducts = () => {
     const fullData = {
       ...formData, // D'abord étendre formData
 
-      // ✅ Si pas de nouvelle image dans formData, utiliser l'image existante
+      //  Si pas de nouvelle image dans formData, utiliser l'image existante
       mainImage: formData.mainImage || productToUpdate.mainImage,
     };
 
     updateMutation.mutate({ id: productToUpdate._id, data: fullData });
   };
 
-  
+  // function to make big image for view
+  const handleShowPicture = useCallback((product) => {
+    setSelectedProduct(product);
+    setShowPicture((prev) => !prev);
+  }, []);
+
   if (isPending) {
     return (
       <div className="bg-black/90 flex items-center justify-center min-h-screen overflow-hidden">
@@ -138,7 +152,7 @@ export const DashboardProducts = () => {
       </div>
     );
   }
-  
+
   // if (error) {
   //   return <div>error occurred when fetching products : {error.message}</div>;
   // }
@@ -210,15 +224,25 @@ export const DashboardProducts = () => {
                   <td className="px-2 py-3 md:px-6 md:py-4">
                     <div className="flex items-center space-x-2 md:space-x-4 overflow-x-auto">
                       {product.mainImage && (
-                        <div className="flex-shrink-0">
+                        <div className=" relative flex-shrink-0">
                           <Link to={`/product-details/${product._id}`}>
                             {" "}
                             <img
                               src={product.mainImage.url}
                               alt={product._id}
-                              className="w-10 h-10 md:w-16 md:h-16 object-cover rounded-full border border-black"
+                              className={`w-10 h-10 md:w-16 md:h-16 ${
+                                deleteSpinner === product._id
+                                  ? " opacity-50"
+                                  : " "
+                              } object-cover rounded-full border border-black`}
                             />
                           </Link>
+
+                          {deleteSpinner === product._id && (
+                            <div className="absolute inset-0 z-10 flex items-center justify-center">
+                              <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-black"></div>
+                            </div>
+                          )}
                         </div>
                       )}
                       <div className="min-w-0">
@@ -295,7 +319,10 @@ export const DashboardProducts = () => {
                       >
                         <Edit size={18} />
                       </button>
-                      <button className="p-2 text-gray-600 hover:bg-gray-50 rounded">
+                      <button
+                        onClick={() => handleShowPicture(product)}
+                        className="p-2 text-gray-600 hover:bg-gray-50 rounded"
+                      >
                         <Eye size={18} />
                       </button>
                       <button
@@ -312,6 +339,31 @@ export const DashboardProducts = () => {
           </tbody>
         </table>
       </div>
+
+      {/* shop picture for previw */}
+      {showPicture && selectedProduct && (
+        <div
+          onClick={handleShowPicture}
+          className="fixed inset-0 bg-black/70 flex items-center justify-center z-50"
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className="relative bg-white p-4 rounded-md shadow-lg"
+          >
+            <button
+              onClick={handleShowPicture}
+              className="absolute top-2 right-2 text-gray-600 hover:text-black"
+            >
+              <X />
+            </button>
+            <img
+              src={selectedProduct.mainImage.url}
+              alt={selectedProduct.title}
+              className="max-w-[90vw] max-h-[80vh] object-contain rounded-md"
+            />
+          </div>
+        </div>
+      )}
 
       {/* Modal de suppression - UN SEUL en dehors de la boucle */}
       {isModalOpen && (

@@ -70,16 +70,16 @@ export const ProductDetails = () => {
     staleTime: 1000 * 60 * 5,
   });
 
-  console.log("Product details:", product);
-  console.log("Product ID:", product._id);
-  console.log("Loading state:", isPending);
-  console.log("Error state:", error);
+  // console.log("Product details:", product);
+  // console.log("Product ID:", product._id);
+  // console.log("Loading state:", isPending);
+  // console.log("Error state:", error);
 
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
   const isTablet = useMediaQuery(theme.breakpoints.between("md", "lg"));
 
-  const { addProduct, handleDecrease, handleIncrease, cart } = UseCart();
+  const { addProduct, handleDerease, handleIncrease, cart } = UseCart();
 
   const handleClickOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
@@ -89,11 +89,6 @@ export const ProductDetails = () => {
     if (!product) return [];
 
     const images = [];
-
-    // Ajouter l'image principale si elle existe
-    // if (product.mainImage && product.mainImage.url) {
-    //   images.push(product.mainImage.url);
-    // }
 
     // Ajouter les images secondaires (pictures)
     if (product.picture && Array.isArray(product.picture)) {
@@ -114,19 +109,14 @@ export const ProductDetails = () => {
 
   const displayImage = allImages[selectedImage] || allImages[0];
 
-  const productInCart = cart.find((item) => item.id === id);
+  const productInCart = cart.find((item) => item._id === product._id);
 
   // Fonction pour ajouter au panier
-  const handleAddToCart = () => {
+  const handleAddToCart = (product) => {
     if (!product) return;
+    alert("no product to add");
 
-    addProduct({
-      id: product._id,
-      name: product.clotheName,
-      price: product.discountPrice || product.price,
-      image: displayImage,
-      quantity: 1,
-    });
+    addProduct();
 
     setIsAddedToCart(true);
     setTimeout(() => setIsAddedToCart(false), 1000);
@@ -406,7 +396,7 @@ export const ProductDetails = () => {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-center">
                 <div className="flex items-center gap-3 justify-center sm:justify-start">
                   <button
-                    onClick={() => handleDecrease(product._id)}
+                    onClick={() => handleDerease(product._id)}
                     className="p-2 border-2 border-gray-300 hover:bg-gray-100 flex items-center justify-center w-10 h-10 rounded-md transition-colors"
                   >
                     <Minus size={18} />
@@ -422,7 +412,7 @@ export const ProductDetails = () => {
                   </button>
                 </div>
                 <button
-                  onClick={handleAddToCart}
+                  onClick={() => addProduct(product)}
                   disabled={isAddedToCart}
                   className={`
                   relative overflow-hidden group
@@ -479,12 +469,15 @@ export const ProductDetails = () => {
                 onClose={handleClose}
                 aria-describedby="alert-dialog-slide-description"
               >
-                <DialogTitle>Ask About This Product</DialogTitle>
+                <DialogTitle>Ask About This Product </DialogTitle>
                 <DialogContent className="p-6">
                   <DialogContentText className="mb-4 text-gray-700 text-sm">
                     Ask your question about this product, we'll reply as soon as
                     possible
                   </DialogContentText>
+                  <div className="flex items-center justify-between mb-4 text-gray-700 text-lg text-center my-3 font-bold">
+                    {product.title}
+                  </div>
                   <textarea
                     placeholder="Your questions here..."
                     className="w-full h-32 resize-none rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 p-3 text-sm"

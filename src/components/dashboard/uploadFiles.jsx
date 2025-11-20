@@ -7,11 +7,9 @@ import { useForm, useFieldArray, Controller } from "react-hook-form";
 import * as yup from "yup";
 import toast from "react-hot-toast";
 import { Eye, EyeOff } from "lucide-react";
-import { api } from "../../services/constant";
 import CreatableSelect from "react-select/creatable";
 
-import { data, useLocation, useOutletContext } from "react-router-dom";
-import axios from "axios";
+import { useOutletContext } from "react-router-dom";
 import imageCompression from "browser-image-compression";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { onSubmit } from "../../api/Product.API";
@@ -32,7 +30,10 @@ const productsSchema = yup.object({
       label: yup.string().required(),
     })
     .required("Brand is required"),
-  category: yup.string().required("category is required"),
+  category: yup
+    .string()
+    .oneOf(["men", "women", "menAccessories", "womenAccessories", "discount"])
+    .required("Category is required"),
   tags: yup
     .array()
     .of(
@@ -68,7 +69,7 @@ const productsSchema = yup.object({
     .array()
     .of(yup.string())
     .required("At leat one 1 Color is required"),
-  size: yup.array().of(yup.string()).required("Size is required"),
+  size: yup.array().of(yup.string()).notRequired(),
   quantity: yup
     .number()
     .integer()
@@ -292,8 +293,30 @@ export const ProductUploadForm = ({ onclose }) => {
 
   const images = watch("images");
 
+  // compressing images using browser compression api
+
+  const handleUploadImage = async (e) => {
+    const files = Array.from(e.target.files);
+
+    const compressedImages = [];
+
+    for (const file of files) {
+      const compressed = await imageCompression(file, {
+        maxSizeMB: 1,
+        maxWidthOrHeight: 1920,
+        useWebWorker: true,
+      });
+      compressedImages.push({
+        file: compressed,
+        preview: URL.createObjectURL(compressed),
+      });
+    }
+
+    compressedImages.forEach((img) => addImage(img));
+  };
+
   return (
-    <div className="fixed inset-0 top-24 min-w-0  flex items-center justify-center bg-black/70 backdrop-blur-sm p-4 transition-all duration-300 w-full">
+    <div className="fixed inset-0 top-24 min-w-0  z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4 transition-all duration-300 w-full">
       <div
         role="dialog"
         aria-modal="true"
@@ -394,16 +417,7 @@ export const ProductUploadForm = ({ onclose }) => {
                       type="file"
                       name="picture"
                       multiple
-                      onChange={(e) => {
-                        const files = Array.from(e.target.files);
-                        files.forEach((file) => {
-                          addImage({
-                            file,
-                            preview: URL.createObjectURL(file),
-                          });
-                        });
-                        e.target.value = null;
-                      }}
+                      onChange={handleUploadImage}
                       className="hidden"
                       accept="image/*"
                     />
@@ -517,11 +531,14 @@ export const ProductUploadForm = ({ onclose }) => {
                     {...register("category")}
                     className="w-full px-0 py-3 border-0 border-b-2 border-gray-200 focus:border-blue-500 focus:ring-0 text-sm text-gray-600 hover:text-gray-900 transition-all duration-300 appearance-none bg-transparent"
                   >
-                    <option value="" disabled>SEARCH CATEGORY</option>
+                    <option value="" disabled>
+                      SEARCH CATEGORY
+                    </option>
                     <option value="men">Men</option>
                     <option value="women">Women</option>
                     <option value="menAccessories">Men Accessories</option>
                     <option value="womenAccessories">Women Accessories</option>
+                    <option value="discount">Discount</option>
                   </select>
                   {errors.category?.message && (
                     <p className="font-medium text-sm text-red-500 mt-2 bg-red-50 py-1 px-3 rounded-lg">
@@ -700,9 +717,13 @@ export const ProductUploadForm = ({ onclose }) => {
             <div className="flex flex-wrap justify-center gap-6 mt-16 pt-8 border-t border-gray-100">
               <button
                 type="button"
+                disabled={useonSubmit.isPending}
                 onClick={handleSaveDraft}
-                className="flex items-center gap-3 px-2 md:px-10 py-3.5 rounded-xl font-semibold transition-all duration-300  bg-gray-300 cursor-not-allowed
-                    bg-gradient-to-r from-gray-700 to-gray-900 text-white hover:shadow-lg transform hover:scale-105 "
+                className={`flex items-center gap-3  px-2 md:px-10 py-3.5 rounded-xl font-semibold transition-all duration-300  ${
+                  useonSubmit.isPending
+                    ? "bg-gray-400 cursor-not-allowed text-white"
+                    : " bg-gray-300      bg-gradient-to-r from-gray-700 to-gray-900 text-white hover:shadow-lg transform hover:scale-105"
+                }  `}
               >
                 <LocalPrintshopIcon />
                 Save Draft

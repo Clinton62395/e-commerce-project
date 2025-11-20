@@ -1,20 +1,39 @@
 import React from "react";
-import { Navigate } from "react-router-dom";
+import { Navigate, useLocation } from "react-router-dom";
 import { useAuth } from "./user_context";
+import { PageLoader } from "./LoadingSpinner";
 
-export const ProtectedRoute = ({ children }) => {
+export const ProtectedRoute = ({ children, fallbackPath = "/login" }) => {
   const { user, loading } = useAuth();
+  const location = useLocation();
 
   if (loading) {
+    return <PageLoader />;
+  }
+
+  // Si pas de user → redirection vers login
+  if (!user) {
     return (
-      <div className=" bg-black bg-opacity-45 flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-24 w-24 border-b-2 border-gray-900"></div>
-      </div>
+      <Navigate
+        to={fallbackPath}
+        state={{ from: location }} // garde la dernière page visitée
+        replace
+      />
     );
   }
 
-  if (!user) return <Navigate to="/login" replace />;
+  // Protection par rôle
+  const roles = user.roles;
 
-  if (user.roles !== "admin") return <Navigate to="/unauthorized" replace />;
+  // Si le token contient un rôle unique (string)
+  if (typeof roles === "string" && roles !== "admin") {
+    return <Navigate to="/unauthorized" replace />;
+  }
+
+  // Si le token contient plusieurs rôles (array)
+  if (Array.isArray(roles) && !roles.includes("admin")) {
+    return <Navigate to="/unauthorized" replace />;
+  }
+
   return children;
 };

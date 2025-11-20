@@ -38,29 +38,28 @@ export const ShopingCart = ({ open: isDrowerOpen, onClose }) => {
         ) : (
           <div className="flex flex-col  gap-5">
             {cart.map((item) => (
-              <div key={item.id} className="border-b pb-2 mb-2">
+              <div key={item._id} className="border-b pb-2 mb-2">
                 <div className="grid grid-cols-2  gap-2">
                   <div className="flex col-span-3 gap-2">
                     Buy more and get
                     <span className="font-bold text-lg">
-                      {ProductPrice(item.image).toLocaleString()} ₦
+                      {ProductPrice(item._id).toLocaleString()} ₦
                     </span>
                     <span className="font-bold text-lg">free shipping</span>
                   </div>
-                  <div className="w-full h-full">
+                  <div className="w-full h-full flex items-center justify-center">
                     <img
-                      src={item.image}
+                      src={item.mainImage.url}
                       alt={item.title}
                       style={{
                         width: "100%",
-                        height: "auto",
                         marginBottom: "8px",
                       }}
-                      className=" object-cover"
+                      className=" object-contain md:h-52 h-24  "
                     />
                   </div>
 
-                  <div className="flex flex-col space-y-2 text-sm">
+                  <div className="flex flex-col space-y-2 text-sm justify-center items-start">
                     <Typography variant="body2">{item.title}</Typography>
                     <Typography variant="body2">
                       Price: {item.price.toLocaleString()} ₦
@@ -70,13 +69,13 @@ export const ShopingCart = ({ open: isDrowerOpen, onClose }) => {
                     </Typography>
 
                     <div>
-                      Color: <div className={item.color1}></div>
+                      Color: <div className={item.color}></div>
                     </div>
                   </div>
                   <div className="flex w-full col-span-2  justify-center items-center gap-2 py-2 bg-[#F1F1F1] rounded-sm shadow ">
                     <Button
                       size="small"
-                      onClick={() => handleDerease(item.image)}
+                      onClick={() => handleDerease(item._id)}
                     >
                       <Minus />
                     </Button>
@@ -85,7 +84,7 @@ export const ShopingCart = ({ open: isDrowerOpen, onClose }) => {
                     </h1>
                     <Button
                       size="small"
-                      onClick={() => handleIncrease(item.image)}
+                      onClick={() => handleIncrease(item._id)}
                     >
                       <Plus />
                     </Button>
@@ -98,7 +97,7 @@ export const ShopingCart = ({ open: isDrowerOpen, onClose }) => {
                     <input
                       type="checkbox"
                       checked={item.giftwrap}
-                      onChange={(e) => toggleGiftWrap(item.image)}
+                      onChange={(e) => toggleGiftWrap(item._id)}
                       className="accent-green-600 w-5 h-5"
                     />
                     <label

@@ -201,13 +201,11 @@ export const TransactionSuccess = () => {
           {payment.status && (
             <div className="inline-block">
               <span
-                className={`px-4 py-2 rounded-full text-sm font-semibold ${
-                  payment.status === "paid"
-                    ? "bg-green-100 text-green-700"
-                    : "bg-yellow-100 text-yellow-700"
-                }`}
+                className={`px-4 py-2 rounded-full text-sm font-semibold bg-green-100 text-green-700
+                   
+                `}
               >
-                {payment.status === "paid" ? "✅ Paid" : "⏳ Pending"}
+                {payment.status}
               </span>
             </div>
           )}
@@ -295,11 +293,24 @@ export const TransactionSuccess = () => {
                   >
                     <div className="flex-1">
                       <p className="font-medium text-gray-800">
-                        {item.name || item.title || "Produit"}
+                        {item?.picture && (
+                          <img
+                            src={item.picture[0].url}
+                            alt={item.title}
+                            className="h-10 w-10 rounded-full"
+                          />
+                        )}{" "}
+                        {item.clotheName || item.title}
                       </p>
-                      <p className="text-sm text-gray-500">
-                        Quantity: {item.quantity || 1}
-                      </p>
+                      <div className="text-sm text-gray-500 flex justify-between items-center">
+                        <span>Quantity: {item.quantity || 1}</span>
+                        {item?.color && (
+                          <span
+                            className="h-10 w-10 rounded-full"
+                            style={{ backgroundColor: item.color }}
+                          ></span>
+                        )}
+                      </div>
                     </div>
                     <p className="font-bold text-gray-800">
                       {item.price ? `${item.price} NGN` : "N/A"}

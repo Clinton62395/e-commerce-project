@@ -39,34 +39,19 @@ export const Provider = ({ children }) => {
     }
   }, [cart]);
 
-  const addProduct = (product, selectedImageUrl) => {
-    if (!product || !selectedImageUrl) return;
-    // const uniqueId = `${product.id}-${selectedImageUrl}`;
-
-    const newProduct = {
-      id: selectedImageUrl, // identifiant unique
-      image: selectedImageUrl,
-      title: product.title,
-      color: product.color1,
-      price: product.price,
-      rate: product.rate,
-      reducePrice: product.reducePrice,
-      size: product.size,
-      deadline: product.deadline,
-      quantity: 1,
-      giftwrap: false,
-    };
+  const addProduct = (product, quantity = 1) => {
+    if (!product) return;
 
     setCart((prev) => {
-      const exists = prev.some((item) => item.id === newProduct.id);
+      const exists = prev.some((item) => item._id === product._id);
 
       const updatedCart = exists
         ? prev.map((item) =>
-            item.id === newProduct.id
-              ? { ...item, quantity: item.quantity + 1 }
+            item._id === product._id
+              ? { ...item, quantity: item.quantity + quantity }
               : item
           )
-        : [...prev, newProduct];
+        : [...prev, { ...product, quantity }];
 
       localStorage.setItem("cart", JSON.stringify(updatedCart));
       return updatedCart;
@@ -74,12 +59,10 @@ export const Provider = ({ children }) => {
   };
 
   // add increase product quantity
-  const handleIncrease = (imageUrl) => {
+  const handleIncrease = (productId) => {
     setCart((prev) => {
       const updated = prev.map((item) =>
-        item.image === imageUrl
-          ? { ...item, quantity: item.quantity + 1 }
-          : item
+        item._id === productId ? { ...item, quantity: item.quantity + 1 } : item
       );
       localStorage.setItem("cart", JSON.stringify(updated));
       return updated;
@@ -87,11 +70,11 @@ export const Provider = ({ children }) => {
   };
 
   // handle decrease product button
-  const handleDerease = (imageUrl) => {
+  const handleDerease = (productId) => {
     setCart((prev) => {
       const updated = prev
         .map((item) =>
-          item.image === imageUrl && item.quantity > 1
+          item._id === productId && item.quantity > 1
             ? { ...item, quantity: item.quantity - 1 }
             : item
         )
@@ -101,16 +84,16 @@ export const Provider = ({ children }) => {
     });
   };
 
-  const handleRemove = (imageUrl) => {
-    setCart((prev) => [...prev.filter((item) => item.id !== imageUrl)]);
+  const handleRemove = (productId) => {
+    setCart((prev) => [...prev.filter((item) => item_id !== productId)]);
   };
 
   const clearCart = () => setCart([]);
 
-  const toggleGiftWrap = (imageUrl) => {
+  const toggleGiftWrap = (productId) => {
     setCart((prev) => {
       const updated = prev.map((item) =>
-        item.image === imageUrl ? { ...item, giftwrap: !item.giftwrap } : item
+        item._id === productId ? { ...item, giftwrap: !item.giftwrap } : item
       );
       localStorage.setItem("cart:", JSON.stringify(updated));
       return updated;
@@ -129,10 +112,11 @@ export const Provider = ({ children }) => {
     return cart.reduce((acc, item) => acc + item.quantity, 0);
   }, [cart]);
 
-  const ProductPrice = (itemId) => {
-    const product = cart.find((item) => item.id === itemId);
+  const ProductPrice = (productId) => {
+    const product = cart.find((item) => item._id === productId);
     return product ? product.price * product.quantity : 0;
   };
+
   const giftCharge = 2000;
   const calculateGiswrap = useMemo(() => {
     const hasGiftWrap = cart.some((item) => item.giftwrap);

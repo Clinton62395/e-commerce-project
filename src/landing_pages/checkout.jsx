@@ -11,6 +11,8 @@ import { api } from "../services/constant";
 import axios from "axios";
 import { PropagateLoader } from "react-spinners";
 import Select from "react-select";
+import { useMutation } from "@tanstack/react-query";
+// import { PhoneInput } from "react-international-phone";
 
 const bankdetailsShemat = yup.object({
   firstName: yup.string().min(3).max(15).required("first Name is required"),
@@ -20,7 +22,7 @@ const bankdetailsShemat = yup.object({
   address: yup.string().required("address is required"),
   postalCode: yup
     .string()
-    .required("code postal is required.") // Rendre le champ obligatoire
+    .required("code postal is required.")
     .matches(/^\d{5}$/, "postalCode must contain exaltly 5 digits"),
   country: yup.object({
     value: yup.string().required("country is required"),
@@ -41,9 +43,10 @@ export const Checkout = ({ displayImage }) => {
     subTotal,
     ProductPrice,
   } = UseCart();
+  console.log("les contenu de cart ==>>", cart);
 
   const singleImagequantity = (imageId) => {
-    const found = cart.find((item) => item.image === imageId);
+    const found = cart.find((item) => item._id === imageId);
     return found ? found.quantity : 0;
   };
 
@@ -70,6 +73,31 @@ export const Checkout = ({ displayImage }) => {
     formState: { errors, isSubmitting },
   } = useForm({
     resolver: yupResolver(bankdetailsShemat),
+  });
+
+  const orderMutation = useMutation({
+    mutationFn: async (payLoad) => {
+      if (payLoad.cartItems.length === 0) {
+        toast.error("no product selected yet");
+        return;
+      }
+      toast.loading("submitting");
+      const res = await api.post("/payment/initialize", payLoad);
+      if (res.data) {
+        reset();
+        window.location.href = res.data.authorization_url;
+
+        console.log("transfer details==>", res.data);
+      }
+    },
+    staleTime: 1000 * 60 * 5,
+    onSuccess: () => {
+      toast.success("payement initialized ");
+      // queryClient.invalidateQueries(["products"]);
+    },
+    onError: () => {
+      toast.error("error when submitting payment form");
+    },
   });
 
   // fetch all country
@@ -99,6 +127,17 @@ export const Checkout = ({ displayImage }) => {
     getAllCountries();
   }, []);
 
+  const onSubmit = (formData) => {
+    const allData = {
+      ...formData,
+      picture: formData.picture,
+      cartItems: cart,
+      amount: totalPrice,
+    };
+
+    orderMutation.mutate(allData);
+  };
+
   const [getSelectedValue, setGetSelectedValue] = useState(null);
 
   const formatOption = ({ label, value, flag }) => {
@@ -109,40 +148,6 @@ export const Checkout = ({ displayImage }) => {
         <span className="font-medium  text-sm md:text-lg">{label}</span>
       </div>
     );
-  };
-
-  const onSubmit = async (formData) => {
-    if (cart.length === 0) {
-      toast.error("no product selected yet");
-      return;
-    }
-    try {
-      const allData = {
-        ...formData,
-        cartItems: cart,
-        amount: totalPrice,
-      };
-      console.log("bank details submitted ==>", allData);
-      const res = await toast.promise(
-        api.post("/payment/initialize", allData),
-        {
-          loading: "submitting...",
-          success: "payement initialized",
-          error: (err) =>
-            err.response?.data ||
-            err.response?.data.message ||
-            "somthing went wrong",
-        }
-      );
-      console.log("transfer details==>", res.data);
-
-      if (res.data) {
-        window.location.href = res.data.authorization_url;
-      }
-      reset();
-    } catch (err) {
-      console.error("error occured when bank details submitted");
-    }
   };
 
   return (
@@ -315,14 +320,14 @@ export const Checkout = ({ displayImage }) => {
             <div className="space-y-4 pt-6">
               <button
                 type="submit"
-                disabled={isSubmitting}
+                disabled={orderMutation.isPending}
                 className={`flex items-center justify-center gap-2 bg-black text-white py-3 w-full rounded-lg font-semibold transition-all duration-200 ${
                   isSubmitting
                     ? "opacity-70 cursor-not-allowed"
                     : "hover:bg-gray-900"
                 }`}
               >
-                {isSubmitting ? (
+                {orderMutation.isPending ? (
                   <span className="flex items-center gap-2">
                     <PropagateLoader size={10} color="#FF6347" />
                     <span className="text-sm">Processing...</span>
@@ -357,13 +362,13 @@ export const Checkout = ({ displayImage }) => {
                 <div className="flex items-center gap-2 w-full min-w-0">
                   <div className="relative">
                     <img
-                      src={item.image}
+                      src={item.mainImage.url}
                       alt={item.title}
                       className="w-52 h-48 object-cover rounded-md relative"
                     />
                     <div className="absolute -top-4 right-1">
                       <Badge
-                        badgeContent={singleImagequantity(item.image)}
+                        badgeContent={singleImagequantity(item._id)}
                         color="error"
                         overlap="circular"
                         showZero
@@ -375,29 +380,28 @@ export const Checkout = ({ displayImage }) => {
                     <div className="flex w-full items-start justify-between min-w-0">
                       <p className="text-sm text-gray-500">
                         color:{" "}
-                        {item.color1 && (
+                        {item.color && (
                           <div
-                            className={`${
-                              item.color1 || "h-8 w-8 rounded-full bg-green-500"
-                            }`}
+                            className="w-8 h-8  rounded-full "
+                            style={{ backgroundColor: item.color }}
                           ></div>
                         )}
                       </p>
                       <p className="text-sm text-gray-500">
-                        SubTotal: {ProductPrice(item.id).toLocaleString()}₦
+                        SubTotal: {ProductPrice(item._id).toLocaleString()}₦
                       </p>
                     </div>
                     <div className="flex gap-2 justify-around items-center bg-slate-100 shadow-sm rounded-md py-2 min-w-0">
-                      <button onClick={() => handleIncrease(item.image)}>
+                      <button onClick={() => handleIncrease(item._id)}>
                         <Plus />
                       </button>
                       <Badge
-                        badgeContent={singleImagequantity(item.image)}
+                        badgeContent={singleImagequantity(item._id)}
                         color="warning"
                         overlap="circular"
                         showZero
                       ></Badge>
-                      <button onClick={() => handleDerease(item.image)}>
+                      <button onClick={() => handleDerease(item._id)}>
                         <Minus />{" "}
                       </button>
                     </div>

@@ -4,10 +4,6 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { useForm } from "react-hook-form";
 import * as yup from "yup";
 
-
-const MAX_FILE_SIZE = 5242880; // 5MB
-const SUPPORTED_FORMATS = ["image/jpg", "image/jpeg", "image/gif", "image/png"];
-
 const productsSchema = yup.object({
   clotheName: yup.string().required("Clothing name is required"),
   price: yup
@@ -15,18 +11,12 @@ const productsSchema = yup.object({
     .positive("Price must be positive")
     .required("Price is required"),
 
-  category: yup.string().required("category is required"),
-  mainImage: yup
-    .mixed()
-    .test("required", "Image is required", (value) => {
-      return value && value.length > 0; // Checks if a file is selected
-    })
-    .test("fileSize", "File size is too large", (value) => {
-      return value && value[0] && value[0].size <= MAX_FILE_SIZE; // Checks file size
-    })
-    .test("fileFormat", "Unsupported file format", (value) => {
-      return value && value[0] && SUPPORTED_FORMATS.includes(value[0].type); // Checks file type
-    }),
+  category: yup
+    .string()
+    .oneOf(["men", "women", "menAccessories", "womenAccessories", "discount"])
+    .required("Category is required"),
+
+  mainImage: yup.string().notRequired(),
 
   quantity: yup
     .number()
@@ -174,10 +164,10 @@ export const UpdateProduct = ({
                   {...register("category")}
                   className="w-full px-3 py-2 border rounded-lg"
                 >
-                  <option>men</option>
-                  <option>women</option>
-                  <option>men accessories</option>
-                  <option>women accessories</option>
+                  <option value={"men"}>men</option>
+                  <option value={"women"}>women</option>
+                  <option value={"menAccessories"}>men accessories</option>
+                  <option value={"womenAccessories"}>women accessories</option>
                 </select>
                 {errors.category && (
                   <p className="text-sm text-red-600 font-medium">

@@ -28,7 +28,7 @@ export const NewProduct = () => {
   ];
 
   return (
-    <div className="container mx-auto p-4 bg-gradient-to-r from-purple-50/30 via-pink-50/50 to-red-50/30 backdrop:blur-md rounded-md my-5 md:my-10">
+    <div className="min-h-screen max-w-full mx-auto p-4 bg-gradient-to-r from-purple-50/30 via-pink-50/50 to-red-50/30 backdrop:blur-md rounded-md my-5 md:my-10">
       <h1 className="text-lg md:text-2xl font-bold mb-4 text-center">
         New Products
       </h1>

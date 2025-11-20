@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { Search } from "lucide-react";
 // CORRECTION: Changement du chemin d'accès relatif pour résoudre l'erreur de compilation
 import toast from "react-hot-toast";
@@ -30,13 +30,24 @@ export const Orders = () => {
   const [transactions, setTransactions] = useState([]);
   const [isConnected, setIsConnected] = useState(socket.connected);
 
+  console.log("les donnees de transaction from orders , top", transactions);
   const { isPending, error, data } = useQuery({
     queryKey: ["allPayments"],
-    queryFn: () => api.get("/payment/all").then((res) => res.data.data),
+    queryFn: async () => {
+      const res = await api.get("/payment/all");
+      if (res.data) {
+        return res.data.data;
+      }
+    },
     staleTime: 1000 * 60 * 10,
   });
 
-  if (isPending) return "Loading...";
+  if (isPending)
+    return (
+      <div className="bg-black/90 flex items-center justify-center min-h-screen overflow-hidden">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-200"></div>
+      </div>
+    );
 
   if (error) return "An error has occurred: " + error.message;
 
@@ -49,21 +60,21 @@ export const Orders = () => {
   useEffect(() => {
     // Charger l'historique
 
-    console.log("🔌 [Orders] Initialisation Socket.IO...");
+    console.log("🔌 [Orders]Socket.IO Initialisation...");
     const handleConnect = () => {
-      console.log("✅ [Orders] Connecté:", socket.id);
+      console.log("✅ [Orders] connected:", socket.id);
       setIsConnected(true);
-      toast.success("Dashboard connecté en temps réel");
+      toast.success("Dashboard connected in reel time");
     };
 
     const handleDisconnect = () => {
-      console.log("❌ [Orders] Déconnecté");
+      console.log("❌ [Orders] disconnect");
       setIsConnected(false);
-      toast.error("Connexion perdue");
+      toast.error("network missing");
     };
 
     const handleNewOrder = (payment) => {
-      console.log("💰 [Orders] Transaction reçue:", payment);
+      console.log("💰 [Orders] Transaction received:", payment);
 
       setTransactions((prev) => {
         const exists = prev.some(
@@ -101,7 +112,7 @@ export const Orders = () => {
       socket.off("order:new", handleNewOrder);
       socket.off("order:updated", handleNewOrder);
     };
-  }, [data]);
+  }, []);
 
   // LOGIQUE DE FILTRAGE
   const filteredTransactions = transactions.filter((transaction) => {
@@ -212,6 +223,7 @@ export const Orders = () => {
                   month: "short",
                   day: "numeric",
                 }).format(createAt);
+                console.log("main items from orders ==>", mainItem);
 
                 return (
                   <tr
@@ -219,20 +231,27 @@ export const Orders = () => {
                     className="hover:bg-gray-50 transition"
                   >
                     <td className="px-6 py-4 flex items-center gap-3">
-                      {transaction.picture && (
+                      {mainItem?.picture.length > 0 ? (
                         <img
-                          src={transaction.picture}
-                          alt={mainItem.title}
-                          className="w-10 h-10 rounded-full object-cover shadow-sm"
+                          src={mainItem?.picture[0]?.url}
+                          alt={mainItem.title || mainItem.className}
+                          className="w-12 h-12 rounded-full object-cover shadow-sm"
                           onError={(e) => {
                             e.target.onerror = null;
                             e.target.src =
                               "https://placehold.co/40x40/cccccc/333333?text=?";
                           }}
                         />
+                      ) : (
+                        <div>
+                          <img
+                            className="w-15 h-15 md:h-10 p-2 rounded-full object-cover shadow-sm"
+                            src="https://image.shutterstock.com/image-vector/picture-icon-isolated-on-white-260nw-1451100425.jpg"
+                          />
+                        </div>
                       )}
                       <span className="font-medium text-gray-800">
-                        {mainItem.title || "N/A"}
+                        {mainItem.title || mainItem.clotheName || "N/A"}
                       </span>
                     </td>
                     <td className="px-6 py-4 text-gray-700">

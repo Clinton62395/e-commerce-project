@@ -46,10 +46,9 @@ export const WomenFashion = () => {
     return () => {
       ScrollTrigger.getAll().forEach((trigger) => trigger.kill());
     };
-  }, [women]); // ✅ Ajouter women comme dépendance pour re-animer quand les données arrivent
+  }, [women]);
 
   const handleHover = (index) => {
-    // ✅ Vérifier que la référence existe
     if (imageRefs.current[index]) {
       gsap.to(imageRefs.current[index], {
         scale: 1.1,
@@ -62,7 +61,6 @@ export const WomenFashion = () => {
   };
 
   const handleLeave = (index) => {
-    // ✅ Vérifier que la référence existe
     if (imageRefs.current[index]) {
       gsap.to(imageRefs.current[index], {
         scale: 1,
@@ -74,7 +72,6 @@ export const WomenFashion = () => {
     }
   };
 
-  // ✅ Corriger les attributs SVG (camelCase pour JSX)
   const svgStar = {
     noted: (
       <svg
@@ -85,8 +82,8 @@ export const WomenFashion = () => {
         xmlns="http://www.w3.org/2000/svg"
       >
         <path
-          fillRule="evenodd" // ✅ fillRule au lieu de fill-rule
-          clipRule="evenodd" // ✅ clipRule au lieu de clip-rule
+          fillRule="evenodd"
+          clipRule="evenodd"
           d="M11.6646 7.12771L9.5 0L7.33536 7.12771H0L5.93479 11.742L3.73214 19L9.5 14.5146L15.2679 19L13.0652 11.742L19 7.12771H11.6646Z"
           fill="#FCA120"
         />
@@ -101,8 +98,8 @@ export const WomenFashion = () => {
         xmlns="http://www.w3.org/2000/svg"
       >
         <path
-          fillRule="evenodd" // ✅ fillRule au lieu de fill-rule
-          clipRule="evenodd" // ✅ clipRule au lieu de clip-rule
+          fillRule="evenodd"
+          clipRule="evenodd"
           d="M11.6646 7.12771L9.5 0L7.33536 7.12771H0L5.93479 11.742L3.73214 19L9.5 14.5146L15.2679 19L13.0652 11.742L19 7.12771H11.6646Z"
           fill="#b9b7b5"
         />
@@ -126,7 +123,6 @@ export const WomenFashion = () => {
     );
   }
 
-  // ✅ Vérifier que women est un tableau avant de mapper
   if (!women || women.length === 0) {
     return (
       <div className="text-center py-8">
@@ -139,7 +135,7 @@ export const WomenFashion = () => {
 
   return (
     <div ref={sectionRef}>
-      <main className="mx-auto w-full md:max-w-6xl p-2 overflow-x-hidden">
+      <main className="max-w-full w-full md:max-w-7xl p-2  mx-auto">
         <div className="text-center">
           <h1 className="text-3xl font-semibold my-2">New Arrivals</h1>
           <p className="text-sm w-full p-4 md:w-1/2 mx-auto">
@@ -149,67 +145,108 @@ export const WomenFashion = () => {
         </div>
 
         <div className="flex items-center justify-center mt-4">
-          {/*  Restructurer la grille - un conteneur principal pour toutes les cartes */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full">
-            {women.map((item, index) => (
+            {women.map((product, index) => (
               <div
-                key={item._id}
+                key={product._id}
                 className="group relative duration-200 transition-all rounded-md shadow-sm hover:shadow-md p-4 border border-gray-100"
                 onMouseEnter={() => handleHover(index)}
                 onMouseLeave={() => handleLeave(index)}
               >
-                {/*  Conteneur pour les images du produit */}
-                <div className="relative">
-                  <div className="grid grid-cols-2 md:grid-cols-4 w-full gap-2 mb-4">
-                    {item?.picture.map((img, i) => (
-                      <Link key={i} to={`/product-details/${item._id}`}>
-                        <img
-                          src={img.url}
-                          alt={`${item.clotheName} ${i + 1}`}
-                          className="w-full h-36 object-cover rounded-md"
-                        />
-                      </Link>
-                    ))}
-                  </div>
+                {/* ✅ CORRECTION : Utiliser pictures au lieu de picture */}
+                <div className="relative w-full h-80 mb-4 overflow-hidden rounded-lg">
+                  <Link to={`/product-details/${product._id}`}>
+                    <img
+                      ref={(el) => (imageRefs.current[index] = el)}
+                      src={
+                        product.picture?.[0]?.url ||
+                        product.mainImag?.url ||
+                        "/placeholder-image.jpg"
+                      }
+                      alt={product.clotheName}
+                      className="scroll-image w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    />
+                  </Link>
 
-                  {/* Overlay (Hors de la grille) */}
-                  <div className="absolute inset-0 bg-black opacity-0 group-hover:opacity-10 transition-opacity duration-200 rounded-md pointer-events-none"></div>
+                  {/* ✅ Overlay effet hover */}
+                  <div className="absolute inset-0 bg-black opacity-0 group-hover:opacity-10 transition-opacity duration-200 rounded-lg pointer-events-none"></div>
                 </div>
+                {/* ✅ CORRECTION : Mini-grille pour les images secondaires */}
+                {product.picture && product.picture.length > 1 && (
+                  <div className="grid grid-cols-3 gap-2 mb-4">
+                    {product.picture.slice(1, 4).map((img, i) => (
+                      <img
+                        key={i}
+                        src={img.url || img}
+                        alt={`${product.clotheName} ${i + 2}`}
+                        className="w-full h-20 object-cover rounded-md opacity-80 hover:opacity-100 transition-opacity cursor-pointer"
+                      />
+                    ))}
+                    {product.picture.length > 4 && (
+                      <div className="w-full h-20 bg-gray-100 rounded-md flex items-center justify-center text-xs text-gray-500">
+                        +{product.picture.length - 4}
+                      </div>
+                    )}
+                  </div>
+                )}
 
-                {/*  Informations du produit */}
+                {/* Informations du produit */}
                 <div className="mt-4">
-                  <h3 className="font-semibold text-lg">{item.clotheName}</h3>
+                  <h3 className="font-semibold text-lg">
+                    {product.clotheName}
+                  </h3>
                   <p className="text-gray-600 text-sm mt-1 line-clamp-2">
-                    {item.description}
+                    {product.description}
                   </p>
 
                   <div className="flex justify-between items-center mt-3">
                     <div className="flex items-center gap-1">
-                      {/* ✅ Afficher les étoiles selon la note */}
                       {[...Array(5)].map((_, i) => (
                         <span key={i}>
-                          {i < Math.floor(item.rate || 0)
+                          {i < Math.floor(product.rate || 0)
                             ? svgStar.noted
                             : svgStar.noNoted}
                         </span>
                       ))}
                       <span className="text-sm text-gray-500 ml-1">
-                        ({item.rate || 0})
+                        ({product.rate || 0})
                       </span>
                     </div>
                     <span className="font-bold text-lg">
-                      {item.price?.toLocaleString()} NGN
+                      {product.price?.toLocaleString()} NGN
                     </span>
                   </div>
 
-                  {item.discountPrice && (
+                  {product.discountPrice && (
                     <div className="flex justify-between items-center mt-1">
                       <span className="text-red-600 font-semibold">
-                        {item.discountPrice.toLocaleString()} NGN
+                        {product.discountPrice.toLocaleString()} NGN
                       </span>
                       <span className="text-gray-500 line-through text-sm">
-                        {item.price?.toLocaleString()} NGN
+                        {product.price?.toLocaleString()} NGN
                       </span>
+                    </div>
+                  )}
+
+                  {/* ✅ Afficher les couleurs si disponibles */}
+                  {product.color && (
+                    <div className="flex gap-2 mt-3">
+                      {Array.isArray(product.color) ? (
+                        product.color
+                          .slice(0, 3)
+                          .map((color, i) => (
+                            <div
+                              key={i}
+                              className="w-6 h-6 rounded-full border border-gray-300"
+                              style={{ backgroundColor: color }}
+                            />
+                          ))
+                      ) : (
+                        <div
+                          className="w-6 h-6 rounded-full border border-gray-300"
+                          style={{ backgroundColor: product.color }}
+                        />
+                      )}
                     </div>
                   )}
                 </div>

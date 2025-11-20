@@ -95,7 +95,10 @@ export const Register = () => {
           error: (err) => err.response.data?.message || error.response?.data,
         }
       );
-      const { token, data: userData } = res.data;
+      const {  data: userData } = res.data;
+      localStorage.setItem("token", res.data.token);
+      localStorage.setItem("refreshToken", res.data.refreshToken);
+
       console.log("data sent to te backend from register ==>", userData);
 
       localStorage.setItem("token", token);

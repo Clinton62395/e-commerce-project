@@ -117,7 +117,7 @@ export const updateProduct = async ({ id, data }) => {
 
     const toastId = toast.loading("Updating product...");
 
-    // 1. SIGNATURE CLOUDINARY
+    // SIGNATURE CLOUDINARY
     const signatureRes = await api.get("/auth/signature");
     if (!signatureRes.data) {
       toast.error("Failed to get cloudinary signature", { id: toastId });
@@ -126,104 +126,47 @@ export const updateProduct = async ({ id, data }) => {
 
     const { signature, timestamp, cloud_key, cloud_name } = signatureRes.data;
 
-    let imageUrl = data.mainImage.url || "";
-    let publicId = data.mainImage.public_id || "";
-
-    // 2. CORRECTION: Gérer FileList correctement
+    // Analyse de la nouvelle image
     let file = null;
 
-    if (data.mainImage instanceof FileList) {
-      file = data.mainImage.length > 0 ? data.mainImage[0] : null;
-    } else if (Array.isArray(data.mainImage)) {
-      file = data.mainImage.length > 0 ? data.mainImage[0] : null;
+    if (data.mainImage instanceof FileList) file = data.mainImage[0] || null;
+    else if (Array.isArray(data.mainImage)) file = data.mainImage[0] || null;
+    else if (data.mainImage instanceof File) file = data.mainImage;
+
+    // On clone data AVANT modification
+    const updateData = { ...data };
+
+    // ❗IMPORTANT : si aucune nouvelle image → on supprime cette clé
+    if (!file) {
+      delete updateData.mainImage;
     } else {
-      file = data.mainImage;
-    }
-
-    console.log("File extracted:", file);
-    console.log("File type:", typeof file);
-    console.log("Is File instance:", file instanceof File);
-
-    // 3. UPLOAD CLOUDINARY SI NOUVEAU FICHIER
-    if (file && file instanceof File) {
-      console.log("Starting upload to Cloudinary...");
-
+      // Upload Cloudinary
       const formData = new FormData();
       formData.append("file", file);
       formData.append("timestamp", timestamp);
       formData.append("signature", signature);
       formData.append("api_key", cloud_key);
-      // ⚠️ IMPORTANT: Ajouter upload_preset si nécessaire
-      // formData.append("upload_preset", "your_upload_preset");
 
-      try {
-        const imageRes = await axios.post(
-          `https://api.cloudinary.com/v1_1/${cloud_name}/image/upload`,
-          formData,
-          {
-            headers: {
-              "Content-Type": "multipart/form-data",
-            },
-            timeout: 30000,
-          }
-        );
+      const imageRes = await axios.post(
+        `https://api.cloudinary.com/v1_1/${cloud_name}/image/upload`,
+        formData,
+        { headers: { "Content-Type": "multipart/form-data" } }
+      );
 
-        console.log("Cloudinary response:", imageRes.data);
-
-        if (!imageRes.data?.secure_url) {
-          toast.error("Cloudinary upload failed - no secure_url", {
-            id: toastId,
-          });
-          return;
-        }
-
-        // ✅ CORRECTION: Stocker les valeurs de Cloudinary
-        imageUrl = imageRes.data.secure_url;
-        publicId = imageRes.data.public_id;
-
-        console.log("New image URL:", imageUrl);
-        console.log("New public ID:", publicId);
-      } catch (uploadError) {
-        console.error("Cloudinary upload error:", uploadError);
-        console.error("Upload error response:", uploadError.response?.data);
-        toast.error("Image upload failed", { id: toastId });
-        return;
-      }
-    } else {
-      console.log("No new file to upload, using existing image");
-      // ✅ Si pas de nouveau fichier, on garde les anciennes valeurs
-      imageUrl;
-      publicId;
+      // Injecte la nouvelle image
+      updateData.mainImage = {
+        url: imageRes.data.secure_url,
+        public_id: imageRes.data.public_id,
+      };
     }
 
-    // 4. PRÉPARER LES DONNÉES POUR LE BACKEND
-    console.log("Sending to backend...", { id, imageUrl, publicId });
-
-    const updateData = {
-      ...data,
-      mainImage: {
-        url: imageUrl,
-        public_id: publicId,
-      },
-    };
-
-    delete updateData.mainImageUrl;
-    delete updateData.url;
-    delete updateData.public_id;
-
-    console.log("Final update data:", updateData);
-
-    // ✅ CORRECTION: Utiliser le bon paramètre (id au lieu de _id)
+    // UPDATE BACKEND
     const response = await api.put(`/products/update/${id}`, updateData);
 
-    console.log("Backend response:", response.data);
-    if (response.data.data) {
-      toast.success("Product updated successfully", { id: toastId });
-      return response.data.data;
-    }
+    toast.success("Product updated successfully", { id: toastId });
+    return response.data.data;
   } catch (err) {
     console.error("Error in updateProduct:", err);
-    console.error("Error response:", err.response?.data);
     toast.error(
       "Update failed: " + (err.response?.data?.message || err.message)
     );
@@ -235,7 +178,7 @@ export const useProductsByCategory = (category) => {
     queryKey: ["products", category],
     queryFn: async () => {
       const res = await api.get(`/products/filters?category=${category}`);
-      return res.data?.data || []; 
+      return res.data?.data || [];
     },
     staleTime: 1000 * 60 * 5,
   });

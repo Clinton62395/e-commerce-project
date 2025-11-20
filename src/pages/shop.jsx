@@ -32,7 +32,19 @@ export const FashionShop = () => {
     staleTime: 1000 * 60 * 5,
   });
 
-  const colors = [...new Set(data.flatMap((item) => item.colors || []))];
+  const colors = [
+    ...new Set(
+      data.flatMap((item) => {
+        if (Array.isArray(item.color)) {
+          return item.color;
+        }
+        if (typeof item.color === "string") {
+          return [item.color]; // on garde la string entière
+        }
+        return [];
+      })
+    ),
+  ];
   const tags = [...new Set(data.flatMap((item) => item.tags || []))];
   const brands = [...new Set(data.flatMap((item) => item.brands || []))];
   const sizes = [...new Set(data.flatMap((item) => item.size || []))];
@@ -495,24 +507,22 @@ export const FashionShop = () => {
                     </div>
 
                     {/* ✅ Couleurs dynamiques depuis l'API */}
-                    <div className="flex gap-2">
-                      {product.color && Array.isArray(product.color) ? (
-                        product.color.map((color, index) => (
-                          <div
-                            key={index}
-                            className="w-6 h-6 rounded-full border border-gray-300"
-                            style={{ backgroundColor: color }}
-                          />
-                        ))
-                      ) : product.color ? (
-                        <div
-                          className="w-6 h-6 rounded-full border border-gray-300"
-                          style={{ backgroundColor: product.color }}
-                        />
-                      ) : (
-                        // Fallback si pas de couleurs
-                        <div className="w-6 h-6 rounded-full bg-gray-300 border border-gray-300" />
-                      )}
+                    <div className="flex  justify-between w-full flex-wrap  items-center">
+                      <div className="text-gray-800  font-medium">
+                        {" "}
+                        qty: {product.quantity || 0} pcs
+                      </div>
+                      <div className="flex items-center gap-2">
+                        {colors?.map((color, index) => (
+                          <div className="flex items-center gap-2">
+                            <div
+                              key={index}
+                              className={`w-6 h-6  rounded-full border border-gray-300`}
+                              style={{ backgroundColor: color }}
+                            />
+                          </div>
+                        ))}
+                      </div>
                     </div>
 
                     {product.description && (

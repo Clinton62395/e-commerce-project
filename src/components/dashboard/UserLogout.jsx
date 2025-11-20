@@ -1,50 +1,37 @@
 import React, { useState } from "react";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
-import { RingLoader } from "react-spinners";
 import { Modal } from "../modal/Logout";
+import { useAuth } from "../../services/user_context";
 
 export const UserLogout = ({ onclose }) => {
-  const [error, setError] = useState("");
-  const [isLoading, setIsloading] = useState(false);
+  const { logout } = useAuth();
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   const navigate = useNavigate();
 
   const handleLogout = () => {
-    const token = localStorage.getItem("token");
+    setIsLoggingOut(true);
 
-    if (!token) {
-      setError("Token missing");
-      setIsloading(true);
-      setTimeout(() => {
-        setIsloading(false);
-        navigate("/admin-login");
-      }, 1500);
-      return;
-    }
-
-    setIsloading(true);
-    localStorage.removeItem("token");
-
+    
     setTimeout(() => {
+      logout(); 
       toast.success("Secured logout");
-      setIsloading(false);
-      setError("");
-      navigate("/");
-    }, 2000);
+      setIsLoggingOut(false);
+      navigate("/"); 
+      if (onclose) onclose();
+    }, 1000); 
   };
 
   return (
-    <>
-      <Modal
-        onConfirme={handleLogout}
-        onclose={onclose}
-        confirmLabel="Confirme"
-        cancelLabel="Cancel"
-        title="Logout"
-        message="Do you want to logout"
-        isLoading={isLoading}
-      />
-    </>
+    <Modal
+      onConfirme={handleLogout}
+      onclose={onclose}
+      confirmLabel="Confirme"
+      cancelLabel="Cancel"
+      title="Logout"
+      message="Do you want to logout?"
+      isLoading={isLoggingOut} 
+    />
   );
 };

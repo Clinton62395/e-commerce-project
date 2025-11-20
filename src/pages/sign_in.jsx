@@ -77,8 +77,12 @@ export const Login = () => {
         error: (err) => err.response.data?.message || err.response?.data,
       });
 
-      const { token, data: userData } = res.data;
-      localStorage.setItem("token", token);
+      const {  data: userData } = res.data;
+      localStorage.setItem("token", res.data.token);
+      localStorage.setItem("refreshToken", res.data.refreshToken);
+
+
+      
       navigate("/shop");
       reset();
       console.log("Response from backend:", userData);

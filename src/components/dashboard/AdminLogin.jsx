@@ -3,8 +3,10 @@ import { ArrowLeft, Eye, EyeOff, Lock, Mail, Undo2 } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import { api } from "../../services/constant";
+import { useAuth } from "../../services/user_context";
 
 export const AdminLogin = () => {
+  const { user, loading, setUser, login } = useAuth();
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     email: "",
@@ -43,16 +45,14 @@ export const AdminLogin = () => {
         });
 
         if (res.data) {
-          const { token } = res.data || res.data.data;
-
-          localStorage.setItem("token", token);
+          localStorage.setItem("token", res.data.token);
+          localStorage.setItem("refreshToken", res.data.refreshToken);
           localStorage.setItem("adminData", JSON.stringify(res.data.data));
+          login(res.data.token);
+          navigate("/admin-dashboard");
 
           setIsLoading(false);
-          navigate("/admin-dashboard");
         }
-
-        
       } catch (error) {
         setErrors({ submit: "Failed to login. Please try again." });
       } finally {

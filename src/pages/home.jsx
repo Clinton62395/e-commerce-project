@@ -123,8 +123,8 @@ export const Home = () => {
         </div>
 
         <div className="min-h-screen flex flex-col  ">
-          {/* new prouct monponent  */}
           <NewProduct />
+          {/* new prouct monponent  */}
           {/* service time component */}
           <ServiceTime />
 
