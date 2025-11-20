@@ -219,6 +219,7 @@ export const ProductUploadForm = ({ onclose }) => {
       console.log("mutation done");
     },
   });
+
   const handleSubmittedData = (formData) => {
     console.log("Form data to submit:", formData);
 
@@ -352,83 +353,74 @@ export const ProductUploadForm = ({ onclose }) => {
           <div className="p-8">
             {/* Section Images améliorée */}
             <div className="mb-8">
-              {!images.some((img) => img.preview) ? (
-                <div className="text-center py-12 border-2 border-dashed border-gray-200 rounded-2xl bg-gray-50/50 hover:bg-gray-50 transition-colors duration-300">
-                  <p className="text-gray-500 text-lg mb-4">
-                    No image added yet
-                  </p>
-                  <span className="text-blue-600 font-medium cursor-pointer hover:text-blue-700 transition-colors">
-                    Upload Images
-                  </span>
-                </div>
-              ) : (
-                <div className="grid grid-cols-2 lg:grid-cols-5 min-w-0 justify-center items-center flex-wrap gap-4  md:gap-2 mb-4">
-                  {imageFields
-                    .filter((img) => img.preview)
-                    .map((src, i) => (
-                      <div key={i} className="relative group">
-                        <div className="relative overflow-hidden rounded-xl bg-gray-100">
-                          <img
-                            src={src.preview}
-                            alt={`Product preview ${i}`}
-                            className="w-full h-32 md:h-48 object-cover transition-transform duration-300 group-hover:scale-105"
-                          />
-                          <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-all duration-300" />
+              <div className="grid grid-cols-2 lg:grid-cols-5 min-w-0 justify-center items-center flex-wrap gap-4  md:gap-2 mb-4">
+                {images
+                  .filter((img) => img.preview)
+                  .map((src, i) => (
+                    <div key={i} className="relative group">
+                      <div className="relative overflow-hidden rounded-xl bg-gray-100">
+                        <img
+                          src={src.preview}
+                          alt={`Product preview ${i}`}
+                          className="w-full h-32 md:h-48 object-cover transition-transform duration-300 group-hover:scale-105"
+                        />
+                        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-all duration-300" />
 
-                          <button
-                            type="button"
-                            onClick={() => removeImages(i)}
-                            className="absolute top-2 right-2 bg-white/90 text-gray-700 rounded-full p-1.5 hover:bg-white hover:text-red-600 transition-all duration-200 opacity-0 group-hover:opacity-100 shadow-lg"
-                          >
-                            <X size={14} />
+                        <button
+                          type="button"
+                          onClick={() => removeImages(i)}
+                          className="absolute top-2 right-2 bg-white/90 text-gray-700 rounded-full p-1.5 hover:bg-white hover:text-red-600 transition-all duration-200 opacity-0 group-hover:opacity-100 shadow-lg"
+                        >
+                          <X size={14} />
+                        </button>
+
+                        <div className="absolute bottom-2 left-2">
+                          <button className="bg-black/80 text-white text-xs px-3 py-1.5 rounded-lg hover:bg-black transition-colors duration-200 backdrop-blur-sm">
+                            Edit Cover
                           </button>
-
-                          <div className="absolute bottom-2 left-2">
-                            <button className="bg-black/80 text-white text-xs px-3 py-1.5 rounded-lg hover:bg-black transition-colors duration-200 backdrop-blur-sm">
-                              Edit Cover
-                            </button>
-                          </div>
-
-                          {useonSubmit.isPending && (
-                            <div className="absolute inset-0 bg-black/50 flex items-center justify-center rounded-xl backdrop-blur-sm">
-                              <div className="w-8 h-8 border-3 border-white border-t rounded-full animate-spin"></div>
-                            </div>
-                          )}
                         </div>
+
+                        {useonSubmit.isPending && (
+                          <div className="absolute inset-0 bg-black/50 flex items-center justify-center rounded-xl backdrop-blur-sm">
+                            <div className="w-8 h-8 border-3 border-white border-t rounded-full animate-spin"></div>
+                          </div>
+                        )}
                       </div>
-                    ))}
-                </div>
-              )}
+                    </div>
+                  ))}
+              </div>
 
               {/* Input Upload amélioré */}
+              <div className="text-center">
+                {images.length < 5 && (
+                  <div className="flex items-center justify-center my-6">
+                    <label className="w-32 h-28 md:w-32 md:h-44 border-2 border-dashed border-gray-300 rounded-xl flex flex-col items-center justify-center cursor-pointer hover:border-blue-400 hover:bg-blue-50/30 transition-all duration-300 group">
+                      <Upload
+                        className="text-gray-400 group-hover:text-blue-400 mb-2 transition-colors"
+                        size={32}
+                      />
+                      <span className="flex gap-3 items-center text-xs text-gray-500 group-hover:text-blue-600 transition-colors">
+                        Upload Image {5 - images.length}
+                      </span>
+                      <input
+                        hidden={isSubmitting}
+                        type="file"
+                        name="picture"
+                        multiple
+                        onChange={handleUploadImage}
+                        className="hidden"
+                        accept="image/*"
+                      />
+                    </label>
+                  </div>
+                )}
 
-              {images.length < 5 && (
-                <div className="flex items-center justify-center my-6">
-                  <label className="w-32 h-28 md:w-32 md:h-44 border-2 border-dashed border-gray-300 rounded-xl flex flex-col items-center justify-center cursor-pointer hover:border-blue-400 hover:bg-blue-50/30 transition-all duration-300 group">
-                    <Upload
-                      className="text-gray-400 group-hover:text-blue-400 mb-2 transition-colors"
-                      size={32}
-                    />
-                    <span className="flex gap-3 items-center text-xs text-gray-500 group-hover:text-blue-600 transition-colors">
-                      Upload Image {5 - images.length}
-                    </span>
-                    <input
-                      hidden={isSubmitting}
-                      type="file"
-                      name="picture"
-                      multiple
-                      onChange={handleUploadImage}
-                      className="hidden"
-                      accept="image/*"
-                    />
-                    {errors.images?.message && (
-                      <p className="text-center font-medium text-sm text-red-500 bg-red-50 py-2 px-4 rounded-lg">
-                        {errors.images.message}
-                      </p>
-                    )}
-                  </label>
-                </div>
-              )}
+                {errors.images?.message && (
+                  <p className="text-center font-medium text-sm text-red-500 bg-red-50 py-2 px-4 rounded-lg">
+                    {errors.images.message}
+                  </p>
+                )}
+              </div>
             </div>
 
             {/* Form Fields améliorés */}
@@ -444,7 +436,7 @@ export const ProductUploadForm = ({ onclose }) => {
                     name="clotheName"
                     {...register("clotheName")}
                     placeholder="Enter product name"
-                    className="w-full px-0 py-3 border-0 border-b-2 border-gray-200 focus:border-blue-500 focus:ring-0 text-sm placeholder-gray-400 transition-all duration-300 bg-transparent"
+                    className="w-full outline-none  px-0 py-3 border-0 border-b-2 border-gray-200 focus:border-blue-500 focus:ring-0 text-sm placeholder-gray-400 transition-all duration-300 bg-transparent"
                   />
                   {errors.clotheName && (
                     <p className="font-medium text-sm text-red-500 mt-2 bg-red-50 py-1 px-3 rounded-lg">
@@ -462,7 +454,7 @@ export const ProductUploadForm = ({ onclose }) => {
                     name="title"
                     {...register("title")}
                     placeholder="Enter product title"
-                    className="w-full px-0 py-3 border-0 border-b-2 border-gray-200 focus:border-blue-500 focus:ring-0 text-sm placeholder-gray-400 transition-all duration-300"
+                    className="w-full outline-none  px-0 py-3 border-0 border-b-2 border-gray-200 focus:border-blue-500 focus:ring-0 text-sm placeholder-gray-400 transition-all duration-300"
                   />
                   {errors.title && (
                     <p className="font-medium text-sm text-red-500 mt-2 bg-red-50 py-1 px-3 rounded-lg">
@@ -480,7 +472,7 @@ export const ProductUploadForm = ({ onclose }) => {
                     {...register("description")}
                     name="description"
                     placeholder="Write product description and add hashtags"
-                    className="w-full px-0 py-3 border-0 border-b-2 border-gray-200 focus:border-blue-500 focus:ring-0 text-sm placeholder-gray-400 transition-all duration-300"
+                    className="w-full px-0 py-3 outline-none focus:border-blue-500 border-0 border-b-2 border-gray-200  focus:ring-0 text-sm placeholder-gray-400 transition-all duration-300"
                   />
                   {errors.description && (
                     <p className="font-medium text-sm text-red-500 mt-2 bg-red-50 py-1 px-3 rounded-lg">
@@ -523,25 +515,40 @@ export const ProductUploadForm = ({ onclose }) => {
                 </div>
 
                 <div className="group">
-                  <label className="block text-sm font-semibold text-gray-700 mb-3">
+                  <label
+                    htmlFor="category"
+                    className="block text-sm font-medium text-gray-700 mb-2"
+                  >
                     Category
                   </label>
-                  <select
-                    name="category"
-                    {...register("category")}
-                    className="w-full px-0 py-3 border-0 border-b-2 border-gray-200 focus:border-blue-500 focus:ring-0 text-sm text-gray-600 hover:text-gray-900 transition-all duration-300 appearance-none bg-transparent"
-                  >
-                    <option value="" disabled>
-                      SEARCH CATEGORY
-                    </option>
-                    <option value="men">Men</option>
-                    <option value="women">Women</option>
-                    <option value="menAccessories">Men Accessories</option>
-                    <option value="womenAccessories">Women Accessories</option>
-                    <option value="discount">Discount</option>
-                  </select>
+
+                  <div className="relative">
+                    <select
+                      id="category"
+                      name="category"
+                      {...register("category")}
+                      className="w-full px-3 py-2 appearance-none text-sm text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200"
+                    >
+                      <option value="" disabled>
+                        Select a category
+                      </option>
+                      <option value="men">Men</option>
+                      <option value="women">Women</option>
+                      <option value="menAccessories">Men Accessories</option>
+                      <option value="womenAccessories">
+                        Women Accessories
+                      </option>
+                      <option value="discount">Discount</option>
+                    </select>
+
+                    {/* Icône flèche personnalisée */}
+                    <span className="absolute inset-y-0 right-3 flex items-center pointer-events-none text-gray-400">
+                      ▼
+                    </span>
+                  </div>
+
                   {errors.category?.message && (
-                    <p className="font-medium text-sm text-red-500 mt-2 bg-red-50 py-1 px-3 rounded-lg">
+                    <p className="mt-2 text-sm text-red-600 bg-red-50 px-3 py-1 rounded-md">
                       {errors.category.message}
                     </p>
                   )}
@@ -559,7 +566,7 @@ export const ProductUploadForm = ({ onclose }) => {
                     name="price"
                     {...register("price")}
                     placeholder="Fill price"
-                    className="w-full px-0 py-3 border-0 border-b-2 border-gray-200 focus:border-blue-500 focus:ring-0 text-sm placeholder-gray-400 transition-all duration-300"
+                    className="w-full outline-none  px-0 py-3 border-0 border-b-2 border-gray-200 focus:border-blue-500 focus:ring-0 text-sm placeholder-gray-400 transition-all duration-300"
                   />
                   {errors.price && (
                     <p className="font-medium text-sm text-red-500 mt-2 bg-red-50 py-1 px-3 rounded-lg">
@@ -577,7 +584,7 @@ export const ProductUploadForm = ({ onclose }) => {
                     name="discountPrice"
                     {...register("discountPrice")}
                     placeholder="PLEASE ADD PERCENTAGE (%) OFF"
-                    className="w-full px-0 py-3 border-0 border-b-2 border-gray-200 focus:border-blue-500 focus:ring-0 text-sm placeholder-gray-400 transition-all duration-300"
+                    className="w-full  outline-none  px-0 py-3 border-0 border-b-2 border-gray-200 focus:border-blue-500 focus:ring-0 text-sm placeholder-gray-400 transition-all duration-300"
                   />
                   {errors.discountPrice && (
                     <p className="font-medium text-sm text-red-500 mt-2 bg-red-50 py-1 px-3 rounded-lg">
@@ -626,7 +633,7 @@ export const ProductUploadForm = ({ onclose }) => {
                       {...register("rate")}
                       name="rate"
                       placeholder="Enter rate, e.g. 2"
-                      className="w-full py-3 px-2 border-0 border-b-2 border-gray-200 focus:border-blue-500 focus:ring-0 text-sm placeholder-gray-400 transition-all duration-300"
+                      className="w-full outline-none  py-3 px-2 border-0 border-b-2 border-gray-200 focus:border-blue-500 focus:ring-0 text-sm placeholder-gray-400 transition-all duration-300"
                     />
                     {errors.rate && (
                       <p className="font-medium text-sm text-red-500 mt-2 bg-red-50 py-1 px-3 rounded-lg">
@@ -643,7 +650,7 @@ export const ProductUploadForm = ({ onclose }) => {
                       name="quantity"
                       {...register("quantity")}
                       placeholder="Enter available product quantity"
-                      className="w-full px-2 py-3 border-0 border-b-2 border-gray-200 focus:border-blue-500 focus:ring-0 text-sm placeholder-gray-400 transition-all duration-300"
+                      className="w-full outline-none  px-2 py-3 border-0 border-b-2 border-gray-200 focus:border-blue-500 focus:ring-0 text-sm placeholder-gray-400 transition-all duration-300"
                     />
                     {errors.quantity && (
                       <p className="font-medium text-sm text-red-500 mt-2 bg-red-50 py-1 px-3 rounded-lg">
@@ -672,7 +679,7 @@ export const ProductUploadForm = ({ onclose }) => {
                           }
                           getOptionValue={(option) => option.value}
                           getOptionLabel={(option) => option.label}
-                          className="react-select-container"
+                          className="react-select-container outline-none "
                           classNamePrefix="react-select"
                         />
                         {errors.tags && (
@@ -699,7 +706,7 @@ export const ProductUploadForm = ({ onclose }) => {
                         placeholder="Enter brand name..."
                         value={field.value}
                         onChange={(selected) => field.onChange(selected)}
-                        className="react-select-container"
+                        className="react-select-container outline-none "
                         classNamePrefix="react-select"
                       />
                     )}
