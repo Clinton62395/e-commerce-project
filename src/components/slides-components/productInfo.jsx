@@ -70,10 +70,21 @@ export const ProductDetails = () => {
     staleTime: 1000 * 60 * 5,
   });
 
-  // console.log("Product details:", product);
-  // console.log("Product ID:", product._id);
-  // console.log("Loading state:", isPending);
-  // console.log("Error state:", error);
+  // handle share button
+
+  const handleShare = () => {
+    if (navigator.share && product) {
+      navigator.share({
+        title: "clinton shopping shop",
+        text: `I am going to pay this product for party ${
+          product.title || product.clotheName
+        }`,
+        url: window.location.href,
+      });
+    } else {
+      alert("your browser doest not allowed it ");
+    }
+  };
 
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
@@ -456,7 +467,10 @@ export const ProductDetails = () => {
                   <MessageCircleQuestionMark size={isMobile ? 16 : 18} />
                   Ask a question
                 </Button>
-                <button className="flex gap-2 items-center text-sm hover:text-blue-600 transition-colors">
+                <button
+                  onClick={handleShare}
+                  className="flex gap-2 items-center text-sm hover:text-blue-600 transition-colors"
+                >
                   <Share2 size={isMobile ? 16 : 18} />
                   Share
                 </button>

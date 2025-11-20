@@ -14,7 +14,7 @@ export const defaultLinks = [
 export const shopLinks = [
   { name: "Home", link: "/" },
   { name: "Shop", link: "/shop" },
-  { name: "products", link: "/product-details" },
+  // { name: "products", link: "/product-details" },
 ];
 export const NavLinks = ({ logo = "FASCO", pages = defaultLinks }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
