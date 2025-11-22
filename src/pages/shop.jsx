@@ -71,28 +71,32 @@ export const FashionShop = () => {
 
     console.log("🎯 Animating elements:", elements.length);
 
-    gsap.fromTo(
-      elements,
-      { opacity: 0, y: 50 },
-      {
-        opacity: 1,
-        y: 0,
-        duration: 1,
-        stagger: 0.3,
-        ease: "power2.out",
-        clearProps: "all",
-        scrollTrigger: {
-          trigger: sectionRef.current,
-          start: "top 90%",
-          end: "bottom 10%",
-          scrub: 1,
-        },
-      }
-    );
+    const ctx = gsap.context(() => {
+      gsap.fromTo(
+        elements,
+        { opacity: 0, y: 50 },
+        {
+          opacity: 1,
+          y: 0,
+          duration: 1,
+          stagger: 0.3,
+          ease: "power2.out",
+          scrollTrigger: {
+            trigger: sectionRef.current,
+            start: "top 80%",
+            end: "bottom 20%",
+            scrub: 1,
+            markers: false, //  Désactiver en production
+          },
+        }
+      );
+    }, sectionRef);
+
+
     return () => {
       ScrollTrigger.getAll().forEach((trigger) => trigger.kill());
     };
-  }, []);
+  }, [data.length]);
 
   const [show, setShow] = useState({
     size: true,
