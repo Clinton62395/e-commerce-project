@@ -61,10 +61,15 @@ export const FashionShop = () => {
 
   console.log("product from shop==>>", data);
   const sectionRef = useRef(null);
+
   useEffect(() => {
+    if (!sectionRef.current || !sectionRef.current.querySelectorAll) return;
+
     const elements =
       sectionRef.current?.querySelectorAll(".scroll-image") || [];
     if (elements.length === 0) return;
+
+    console.log("🎯 Animating elements:", elements.length);
 
     gsap.fromTo(
       elements,
