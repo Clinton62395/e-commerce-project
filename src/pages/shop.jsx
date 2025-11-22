@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
   ChevronRight,
   ChevronDown,
@@ -32,33 +32,39 @@ export const FashionShop = () => {
     staleTime: 1000 * 60 * 5,
   });
 
-  const colors = [
-    ...new Set(
-      data.flatMap((item) => {
-        if (Array.isArray(item.color)) {
-          return item.color;
-        }
-        if (typeof item.color === "string") {
-          return [item.color]; // on garde la string entière
-        }
-        return [];
-      })
-    ),
-  ];
-  const tags = [...new Set(data.flatMap((item) => item.tags || []))];
-  const brands = [...new Set(data.flatMap((item) => item.brands || []))];
-  const sizes = [...new Set(data.flatMap((item) => item.size || []))];
-  const prices = [...new Set(data.flatMap((item) => item.price || []))];
-  const collections = [...new Set(data.flatMap((item) => item.category || []))];
+  const filtaData = useMemo(() => {
+    const colors = [
+      ...new Set(
+        data.flatMap((item) => {
+          if (Array.isArray(item.color)) {
+            return item.color;
+          }
+          if (typeof item.color === "string") {
+            return [item.color]; // on garde la string entière
+          }
+          return [];
+        })
+      ),
+    ];
+    const tags = [...new Set(data.flatMap((item) => item.tags || []))];
+    const brands = [...new Set(data.flatMap((item) => item.brands || []))];
+    const sizes = [...new Set(data.flatMap((item) => item.size || []))];
+    const prices = [...new Set(data.flatMap((item) => item.price || []))];
+    const collections = [
+      ...new Set(data.flatMap((item) => item.category || [])),
+    ];
 
-  console.log("les valeur extraites de data colors", colors);
-  console.log("les valeur extraites de data tags", tags);
-  console.log("les valeur extraites de data brands", brands);
-  console.log("les valeur extraites de data sizes", sizes);
-  console.log("les valeur extraites de data prices", prices);
-  console.log("les valeur extraites de data category", collections);
+    return { tags, brands, sizes, prices, collections, colors };
+  }, [data]);
 
-  console.log("product from shop==>>", data);
+  // console.log("les valeur extraites de data colors", colors);
+  // console.log("les valeur extraites de data tags", tags);
+  // console.log("les valeur extraites de data brands", brands);
+  // console.log("les valeur extraites de data sizes", sizes);
+  // console.log("les valeur extraites de data prices", prices);
+  // console.log("les valeur extraites de data category", collections);
+
+  // console.log("product from shop==>>", data);
 
   const [show, setShow] = useState({
     size: true,
@@ -255,7 +261,7 @@ export const FashionShop = () => {
                       transition={{ duration: 0.3 }}
                       className="px-4 pb-4 pt-2 border-t border-gray-100 flex flex-wrap gap-2"
                     >
-                      {[...new Set(sizes)].map((size) => (
+                      {[...new Set(filtaData.sizes)].map((size) => (
                         <motion.button
                           key={size}
                           whileHover={{ scale: 1.05 }}
@@ -302,7 +308,7 @@ export const FashionShop = () => {
                       transition={{ duration: 0.3 }}
                       className="px-4 pb-4 pt-2 border-t border-gray-100 grid grid-cols-7 gap-2"
                     >
-                      {[...new Set(colors)].map((color) => (
+                      {[...new Set(filtaData.colors)].map((color) => (
                         <motion.button
                           key={color}
                           whileHover={{ scale: 1.1 }}
@@ -348,10 +354,9 @@ export const FashionShop = () => {
                       transition={{ duration: 0.3 }}
                       className="px-4 pb-4 pt-2 border-t border-gray-100 space-y-2"
                     >
-                      {[...new Set(prices)].map((price) => (
+                      {[...new Set(filtaData.prices)].map((price) => (
                         <motion.button
                           key={price}
-                          whileHover={{ backgroundColor: "rgba(0,0,0,0.05)" }}
                           whileTap={{ scale: 0.98 }}
                           onClick={() => toggleFilter("price", price)}
                           className={`flex justify-between items-center w-full text-left px-3 py-2 rounded-md text-sm transition-colors ${
@@ -375,7 +380,6 @@ export const FashionShop = () => {
                 className="bg-white rounded-lg border border-gray-200 overflow-hidden"
               >
                 <motion.button
-                  whileHover={{ backgroundColor: "rgba(0,0,0,0.02)" }}
                   whileTap={{ scale: 0.995 }}
                   onClick={() => toggleSwitch("brand")}
                   className="w-full flex items-center justify-between p-4 transition-colors"
@@ -396,10 +400,9 @@ export const FashionShop = () => {
                       transition={{ duration: 0.3 }}
                       className="px-4 pb-4 pt-2 border-t border-gray-100 space-y-2"
                     >
-                      {[...new Set(brands)].map((brand) => (
+                      {[...new Set(filtaData.brands)].map((brand) => (
                         <motion.button
                           key={brand}
-                          whileHover={{ backgroundColor: "rgba(0,0,0,0.05)" }}
                           whileTap={{ scale: 0.98 }}
                           onClick={() => toggleFilter("brand", brand)}
                           className={`w-full text-left px-3 py-2 rounded-md text-sm transition-colors ${
@@ -422,7 +425,6 @@ export const FashionShop = () => {
                 className="bg-white rounded-lg border border-gray-200 overflow-hidden"
               >
                 <motion.button
-                  whileHover={{ backgroundColor: "rgba(0,0,0,0.02)" }}
                   whileTap={{ scale: 0.995 }}
                   onClick={() => toggleSwitch("collection")}
                   className="w-full flex items-center justify-between p-4 transition-colors"
@@ -445,10 +447,9 @@ export const FashionShop = () => {
                       transition={{ duration: 0.3 }}
                       className="px-4 pb-4 pt-2 border-t border-gray-100 space-y-2"
                     >
-                      {collections.map((col) => (
+                      {filtaData.collections.map((col) => (
                         <motion.button
                           key={col}
-                          whileHover={{ backgroundColor: "rgba(0,0,0,0.05)" }}
                           whileTap={{ scale: 0.98 }}
                           onClick={() => toggleFilter("collection", col)}
                           className={`w-full text-left px-3 py-2 rounded-md text-sm transition-colors ${
@@ -471,7 +472,6 @@ export const FashionShop = () => {
                 className="bg-white rounded-lg border border-gray-200 overflow-hidden"
               >
                 <motion.button
-                  whileHover={{ backgroundColor: "rgba(0,0,0,0.02)" }}
                   whileTap={{ scale: 0.995 }}
                   onClick={() => toggleSwitch("tag")}
                   className="w-full flex items-center justify-between p-4 transition-colors"
@@ -492,7 +492,7 @@ export const FashionShop = () => {
                       transition={{ duration: 0.3 }}
                       className="px-4 pb-4 pt-2 border-t border-gray-100 flex flex-wrap gap-2"
                     >
-                      {[...new Set(tags)].map((tag) => (
+                      {[...new Set(filtaData.tags)].map((tag) => (
                         <motion.button
                           key={tag}
                           whileHover={{ scale: 1.05 }}
