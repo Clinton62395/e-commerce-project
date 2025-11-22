@@ -5,7 +5,7 @@ import { Star } from "lucide-react";
 import StarIcon from "@mui/icons-material/Star";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-
+import { LoadingSqueleton } from "../LoadingSqueleton";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -76,11 +76,7 @@ export const MenAccessories = () => {
   };
 
   if (isLoading) {
-    return (
-      <div className="bg-black/90 flex items-center justify-center min-h-[24vh] overflow-hidden">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-200"></div>
-      </div>
-    );
+    return <LoadingSqueleton />;
   }
 
   if (isError) {

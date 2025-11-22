@@ -3,6 +3,7 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useProductsByCategory } from "../../api/Product.API";
 import { Link } from "react-router-dom";
+import { LoadingSqueleton } from "../LoadingSqueleton";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -108,13 +109,8 @@ export const WomenFashion = () => {
   };
 
   if (isLoading) {
-    return (
-      <div className="bg-black/90 flex items-center justify-center min-h-[24vh] overflow-hidden">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-200"></div>
-      </div>
-    );
+    return <LoadingSqueleton />;
   }
-
   if (isError) {
     return (
       <div className="text-center py-8">

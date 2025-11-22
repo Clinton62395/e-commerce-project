@@ -6,6 +6,7 @@ import { Link } from "react-router-dom";
 import StarIcon from "@mui/icons-material/Star";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { LoadingSqueleton } from "../LoadingSqueleton";
 gsap.registerPlugin(ScrollTrigger);
 
 export const MenFashion = () => {
@@ -71,11 +72,7 @@ export const MenFashion = () => {
   };
 
   if (isLoading) {
-    return (
-      <div className="bg-black/90 flex items-center justify-center min-h-[24vh] overflow-hidden">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-200"></div>
-      </div>
-    );
+    return <LoadingSqueleton />;
   }
 
   if (isError) {
@@ -122,15 +119,15 @@ export const MenFashion = () => {
                   <img
                     ref={(el) => (imageRefs.current[index] = el)}
                     src={
-                      product.picture?.[0]?.url || 
-                      product.mainImag?.url || 
+                      product.picture?.[0]?.url ||
+                      product.mainImag?.url ||
                       "/placeholder-image.jpg"
                     }
                     alt={product.clotheName}
                     className="scroll-image w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                   />
                 </Link>
-                
+
                 {/* ✅ Overlay effet hover */}
                 <div className="absolute inset-0 bg-black opacity-0 group-hover:opacity-10 transition-opacity duration-200 rounded-lg pointer-events-none"></div>
               </div>
@@ -159,7 +156,7 @@ export const MenFashion = () => {
                 <h3 className="font-bold text-lg text-gray-900 line-clamp-1">
                   {product.clotheName}
                 </h3>
-                
+
                 <p className="text-gray-600 text-sm line-clamp-2">
                   {product.description}
                 </p>
@@ -169,7 +166,10 @@ export const MenFashion = () => {
                     {[...Array(5)].map((_, i) => (
                       <span key={i}>
                         {i < Math.floor(product.rate || 0) ? (
-                          <StarIcon className="text-yellow-500" fontSize="small" />
+                          <StarIcon
+                            className="text-yellow-500"
+                            fontSize="small"
+                          />
                         ) : (
                           <Star size={16} className="text-gray-300" />
                         )}
@@ -179,13 +179,13 @@ export const MenFashion = () => {
                       ({product.rate || 0})
                     </span>
                   </div>
-                  
+
                   <div className="text-right">
                     <span className="font-bold text-lg text-gray-900 block">
-                      {product.discountPrice 
+                      {product.discountPrice
                         ? product.discountPrice.toLocaleString()
-                        : product.price?.toLocaleString()
-                      } NGN
+                        : product.price?.toLocaleString()}{" "}
+                      NGN
                     </span>
                     {product.discountPrice && product.price && (
                       <span className="text-sm text-gray-500 line-through">
@@ -199,24 +199,27 @@ export const MenFashion = () => {
                 {product.color && (
                   <div className="flex gap-2 mt-2">
                     {Array.isArray(product.color) ? (
-                      product.color.slice(0, 3).map((color, i) => (
-                        <div
-                          key={i}
-                          className="w-6 h-6 rounded-full border border-gray-300"
-                          style={{ backgroundColor: color }}
-                        />
-                      ))
+                      product.color
+                        .slice(0, 3)
+                        .map((color, i) => (
+                          <div
+                            key={i}
+                            className="w-6 h-6 rounded-full border border-gray-300"
+                            style={{ backgroundColor: color }}
+                          />
+                        ))
                     ) : (
                       <div
                         className="w-6 h-6 rounded-full border border-gray-300"
                         style={{ backgroundColor: product.color }}
                       />
                     )}
-                    {Array.isArray(product.color) && product.color.length > 3 && (
-                      <div className="text-xs text-gray-500 flex items-center">
-                        +{product.color.length - 3}
-                      </div>
-                    )}
+                    {Array.isArray(product.color) &&
+                      product.color.length > 3 && (
+                        <div className="text-xs text-gray-500 flex items-center">
+                          +{product.color.length - 3}
+                        </div>
+                      )}
                   </div>
                 )}
               </div>
