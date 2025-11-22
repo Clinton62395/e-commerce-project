@@ -294,7 +294,7 @@ export const FashionShop = () => {
                   )}
                 </motion.button>
                 <AnimatePresence>
-                  {show.colors && (
+                  {show.color && (
                     <motion.div
                       initial={{ opacity: 0, height: 0 }}
                       animate={{ opacity: 1, height: "auto" }}
@@ -333,14 +333,14 @@ export const FashionShop = () => {
                   className="w-full flex items-center justify-between p-4 transition-colors"
                 >
                   <span className="font-semibold text-gray-900">Price</span>
-                  {show.prices ? (
+                  {show.price ? (
                     <ChevronUp size={18} />
                   ) : (
                     <ChevronDown size={18} />
                   )}
                 </motion.button>
                 <AnimatePresence>
-                  {show.prices && (
+                  {show.price && (
                     <motion.div
                       initial={{ opacity: 0, height: 0 }}
                       animate={{ opacity: 1, height: "auto" }}
@@ -381,14 +381,14 @@ export const FashionShop = () => {
                   className="w-full flex items-center justify-between p-4 transition-colors"
                 >
                   <span className="font-semibold text-gray-900">Brands</span>
-                  {show.brands ? (
+                  {show.brand ? (
                     <ChevronUp size={18} />
                   ) : (
                     <ChevronDown size={18} />
                   )}
                 </motion.button>
                 <AnimatePresence>
-                  {show.brands && (
+                  {show.brand && (
                     <motion.div
                       initial={{ opacity: 0, height: 0 }}
                       animate={{ opacity: 1, height: "auto" }}
@@ -477,14 +477,14 @@ export const FashionShop = () => {
                   className="w-full flex items-center justify-between p-4 transition-colors"
                 >
                   <span className="font-semibold text-gray-900">Tags</span>
-                  {show.tags ? (
+                  {show.tag ? (
                     <ChevronUp size={18} />
                   ) : (
                     <ChevronDown size={18} />
                   )}
                 </motion.button>
                 <AnimatePresence>
-                  {show.tags && (
+                  {show.tag && (
                     <motion.div
                       initial={{ opacity: 0, height: 0 }}
                       animate={{ opacity: 1, height: "auto" }}
