@@ -19,6 +19,7 @@ import gsap from "gsap";
 import { Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { getProduct } from "../api/Product.API";
+import { FashionShopSkeleton } from "../components/ShopSkeleton";
 gsap.registerPlugin(ScrollTrigger);
 
 export const FashionShop = () => {
@@ -192,11 +193,7 @@ export const FashionShop = () => {
   };
 
   if (isLoading) {
-    return (
-      <div className="bg-black/90 flex items-center justify-center min-h-screen  overflow-hidden">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-200"></div>
-      </div>
-    );
+    return <FashionShopSkeleton />;
   }
 
   if (isError) {
