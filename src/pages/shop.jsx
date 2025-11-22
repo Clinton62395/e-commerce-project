@@ -329,7 +329,7 @@ export const FashionShop = () => {
                 <motion.button
                   whileHover={{ backgroundColor: "rgba(0,0,0,0.02)" }}
                   whileTap={{ scale: 0.995 }}
-                  onClick={() => toggleSwitch("prices")}
+                  onClick={() => toggleSwitch("price")}
                   className="w-full flex items-center justify-between p-4 transition-colors"
                 >
                   <span className="font-semibold text-gray-900">Price</span>
@@ -377,7 +377,7 @@ export const FashionShop = () => {
                 <motion.button
                   whileHover={{ backgroundColor: "rgba(0,0,0,0.02)" }}
                   whileTap={{ scale: 0.995 }}
-                  onClick={() => toggleSwitch("brands")}
+                  onClick={() => toggleSwitch("brand")}
                   className="w-full flex items-center justify-between p-4 transition-colors"
                 >
                   <span className="font-semibold text-gray-900">Brands</span>
@@ -473,7 +473,7 @@ export const FashionShop = () => {
                 <motion.button
                   whileHover={{ backgroundColor: "rgba(0,0,0,0.02)" }}
                   whileTap={{ scale: 0.995 }}
-                  onClick={() => toggleSwitch("tags")}
+                  onClick={() => toggleSwitch("tag")}
                   className="w-full flex items-center justify-between p-4 transition-colors"
                 >
                   <span className="font-semibold text-gray-900">Tags</span>
