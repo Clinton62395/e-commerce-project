@@ -258,23 +258,21 @@ export const FashionShop = () => {
                 </button>
                 {show.size && (
                   <div className="px-4 pb-4 pt-2 border-t border-gray-100 flex flex-wrap gap-2">
-                    {
-                      new Set(
-                        [...sizes].map((size) => (
-                          <button
-                            key={size}
-                            onClick={() => toggleFilter("size", size)}
-                            className={`px-3 py-2 rounded-md text-sm font-medium transition-all ${
-                              activeFilters.size === size
-                                ? "bg-gray-900 text-white"
-                                : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                            }`}
-                          >
-                            {size}
-                          </button>
-                        ))
-                      )
-                    }
+                    {...new Set(
+                      [sizes].map((size) => (
+                        <button
+                          key={size}
+                          onClick={() => toggleFilter("size", size)}
+                          className={`px-3 py-2 rounded-md text-sm font-medium transition-all ${
+                            activeFilters.size === size
+                              ? "bg-gray-900 text-white"
+                              : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                          }`}
+                        >
+                          {size}
+                        </button>
+                      ))
+                    )}
                   </div>
                 )}
               </div>
@@ -294,22 +292,20 @@ export const FashionShop = () => {
                 </button>
                 {show.color && (
                   <div className="px-4 pb-4 pt-2 border-t border-gray-100 grid grid-cols-7 gap-2">
-                    {
-                      new Set(
-                        [...colors].map((color, i) => (
-                          <button
-                            style={{ backgroundColor: color }}
-                            key={`${color}-${i}`}
-                            onClick={() => toggleFilter("color", color)}
-                            className={`w-7 h-7 rounded-full transition-all flex gap-2 items-center flex-wrap ${
-                              activeFilters.color === color
-                                ? "ring-2 ring-offset-2 ring-gray-900"
-                                : "hover:ring-2 hover:ring-offset-1 hover:ring-gray-400"
-                            }`}
-                          />
-                        ))
-                      )
-                    }
+                    {...new Set(
+                      [colors].map((color, i) => (
+                        <button
+                          style={{ backgroundColor: color }}
+                          key={`${color}-${i}`}
+                          onClick={() => toggleFilter("color", color)}
+                          className={`w-7 h-7 rounded-full transition-all flex gap-2 items-center flex-wrap ${
+                            activeFilters.color === color
+                              ? "ring-2 ring-offset-2 ring-gray-900"
+                              : "hover:ring-2 hover:ring-offset-1 hover:ring-gray-400"
+                          }`}
+                        />
+                      ))
+                    )}
                   </div>
                 )}
               </div>
@@ -329,24 +325,22 @@ export const FashionShop = () => {
                 </button>
                 {show.prices && (
                   <div className="px-4 pb-4 pt-2 border-t border-gray-100 space-y-2">
-                    {
-                      new Set(
-                        [...prices].map((price) => (
-                          <button
-                            key={price}
-                            onClick={() => toggleFilter("price", price)}
-                            className={`flex justify-between items-center w-full text-left px-3 py-2 rounded-md text-sm transition-colors ${
-                              activeFilters.price === price
-                                ? "bg-gray-900 text-white"
-                                : "text-gray-700 hover:bg-gray-100"
-                            }`}
-                          >
-                            <span> {price}</span>
-                            <span>NGN</span>
-                          </button>
-                        ))
-                      )
-                    }
+                    {...new Set(
+                      [prices].map((price) => (
+                        <button
+                          key={price}
+                          onClick={() => toggleFilter("price", price)}
+                          className={`flex justify-between items-center w-full text-left px-3 py-2 rounded-md text-sm transition-colors ${
+                            activeFilters.price === price
+                              ? "bg-gray-900 text-white"
+                              : "text-gray-700 hover:bg-gray-100"
+                          }`}
+                        >
+                          <span> {price}</span>
+                          <span>NGN</span>
+                        </button>
+                      ))
+                    )}
                   </div>
                 )}
               </div>
@@ -366,19 +360,21 @@ export const FashionShop = () => {
                 </button>
                 {show.brands && (
                   <div className="px-4 pb-4 pt-2 border-t border-gray-100 space-y-2">
-                    {brands.map((brand) => (
-                      <button
-                        key={brand}
-                        onClick={() => toggleFilter("brand", brand)}
-                        className={`w-full text-left px-3 py-2 rounded-md text-sm transition-colors ${
-                          activeFilters.brand === brand
-                            ? "bg-gray-900 text-white"
-                            : "text-gray-700 hover:bg-gray-100"
-                        }`}
-                      >
-                        {brand}
-                      </button>
-                    ))}
+                    {...new Set(
+                      [brands].map((brand) => (
+                        <button
+                          key={brand}
+                          onClick={() => toggleFilter("brand", brand)}
+                          className={`w-full text-left px-3 py-2 rounded-md text-sm transition-colors ${
+                            activeFilters.brand === brand
+                              ? "bg-gray-900 text-white"
+                              : "text-gray-700 hover:bg-gray-100"
+                          }`}
+                        >
+                          {brand}
+                        </button>
+                      ))
+                    )}
                   </div>
                 )}
               </div>
@@ -432,23 +428,21 @@ export const FashionShop = () => {
                 </button>
                 {show.tags && (
                   <div className="px-4 pb-4 pt-2 border-t border-gray-100 flex flex-wrap gap-2">
-                    {
-                      new Set(
-                        [...tags].map((tag) => (
-                          <button
-                            key={tag}
-                            onClick={() => toggleFilter("tag", tag)}
-                            className={`px-3 py-1 rounded-full text-xs font-medium transition-all ${
-                              activeFilters.tag === tag
-                                ? "bg-gray-900 text-white"
-                                : "bg-gray-200 text-gray-700 hover:bg-gray-300"
-                            }`}
-                          >
-                            {tag}
-                          </button>
-                        ))
-                      )
-                    }
+                    {...new Set(
+                      [tags].map((tag) => (
+                        <button
+                          key={tag}
+                          onClick={() => toggleFilter("tag", tag)}
+                          className={`px-3 py-1 rounded-full text-xs font-medium transition-all ${
+                            activeFilters.tag === tag
+                              ? "bg-gray-900 text-white"
+                              : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                          }`}
+                        >
+                          {tag}
+                        </button>
+                      ))
+                    )}
                   </div>
                 )}
               </div>
