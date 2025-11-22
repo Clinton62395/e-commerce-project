@@ -258,9 +258,9 @@ export const FashionShop = () => {
                 </button>
                 {show.size && (
                   <div className="px-4 pb-4 pt-2 border-t border-gray-100 flex flex-wrap gap-2">
-                    {[...new Set(sizes)].map((size, i) => (
+                    {[...new Set(sizes)].map((size) => (
                       <button
-                        key={i}
+                        key={size}
                         onClick={() => toggleFilter("size", size)}
                         className={`px-3 py-2 rounded-md text-sm font-medium transition-all ${
                           activeFilters.size === size
@@ -321,9 +321,9 @@ export const FashionShop = () => {
                 </button>
                 {show.prices && (
                   <div className="px-4 pb-4 pt-2 border-t border-gray-100 space-y-2">
-                    {[...new Set(prices)].map((price, i) => (
+                    {[...new Set(prices)].map((price) => (
                       <button
-                        key={i}
+                        key={price}
                         onClick={() => toggleFilter("price", price)}
                         className={`flex justify-between items-center w-full text-left px-3 py-2 rounded-md text-sm transition-colors ${
                           activeFilters.price === price
@@ -354,9 +354,9 @@ export const FashionShop = () => {
                 </button>
                 {show.brands && (
                   <div className="px-4 pb-4 pt-2 border-t border-gray-100 space-y-2">
-                    {[...new Set(brands)].map((brand, i) => (
+                    {[...new Set(brands)].map((brand) => (
                       <button
-                        key={i}
+                        key={brand}
                         onClick={() => toggleFilter("brand", brand)}
                         className={`w-full text-left px-3 py-2 rounded-md text-sm transition-colors ${
                           activeFilters.brand === brand
@@ -388,9 +388,9 @@ export const FashionShop = () => {
                 </button>
                 {show.collection && (
                   <div className="px-4 pb-4 pt-2 border-t border-gray-100 space-y-2">
-                    {collections.map((col, i) => (
+                    {collections.map((col) => (
                       <button
-                        key={i}
+                        key={col}
                         onClick={() => toggleFilter("collection", col)}
                         className={`w-full text-left px-3 py-2 rounded-md text-sm transition-colors ${
                           activeFilters.collection === col
@@ -420,9 +420,9 @@ export const FashionShop = () => {
                 </button>
                 {show.tags && (
                   <div className="px-4 pb-4 pt-2 border-t border-gray-100 flex flex-wrap gap-2">
-                    {[...new Set(tags)].map((tag, i) => (
+                    {[...new Set(tags)].map((tag) => (
                       <button
-                        key={i}
+                        key={tag}
                         onClick={() => toggleFilter("tag", tag)}
                         className={`px-3 py-1 rounded-full text-xs font-medium transition-all ${
                           activeFilters.tag === tag
