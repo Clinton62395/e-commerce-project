@@ -290,10 +290,10 @@ export const FashionShop = () => {
                 </button>
                 {show.color && (
                   <div className="px-4 pb-4 pt-2 border-t border-gray-100 grid grid-cols-7 gap-2">
-                    {[...new Set(colors)].map((color, i) => (
+                    {[...new Set(colors)].map((color) => (
                       <button
                         style={{ backgroundColor: color }}
-                        key={`${color}-${i}`}
+                        key={color}
                         onClick={() => toggleFilter("color", color)}
                         className={`w-7 h-7 rounded-full transition-all flex gap-2 items-center flex-wrap ${
                           activeFilters.color === color
