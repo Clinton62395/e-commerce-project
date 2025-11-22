@@ -1,3 +1,6 @@
+import { Percent } from "lucide-react";
+import { Link } from "react-router-dom";
+
 export const DiscountDeals = () => {
   return (
     <div className="container mx-auto p-4 space-y-8">
@@ -5,7 +8,7 @@ export const DiscountDeals = () => {
 
       <div className="bg-gradient-to-r from-orange-50 to-red-50 rounded-2xl p-8 text-center border border-orange-100">
         <div className="w-20 h-20 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-4">
-          <Tag className="text-orange-500" size={32} />
+          <Percent className="text-orange-500" size={32} />
         </div>
         <h2 className="text-2xl font-bold text-gray-800 mb-2">
           Big Sale Coming Soon!
@@ -23,9 +26,12 @@ export const DiscountDeals = () => {
             <span className="text-xs text-gray-500 block">Hours</span>
           </div>
         </div>
-        <button className="bg-orange-500 text-white px-6 py-2 rounded-lg hover:bg-orange-600">
-          Notify Me
-        </button>
+        <Link
+          to="/shop"
+          className="bg-orange-500 text-white px-6 py-2 rounded-lg hover:bg-orange-600"
+        >
+          Go to the shopping
+        </Link>
       </div>
     </div>
   );
