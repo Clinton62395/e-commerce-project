@@ -13,14 +13,13 @@ import PaginationItem from "@mui/material/PaginationItem";
 import Stack from "@mui/material/Stack";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
-import ScrollTrigger from "gsap/ScrollTrigger";
 
-import gsap from "gsap";
 import { Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { getProduct } from "../api/Product.API";
 import { FashionShopSkeleton } from "../components/ShopSkeleton";
-gsap.registerPlugin(ScrollTrigger);
+
+import { motion, AnimatePresence } from "framer-motion"; // ✅ Remplace GSAP
 
 export const FashionShop = () => {
   const {
@@ -60,51 +59,14 @@ export const FashionShop = () => {
   console.log("les valeur extraites de data category", collections);
 
   console.log("product from shop==>>", data);
-  const sectionRef = useRef(null);
-
-  useEffect(() => {
-    if (!sectionRef.current || !sectionRef.current.querySelectorAll) return;
-
-    const elements =
-      sectionRef.current?.querySelectorAll(".scroll-image") || [];
-    if (elements.length === 0) return;
-
-    console.log("🎯 Animating elements:", elements.length);
-
-    const ctx = gsap.context(() => {
-      gsap.fromTo(
-        elements,
-        { opacity: 0, y: 50 },
-        {
-          opacity: 1,
-          y: 0,
-          duration: 1,
-          stagger: 0.3,
-          ease: "power2.out",
-          scrollTrigger: {
-            trigger: sectionRef.current,
-            start: "top 80%",
-            end: "bottom 20%",
-            scrub: 1,
-            markers: false, //  Désactiver en production
-          },
-        }
-      );
-    }, sectionRef);
-
-
-    return () => {
-      ScrollTrigger.getAll().forEach((trigger) => trigger.kill());
-    };
-  }, [data.length]);
 
   const [show, setShow] = useState({
     size: true,
     color: true,
-    prices: true,
-    brands: true,
+    price: true,
+    brand: true,
     collection: true,
-    tags: true,
+    tag: true,
     BestSelling: true,
   });
 
@@ -214,12 +176,14 @@ export const FashionShop = () => {
   }
 
   return (
-    <div
-      ref={sectionRef}
-      className="min-h-screen bg-gradient-to-r from-gray-50 to-gray-100"
-    >
+    <div className="min-h-screen bg-gradient-to-r from-gray-50 to-gray-100">
       {/* Header */}
-      <div className="bg-white border-b border-gray-100 sticky top-0 z-30 shadow-sm">
+      <motion.div
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className="bg-white border-b border-gray-100 sticky top-0 z-30 shadow-sm"
+      >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex items-center justify-center flex-col gap-2">
             <h3 className="font-bold text-xl text-black">Fashion</h3>
@@ -235,28 +199,45 @@ export const FashionShop = () => {
             </div>
           </div>
         </div>
-      </div>
+      </motion.div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
           {/* Sidebar Filters */}
-          <div className="lg:col-span-1 w-full min-h-screen py-8 lg:pt-0">
-            <div className="sticky top-0 min-h-screen">
+          <motion.div
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.5, delay: 0.1 }}
+            className="lg:col-span-1 w-full min-h-screen py-8 lg:pt-0"
+          >
+            <div className="sticky top-0 min-h-screen space-y-4">
               {/* Clear Filters */}
-              {hasActiveFilters && (
-                <button
-                  onClick={clearFilters}
-                  className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-red-50 hover:bg-red-100 text-red-600 rounded-lg transition-colors text-sm font-medium"
-                >
-                  <X size={16} /> Clear Filters
-                </button>
-              )}
+              <AnimatePresence>
+                {hasActiveFilters && (
+                  <motion.button
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.8 }}
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={clearFilters}
+                    className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-red-50 hover:bg-red-100 text-red-600 rounded-lg transition-colors text-sm font-medium"
+                  >
+                    <X size={16} /> Clear Filters
+                  </motion.button>
+                )}
+              </AnimatePresence>
 
               {/* Size Filter */}
-              <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
-                <button
+              <motion.div
+                layout
+                className="bg-white rounded-lg border border-gray-200 overflow-hidden"
+              >
+                <motion.button
+                  whileHover={{ backgroundColor: "rgba(0,0,0,0.02)" }}
+                  whileTap={{ scale: 0.995 }}
                   onClick={() => toggleSwitch("size")}
-                  className="w-full flex items-center justify-between p-4 hover:bg-gray-50 transition-colors"
+                  className="w-full flex items-center justify-between p-4 transition-colors"
                 >
                   <span className="font-semibold text-gray-900">Size</span>
                   {show.size ? (
@@ -264,31 +245,46 @@ export const FashionShop = () => {
                   ) : (
                     <ChevronDown size={18} />
                   )}
-                </button>
-                {show.size && (
-                  <div className="px-4 pb-4 pt-2 border-t border-gray-100 flex flex-wrap gap-2">
-                    {[...new Set(sizes)].map((size) => (
-                      <button
-                        key={size}
-                        onClick={() => toggleFilter("size", size)}
-                        className={`px-3 py-2 rounded-md text-sm font-medium transition-all ${
-                          activeFilters.size === size
-                            ? "bg-gray-900 text-white"
-                            : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                        }`}
-                      >
-                        {size}
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
+                </motion.button>
+                <AnimatePresence>
+                  {show.size && (
+                    <motion.div
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: "auto" }}
+                      exit={{ opacity: 0, height: 0 }}
+                      transition={{ duration: 0.3 }}
+                      className="px-4 pb-4 pt-2 border-t border-gray-100 flex flex-wrap gap-2"
+                    >
+                      {[...new Set(sizes)].map((size) => (
+                        <motion.button
+                          key={size}
+                          whileHover={{ scale: 1.05 }}
+                          whileTap={{ scale: 0.95 }}
+                          onClick={() => toggleFilter("size", size)}
+                          className={`px-3 py-2 rounded-md text-sm font-medium transition-all ${
+                            activeFilters.size === size
+                              ? "bg-gray-900 text-white"
+                              : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                          }`}
+                        >
+                          {size}
+                        </motion.button>
+                      ))}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </motion.div>
 
               {/* Color Filter */}
-              <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
-                <button
+              <motion.div
+                layout
+                className="bg-white rounded-lg border border-gray-200 overflow-hidden"
+              >
+                <motion.button
+                  whileHover={{ backgroundColor: "rgba(0,0,0,0.02)" }}
+                  whileTap={{ scale: 0.995 }}
                   onClick={() => toggleSwitch("color")}
-                  className="w-full flex items-center justify-between p-4 hover:bg-gray-50 transition-colors"
+                  className="w-full flex items-center justify-between p-4 transition-colors"
                 >
                   <span className="font-semibold text-gray-900">Color</span>
                   {show.color ? (
@@ -296,30 +292,45 @@ export const FashionShop = () => {
                   ) : (
                     <ChevronDown size={18} />
                   )}
-                </button>
-                {show.color && (
-                  <div className="px-4 pb-4 pt-2 border-t border-gray-100 grid grid-cols-7 gap-2">
-                    {[...new Set(colors)].map((color) => (
-                      <button
-                        style={{ backgroundColor: color }}
-                        key={color}
-                        onClick={() => toggleFilter("color", color)}
-                        className={`w-7 h-7 rounded-full transition-all flex gap-2 items-center flex-wrap ${
-                          activeFilters.color === color
-                            ? "ring-2 ring-offset-2 ring-gray-900"
-                            : "hover:ring-2 hover:ring-offset-1 hover:ring-gray-400"
-                        }`}
-                      />
-                    ))}
-                  </div>
-                )}
-              </div>
+                </motion.button>
+                <AnimatePresence>
+                  {show.colors && (
+                    <motion.div
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: "auto" }}
+                      exit={{ opacity: 0, height: 0 }}
+                      transition={{ duration: 0.3 }}
+                      className="px-4 pb-4 pt-2 border-t border-gray-100 grid grid-cols-7 gap-2"
+                    >
+                      {[...new Set(colors)].map((color) => (
+                        <motion.button
+                          key={color}
+                          whileHover={{ scale: 1.1 }}
+                          whileTap={{ scale: 0.9 }}
+                          style={{ backgroundColor: color }}
+                          onClick={() => toggleFilter("color", color)}
+                          className={`w-7 h-7 rounded-full transition-all flex gap-2 items-center flex-wrap ${
+                            activeFilters.color === color
+                              ? "ring-2 ring-offset-2 ring-gray-900"
+                              : "hover:ring-2 hover:ring-offset-1 hover:ring-gray-400"
+                          }`}
+                        />
+                      ))}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </motion.div>
 
               {/* Price Filter */}
-              <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
-                <button
+              <motion.div
+                layout
+                className="bg-white rounded-lg border border-gray-200 overflow-hidden"
+              >
+                <motion.button
+                  whileHover={{ backgroundColor: "rgba(0,0,0,0.02)" }}
+                  whileTap={{ scale: 0.995 }}
                   onClick={() => toggleSwitch("prices")}
-                  className="w-full flex items-center justify-between p-4 hover:bg-gray-50 transition-colors"
+                  className="w-full flex items-center justify-between p-4 transition-colors"
                 >
                   <span className="font-semibold text-gray-900">Price</span>
                   {show.prices ? (
@@ -327,32 +338,47 @@ export const FashionShop = () => {
                   ) : (
                     <ChevronDown size={18} />
                   )}
-                </button>
-                {show.prices && (
-                  <div className="px-4 pb-4 pt-2 border-t border-gray-100 space-y-2">
-                    {[...new Set(prices)].map((price) => (
-                      <button
-                        key={price}
-                        onClick={() => toggleFilter("price", price)}
-                        className={`flex justify-between items-center w-full text-left px-3 py-2 rounded-md text-sm transition-colors ${
-                          activeFilters.price === price
-                            ? "bg-gray-900 text-white"
-                            : "text-gray-700 hover:bg-gray-100"
-                        }`}
-                      >
-                        <span> {price}</span>
-                        <span>NGN</span>
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
+                </motion.button>
+                <AnimatePresence>
+                  {show.prices && (
+                    <motion.div
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: "auto" }}
+                      exit={{ opacity: 0, height: 0 }}
+                      transition={{ duration: 0.3 }}
+                      className="px-4 pb-4 pt-2 border-t border-gray-100 space-y-2"
+                    >
+                      {[...new Set(prices)].map((price) => (
+                        <motion.button
+                          key={price}
+                          whileHover={{ backgroundColor: "rgba(0,0,0,0.05)" }}
+                          whileTap={{ scale: 0.98 }}
+                          onClick={() => toggleFilter("price", price)}
+                          className={`flex justify-between items-center w-full text-left px-3 py-2 rounded-md text-sm transition-colors ${
+                            activeFilters.price === price
+                              ? "bg-gray-900 text-white"
+                              : "text-gray-700 hover:bg-gray-100"
+                          }`}
+                        >
+                          <span>{price}</span>
+                          <span>NGN</span>
+                        </motion.button>
+                      ))}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </motion.div>
 
               {/* Brands Filter */}
-              <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
-                <button
+              <motion.div
+                layout
+                className="bg-white rounded-lg border border-gray-200 overflow-hidden"
+              >
+                <motion.button
+                  whileHover={{ backgroundColor: "rgba(0,0,0,0.02)" }}
+                  whileTap={{ scale: 0.995 }}
                   onClick={() => toggleSwitch("brands")}
-                  className="w-full flex items-center justify-between p-4 hover:bg-gray-50 transition-colors"
+                  className="w-full flex items-center justify-between p-4 transition-colors"
                 >
                   <span className="font-semibold text-gray-900">Brands</span>
                   {show.brands ? (
@@ -360,31 +386,46 @@ export const FashionShop = () => {
                   ) : (
                     <ChevronDown size={18} />
                   )}
-                </button>
-                {show.brands && (
-                  <div className="px-4 pb-4 pt-2 border-t border-gray-100 space-y-2">
-                    {[...new Set(brands)].map((brand) => (
-                      <button
-                        key={brand}
-                        onClick={() => toggleFilter("brand", brand)}
-                        className={`w-full text-left px-3 py-2 rounded-md text-sm transition-colors ${
-                          activeFilters.brand === brand
-                            ? "bg-gray-900 text-white"
-                            : "text-gray-700 hover:bg-gray-100"
-                        }`}
-                      >
-                        {brand}
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
+                </motion.button>
+                <AnimatePresence>
+                  {show.brands && (
+                    <motion.div
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: "auto" }}
+                      exit={{ opacity: 0, height: 0 }}
+                      transition={{ duration: 0.3 }}
+                      className="px-4 pb-4 pt-2 border-t border-gray-100 space-y-2"
+                    >
+                      {[...new Set(brands)].map((brand) => (
+                        <motion.button
+                          key={brand}
+                          whileHover={{ backgroundColor: "rgba(0,0,0,0.05)" }}
+                          whileTap={{ scale: 0.98 }}
+                          onClick={() => toggleFilter("brand", brand)}
+                          className={`w-full text-left px-3 py-2 rounded-md text-sm transition-colors ${
+                            activeFilters.brand === brand
+                              ? "bg-gray-900 text-white"
+                              : "text-gray-700 hover:bg-gray-100"
+                          }`}
+                        >
+                          {brand}
+                        </motion.button>
+                      ))}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </motion.div>
 
               {/* Collections Filter */}
-              <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
-                <button
+              <motion.div
+                layout
+                className="bg-white rounded-lg border border-gray-200 overflow-hidden"
+              >
+                <motion.button
+                  whileHover={{ backgroundColor: "rgba(0,0,0,0.02)" }}
+                  whileTap={{ scale: 0.995 }}
                   onClick={() => toggleSwitch("collection")}
-                  className="w-full flex items-center justify-between p-4 hover:bg-gray-50 transition-colors"
+                  className="w-full flex items-center justify-between p-4 transition-colors"
                 >
                   <span className="font-semibold text-gray-900">
                     Collection
@@ -394,31 +435,46 @@ export const FashionShop = () => {
                   ) : (
                     <ChevronDown size={18} />
                   )}
-                </button>
-                {show.collection && (
-                  <div className="px-4 pb-4 pt-2 border-t border-gray-100 space-y-2">
-                    {collections.map((col) => (
-                      <button
-                        key={col}
-                        onClick={() => toggleFilter("collection", col)}
-                        className={`w-full text-left px-3 py-2 rounded-md text-sm transition-colors ${
-                          activeFilters.collection === col
-                            ? "bg-gray-900 text-white"
-                            : "text-gray-700 hover:bg-gray-100"
-                        }`}
-                      >
-                        {col}
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
+                </motion.button>
+                <AnimatePresence>
+                  {show.collection && (
+                    <motion.div
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: "auto" }}
+                      exit={{ opacity: 0, height: 0 }}
+                      transition={{ duration: 0.3 }}
+                      className="px-4 pb-4 pt-2 border-t border-gray-100 space-y-2"
+                    >
+                      {collections.map((col) => (
+                        <motion.button
+                          key={col}
+                          whileHover={{ backgroundColor: "rgba(0,0,0,0.05)" }}
+                          whileTap={{ scale: 0.98 }}
+                          onClick={() => toggleFilter("collection", col)}
+                          className={`w-full text-left px-3 py-2 rounded-md text-sm transition-colors ${
+                            activeFilters.collection === col
+                              ? "bg-gray-900 text-white"
+                              : "text-gray-700 hover:bg-gray-100"
+                          }`}
+                        >
+                          {col}
+                        </motion.button>
+                      ))}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </motion.div>
 
               {/* Tags Filter */}
-              <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
-                <button
+              <motion.div
+                layout
+                className="bg-white rounded-lg border border-gray-200 overflow-hidden"
+              >
+                <motion.button
+                  whileHover={{ backgroundColor: "rgba(0,0,0,0.02)" }}
+                  whileTap={{ scale: 0.995 }}
                   onClick={() => toggleSwitch("tags")}
-                  className="w-full flex items-center justify-between p-4 hover:bg-gray-50 transition-colors"
+                  className="w-full flex items-center justify-between p-4 transition-colors"
                 >
                   <span className="font-semibold text-gray-900">Tags</span>
                   {show.tags ? (
@@ -426,39 +482,59 @@ export const FashionShop = () => {
                   ) : (
                     <ChevronDown size={18} />
                   )}
-                </button>
-                {show.tags && (
-                  <div className="px-4 pb-4 pt-2 border-t border-gray-100 flex flex-wrap gap-2">
-                    {[...new Set(tags)].map((tag) => (
-                      <button
-                        key={tag}
-                        onClick={() => toggleFilter("tag", tag)}
-                        className={`px-3 py-1 rounded-full text-xs font-medium transition-all ${
-                          activeFilters.tag === tag
-                            ? "bg-gray-900 text-white"
-                            : "bg-gray-200 text-gray-700 hover:bg-gray-300"
-                        }`}
-                      >
-                        {tag}
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
+                </motion.button>
+                <AnimatePresence>
+                  {show.tags && (
+                    <motion.div
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: "auto" }}
+                      exit={{ opacity: 0, height: 0 }}
+                      transition={{ duration: 0.3 }}
+                      className="px-4 pb-4 pt-2 border-t border-gray-100 flex flex-wrap gap-2"
+                    >
+                      {[...new Set(tags)].map((tag) => (
+                        <motion.button
+                          key={tag}
+                          whileHover={{ scale: 1.05 }}
+                          whileTap={{ scale: 0.95 }}
+                          onClick={() => toggleFilter("tag", tag)}
+                          className={`px-3 py-1 rounded-full text-xs font-medium transition-all ${
+                            activeFilters.tag === tag
+                              ? "bg-gray-900 text-white"
+                              : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                          }`}
+                        >
+                          {tag}
+                        </motion.button>
+                      ))}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </motion.div>
             </div>
-          </div>
+          </motion.div>
 
           {/* Main Content */}
-          <div className="lg:col-span-3">
+          <motion.div
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+            className="lg:col-span-3"
+          >
             {/* Controls */}
-            <div className="flex items-center gap-2 justify-between mb-6 w-full">
+            <motion.div
+              layout
+              className="flex items-center gap-2 justify-between mb-6 w-full"
+            >
               <div className="flex items-center gap-3 w-full text-sm font-bold text-gray-700">
                 {show.BestSelling ? (
                   "Best selling"
                 ) : (
                   <p>Showing {currentIndex.length} products</p>
                 )}
-                <button
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
                   onClick={() => toggleSwitch("BestSelling")}
                   className="flex items-center justify-between p-4 hover:bg-gray-50 transition-colors"
                 >
@@ -467,10 +543,15 @@ export const FashionShop = () => {
                   ) : (
                     <ChevronDown size={18} />
                   )}
-                </button>
+                </motion.button>
               </div>
-              <div className="flex gap-2 bg-white rounded-lg p-1 border border-gray-200">
-                <button
+              <motion.div
+                className="flex gap-2 bg-white rounded-lg p-1 border border-gray-200"
+                whileHover={{ scale: 1.02 }}
+              >
+                <motion.button
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.9 }}
                   onClick={() => setLayout("list")}
                   className={`p-2 rounded-md transition-all ${
                     layout === "list"
@@ -479,8 +560,10 @@ export const FashionShop = () => {
                   }`}
                 >
                   <Columns2 size={20} />
-                </button>
-                <button
+                </motion.button>
+                <motion.button
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.9 }}
                   onClick={() => setLayout("grid")}
                   className={`p-2 rounded-md transition-all ${
                     layout === "grid"
@@ -489,39 +572,63 @@ export const FashionShop = () => {
                   }`}
                 >
                   <Rows3 size={20} />
-                </button>
-              </div>
-            </div>
+                </motion.button>
+              </motion.div>
+            </motion.div>
 
-            {/* Products - ADAPTÉ POUR LES DONNÉES API */}
-            {filteredProducts.length === 0 ? (
-              <div className="py-12 col-span-3 text-center">
-                <p className="text-lg font-semibold text-gray-700">
-                  No product match your filters.
-                </p>
-                {hasActiveFilters && (
-                  <div className="mt-4">
-                    <button
-                      onClick={clearFilters}
-                      className="px-4 py-2 bg-gray-900 text-white rounded-md hover:bg-gray-800 transition-colors"
+            {/* Products */}
+            <AnimatePresence mode="wait">
+              {filteredProducts.length === 0 ? (
+                <motion.div
+                  key="no-products"
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.9 }}
+                  className="py-12 col-span-3 text-center"
+                >
+                  <p className="text-lg font-semibold text-gray-700">
+                    No product match your filters.
+                  </p>
+                  {hasActiveFilters && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.2 }}
+                      className="mt-4"
                     >
-                      Delete all filters
-                    </button>
-                  </div>
-                )}
-              </div>
-            ) : (
-              <>
-                <div
+                      <motion.button
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                        onClick={clearFilters}
+                        className="px-4 py-2 bg-gray-900 text-white rounded-md hover:bg-gray-800 transition-colors"
+                      >
+                        Delete all filters
+                      </motion.button>
+                    </motion.div>
+                  )}
+                </motion.div>
+              ) : (
+                <motion.div
+                  key="products-grid"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ staggerChildren: 0.1 }}
                   className={
                     layout === "grid"
                       ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
                       : "space-y-4"
                   }
                 >
-                  {currentIndex.map((product) => (
-                    <div
+                  {currentIndex.map((product, index) => (
+                    <motion.div
                       key={product._id}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.4, delay: index * 0.1 }}
+                      whileHover={{
+                        scale: 1.02,
+                        transition: { duration: 0.2 },
+                      }}
                       className={`group bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-lg transition-all ${
                         layout === "list" ? "flex gap-6 p-4" : ""
                       }`}
@@ -531,23 +638,25 @@ export const FashionShop = () => {
                           layout === "list" ? "flex-shrink-0 w-48" : ""
                         }
                       >
-                        <div
-                          className={`scroll-image relative overflow-hidden bg-gray-100 ${
+                        <motion.div
+                          whileHover={{ scale: 1.05 }}
+                          className={`relative overflow-hidden bg-gray-100 ${
                             layout === "list" ? "h-48 w-48" : "h-64 w-full"
                           }`}
                         >
                           <Link to={`/product-details/${product._id}`}>
-                            {" "}
-                            <img
+                            <motion.img
+                              whileHover={{ scale: 1.1 }}
+                              transition={{ duration: 0.3 }}
                               src={
                                 product.picture?.[0]?.url ||
                                 product.mainImage?.url
                               }
                               alt={product.clotheName || product.title}
-                              className="scroll-image w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                              className="w-full h-full object-cover transition-transform duration-300"
                             />
                           </Link>
-                        </div>
+                        </motion.div>
                       </div>
                       <div
                         className={
@@ -573,22 +682,22 @@ export const FashionShop = () => {
                           )}
                         </div>
 
-                        <div className="flex  justify-between w-full flex-wrap  items-center">
-                          <div className="text-gray-800 text-sm  font-medium">
-                            {" "}
+                        <div className="flex justify-between w-full flex-wrap items-center">
+                          <div className="text-gray-800 text-sm font-medium">
                             qty: {product.quantity || 0} pcs
                           </div>
                           <div className="flex items-center gap-2">
                             {product.color?.map((color, index) => (
-                              <div
-                                className="flex items-center gap-2"
+                              <motion.div
                                 key={index}
+                                whileHover={{ scale: 1.2 }}
+                                className="flex items-center gap-2"
                               >
                                 <div
-                                  className={`w-6 h-6  rounded-full border border-gray-300`}
+                                  className={`w-6 h-6 rounded-full border border-gray-300`}
                                   style={{ backgroundColor: color }}
                                 />
-                              </div>
+                              </motion.div>
                             ))}
                           </div>
                         </div>
@@ -613,36 +722,41 @@ export const FashionShop = () => {
                           </div>
                         )}
                       </div>
-                    </div>
+                    </motion.div>
                   ))}
-                </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
 
-                {/* Pagination */}
-                <div className="flex items-center justify-center gap-2 mt-12">
-                  <Stack spacing={2}>
-                    <Pagination
-                      count={totalPages}
-                      page={page}
-                      onChange={(e, value) => setPage(value)}
-                      renderItem={(item) => (
-                        <PaginationItem
-                          slots={{
-                            previous: ArrowBackIcon,
-                            next: ArrowForwardIcon,
-                          }}
-                          {...item}
-                          size="large"
-                          showFirstButton
-                          showLastButton
-                          color="primary"
-                        />
-                      )}
+            {/* Pagination */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.5 }}
+              className="flex items-center justify-center gap-2 mt-12"
+            >
+              <Stack spacing={2}>
+                <Pagination
+                  count={totalPages}
+                  page={page}
+                  onChange={(e, value) => setPage(value)}
+                  renderItem={(item) => (
+                    <PaginationItem
+                      slots={{
+                        previous: ArrowBackIcon,
+                        next: ArrowForwardIcon,
+                      }}
+                      {...item}
+                      size="large"
+                      showFirstButton
+                      showLastButton
+                      color="primary"
                     />
-                  </Stack>
-                </div>
-              </>
-            )}
-          </div>
+                  )}
+                />
+              </Stack>
+            </motion.div>
+          </motion.div>
         </div>
       </div>
     </div>
